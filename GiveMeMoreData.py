@@ -10,62 +10,123 @@ __description__ = 'Data Generaing Program'
 
 import os
 from os import listdir
-import random
 import copy
-
-import cv2
-import numpy as np
-
-from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
 from module.RandomFunction import *
 
 # set printing resolution of numpy module
 np.set_printoptions(threshold=np.inf)
 
 
+'''*************************************************
+*                                                  *
+*                 global variable                  *
+*                                                  *
+*************************************************'''
 MAIN_PATH = os.getcwd()
-
 Font_Path = ["\\font\\ENGFONT\\","\\font\\ENGFONT\\","\\font\\THFONT\\"]
 Word = ["NUM","EN","TH"]
 
 
-
-
-Save_Path = "D:\\2560\\FRA361_Robot_Studio\\FIBO_project_Module8-9\\Dataset\\Tew\\Augmented_dataset\\"
+SAVE_PATH = MAIN_PATH + "\\dataset\\synthesis\\textfile\\"
 Font_Size = 32
-AUGMOUNT = 50
+AUGMOUNT = 30
 Image_Shape = (64, 32)
 MAGNIFY = [90,110]
 MORPH = [1,5]
 MOVE = [-3,3]
 GAMMA = [10,40]
 
+if not os.path.exists(SAVE_PATH):
+    os.makedirs(SAVE_PATH)
+
+FILENAME = range(0,30)
+FILENAME = list(map(str, FILENAME))
+WORDLIST = ["0","1","2","3","4","5","6","7","8","9",
+            "zero","one","two","three","four","five","six","seven","eight","nine",
+            "ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","เเปด","เก้า"]
+
+def Gennie(font_path,font,wordlist,waitTime=1,start=0):
+
+    '''
+    :param font_path: path to font
+    :param font: font name
+    :param wordlist: word
+    :param waitTime: wait time each frame to show
+    :param start: index of the first word in each class (0 for number, 10 for english word and
+    20 for this word)
+    :return: None
+    example
+            Gennie('c:\font\ENGFONT','bell.ttf',['one','two'],start=0)
+        this function will search for font 'bell' inside directory 'c:\font\ENGFONT' (ENGFONT start at 0), then save two compressed
+    text file of 'one' and 'two' in directory specified by global variable SAVE_PATH.
+    '''
+
+    global FILENAME,SAVE_PATH
+
+    for w in range(0,len(wordlist)):
+        word = wordlist[w]
+        write = ""
+        process = 0
+        finish = len(font)
+        for y in font:
+            if process % (finish//4) == 0:
+                print('WORD:',word,'PROCESS:',process*100.0/finish, 'percent')
+            process += 1
+            img = ipaddr.font_to_image(font_path + y, Font_Size, 0, word)
+
+            plate = ipaddr.Get_Plate2(img)
+            plate = ipaddr.Get_Word2(plate,image_size=Image_Shape)
+            img = np.array(plate[0])
+
+            for i in range(0,AUGMOUNT):
+                image = copy.deepcopy(img)
+                #image = RND_MAGNIFY(image,MAGNIFY)
+                image = RND_MORPH(image,MORPH)
+                #image = RND_MOVE(image,MOVE)
+                image = RND_GAMMA(image,GAMMA)
+                stringy = np.array2string(((image.ravel())).astype(int), max_line_width=Image_Shape[0]*Image_Shape[1]*(AUGMOUNT+2),separator=',')
+                write += stringy[1:-1] + "\n"
+                if i == 0:
+                    cv2.imshow('image',image)
+                    cv2.waitKey(waitTime)
+            if process==len(font)*0.2:
+                open(SAVE_PATH+FILENAME[w+start]+"_"+"test" + '.txt', 'w').close()
+                file = open(SAVE_PATH+FILENAME[w+start] +"_"+"test"+ '.txt', 'a')
+                file.write(write)
+                file.close()
+                write = ""
+            elif process == len(font)*0.4:
+                open(SAVE_PATH+FILENAME[w+start] + "_" + "validate" + '.txt', 'w').close()
+                file = open(SAVE_PATH+ FILENAME[w+start] + "_" + "validate" + '.txt', 'a')
+                file.write(write)
+                file.close()
+                write = ""
+            elif process == len(font)-1:
+                open(SAVE_PATH+FILENAME[w+start] + "_" + "train" + '.txt', 'w').close()
+                file = open(SAVE_PATH+FILENAME[w+start] + "_" + "train"+ '.txt', 'a')
+                file.write(write)
+                file.close()
+
+for i in range(0,len(Font_Path)):
+    # loop through NUM, ENG and THAI
 
 
-wordlist = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "0", "1", "2", "3", "4",
-            "5", "6", "7", "8", "9", "ศูนย์ ", "หนึ่ง ", "สอง ", "สาม ", "สี่ ", "ห้า ", "หก ", "เจ็ด ", "แปด ",
-            "เก้า "]
-filename = {"zero": "zero", "one": "one", "two": "two", "three": "three", "four": "four", "five": "five",
-            "six": "six", "seven": "seven", "eight": "eight", "nine": "nine", "0": "0", "1": "1", "2": "2",
-            "3": "3", "4": "4", "5": "5", "6": "6", "7": "7", "8": "8", "9": "9", "ศูนย์ ": "ZeroTH",
-            "หนึ่ง ": "OneTH", "สอง ": "TwoTH", "สาม ": "ThreeTH", "สี่ ": "FourTH", "ห้า ": "FiveTH",
-            "หก ": "SixTH",
-            "เจ็ด ": "SevenTH", "แปด ": "EightTH", "เก้า ": "NineTH"}
+    font_path = MAIN_PATH+Font_Path[i]
+    word = Word[i]
+    font = [x for x in listdir(font_path) if
+                    ".ttf" in x or ".otf" in x or ".ttc" in x or ".TTF" in x or ".OTF" in x or ".TTC" in x]
+    font =font[:-1]
+    random.shuffle(font)
+
+    if word is "EN":
+        wordlist = WORDLIST[10:20]
+        start = 10
+    elif word is "NUM":
+        wordlist = WORDLIST[0:10]
+        start = 0
+    elif word is "TH":
+        wordlist = WORDLIST[20:]
+        start = 20
 
 
-cap = cv2.VideoCapture(0)
-while(True):
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-
-    # Our operations on the frame come here
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    gray = RND_MAGNIFY(gray,MAGNIFY=[90.0,110.0])
-    # Display the resulting frame
-    cv2.imshow('frame',gray)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# When everything done, release the capture
-cap.release()
-
+    Gennie(font_path,font,wordlist,start=start)
