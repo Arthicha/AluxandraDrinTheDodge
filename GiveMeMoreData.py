@@ -73,7 +73,6 @@ def Gennie(font_path,font,wordlist,waitTime=1,start=0):
                 print('WORD:',word,'PROCESS:',process*100.0/finish, 'percent')
             process += 1
             img = ipaddr.font_to_image(font_path + y, Font_Size, 0, word)
-
             plate = ipaddr.Get_Plate2(img)
             plate = ipaddr.Get_Word2(plate,image_size=Image_Shape)
             img = np.array(plate[0])
