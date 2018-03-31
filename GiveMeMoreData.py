@@ -108,8 +108,6 @@ def Gennie(font_path,font,wordlist,waitTime=1,start=0):
 
 for i in range(0,len(Font_Path)):
     # loop through NUM, ENG and THAI
-
-
     font_path = MAIN_PATH+Font_Path[i]
     word = Word[i]
     font = [x for x in listdir(font_path) if
