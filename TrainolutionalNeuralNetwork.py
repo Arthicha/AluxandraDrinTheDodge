@@ -143,7 +143,7 @@ def accuracyPlot(y,graphName,xLabel,yLabel,saveAs):
 if not os.path.exists(SAVE_PATH):
     os.makedirs(SAVE_PATH)
 # read data from compress text file
-test,train,validate = getData(PATH+'\\dataset\\synthesis\\textfile',N_CLASS,IMAGE_SIZE,n=-1,readList=[1],ttv=[1,1,1])
+test,train,validate = getData(PATH+'\\dataset\\synthesis\\textfile',N_CLASS,IMAGE_SIZE,n=100,readList=[1],ttv=[1,1,1])
 
 '''*************************************************
 *                                                  *
@@ -168,9 +168,9 @@ with tf.name_scope('cross_entropy'):
 
 with tf.name_scope('gradient_descent_learning_algorithm'):
 
-    if LEARNING_ALGORITHM is 'GRAD':
+    if LEARNING_ALGORITHM is LA_GRAD:
         train_step = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(cross_entropy)
-    elif LEARNING_ALGORITHM is 'ADAM':
+    elif LEARNING_ALGORITHM is LA_ADAM:
         train_step = tf.train.AdamOptimizer(LEARNING_RATE).minimize(cross_entropy)
 
 with tf.name_scope('evaluation'):
