@@ -8,9 +8,7 @@ __description__ = 'Store Skeletoning Function'
 *                                                  *
 *************************************************'''
 
-import matplotlib.pyplot as plt
 from skimage.morphology import skeletonize, skeletonize_3d
-from skimage.data import binary_blobs
 import cv2
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
 
@@ -32,7 +30,6 @@ def Zkele(image,sauvola=15,method='norm'):
         this function find the skeleton of input image,'image' by using Sauvola thresholding with kernel
     size equal to 3 and find skeleton by using 3d skeleton method.
     '''
-
     data = IP.binarize(image,method=IP.SAUVOLA_THRESHOLDING,value=sauvola)/255
     data = 1.00-data
     if method == 'norm':
@@ -40,4 +37,5 @@ def Zkele(image,sauvola=15,method='norm'):
     elif method == '3d':
         skeleton = skeletonize_3d(data)
     skeleton = skeleton*255.0
-    return skeleton
+
+    return 255.0 - skeleton

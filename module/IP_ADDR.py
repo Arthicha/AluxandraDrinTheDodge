@@ -299,10 +299,12 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             word = word[bou:wx-bou,bou:wy-bou]
 
             plate[i] = plate[i][bou:wx-bou,bou:wy-bou]
+
             #word = IP.morph(word,mode=IP.OPENING,value=[5,5])
             word = __class__.crop_image(plate[i],word,tol=black_tollerance)
+
             if word != []:
-                word = cv2.resize(word,image_size)
+                word = cv2.resize(word,(image_size[1],image_size[0]))
             listOfWord.append(word)
         return listOfWord
 

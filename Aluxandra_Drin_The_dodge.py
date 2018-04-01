@@ -26,6 +26,7 @@ from module.Tenzor import TenzorCNN,TenzorNN,TenzorAE
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
 from module.Retinutella_theRobotEye import Retinutella
 from module.RandomFunction import *
+from module.Zkeleton import Zkele
 
 # 5. visualization module
 import matplotlib.pyplot as plt
@@ -168,7 +169,8 @@ while(1):
 
     # preprocessing image
     for p in range(0,len(plate)):
-        plate[p] = IP.binarize(plate[p],method=IP.SAUVOLA_THRESHOLDING,value=15)
+        plate[p] = Zkele(plate[p],method='3d')
+        #plate[p] = IP.binarize(plate[p],method=IP.SAUVOLA_THRESHOLDING,value=15)
         #plate[p] = IP.morph(plate[p],mode=IP.ERODE,value=[2,2])
         #plate[p] = IP.morph(plate[p],mode=IP.DILATE,value=[2,2])
         #plate[p] = cv2.resize(plate[p],(16,32))
