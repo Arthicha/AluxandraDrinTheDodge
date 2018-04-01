@@ -2,7 +2,7 @@
 ## FIBO project Module8-9 Group 2
 ### Institute of FIeld RObotics (FIBO), King Mongkut University of Technology Thonburi (KMUTT)
 
-![picture] (picture/RobotCAD.jpg)
+![](https://user-images.githubusercontent.com/21967074/38171083-6e1bed66-35bc-11e8-9cda-52d350386b7a.jpg)
 
 ## Group Member
 - Arthicha    Srisuchinnawong   zumoarthicha@gmail.com
