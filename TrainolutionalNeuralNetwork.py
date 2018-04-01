@@ -143,8 +143,8 @@ def accuracyPlot(y,graphName,xLabel,yLabel,saveAs):
 if not os.path.exists(SAVE_PATH):
     os.makedirs(SAVE_PATH)
 # read data from compress text file
-test,train,validate = getData(PATH+'\\dataset\\synthesis\\textfile',N_CLASS,IMAGE_SIZE,n=100,readList=[1],ttv=[1,1,1])
-
+test,train,validate = getData(PATH+'\\dataset\\synthesis\\textfile',N_CLASS,IMAGE_SIZE,n=-1,readList=[1],ttv=[1,1,1])
+print(len(train[1]))
 '''*************************************************
 *                                                  *
 *                    CNN model                     *
