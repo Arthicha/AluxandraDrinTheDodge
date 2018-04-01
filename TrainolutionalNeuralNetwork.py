@@ -201,7 +201,7 @@ for epoch in range(EPOCH):
             validation_accuracy = validation_accuracy/n_sec
             print('EPOCH %d: step %d, training accuracy %g, validation accuracy %g' % (epoch,i, train_accuracy,validation_accuracy))
 
-        train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: KEEP_PROB})
+        sess.run(train_step,feed_dict={x: batch[0], y_: batch[1], keep_prob: KEEP_PROB})
 
     testing_accuracy = 0
     n_sec = 0
