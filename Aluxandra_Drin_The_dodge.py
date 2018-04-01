@@ -25,6 +25,7 @@ import random
 from module.Tenzor import TenzorCNN,TenzorNN,TenzorAE
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
 from module.Retinutella_theRobotEye import Retinutella
+from module.RandomFunction import *
 
 # 5. visualization module
 import matplotlib.pyplot as plt
@@ -79,6 +80,9 @@ GETT_HAR_PATH = PATH
 
 CONTINUE = False
 AUG_VALUE = [20,3]
+MAGNIFY = [90,110]
+MORPH = [1,5]
+MOVE = [-3,3]
 
 # convolutional neural network config
 CNN_HIDDEN_LAYER = [32,64,128]
@@ -155,26 +159,32 @@ while(1):
     # get word from original picture
     # after pass through this section, we get list of word (image) in the variable
     # 'plate'.
-    org,plate = cam.getListOfPlate()
+    org,plate = cam.getListOfPlate(image_size=IMAGE_SIZE)
 
     # prediction section
     # pred_result store predicted result from spicified machine learning model.
     pred_result = np.zeros(len(plate))
     list_vector = np.zeros(len(plate))
 
+    # preprocessing image
     for p in range(0,len(plate)):
+        plate[p] = IP.binarize(plate[p],method=IP.SAUVOLA_THRESHOLDING,value=15)
+
+    if plate != []:
         # preparing input, convert image to vector
-        list_vector[p] = np.resize(plate[p],(IMAGE_SIZE[0]*IMAGE_SIZE[1]))
+        list_vector = np.resize(np.array(plate),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
         # convert 8 bit image to be in range of 0.00-1.00, dtype = float
-        list_vector[p] = list_vector[p]/255
+        list_vector = list_vector/255
 
 
-    if MODEL is ML_CNN:
-        pred_result[p] = pred_prob.eval(feed_dict={x: list_vector})
+        if MODEL is ML_CNN:
+            pred_result = sess.run(pred_prob,feed_dict={x: list_vector})
+
 
 
     #show and finally destroy those windows.
     for p in range(0,len(plate)):
+        plate[p] = cv2.resize(plate[p],(IMAGE_SIZE[1]*5,IMAGE_SIZE[0]*5))
         cam.show(plate[p],frame='plate'+str(pred_result[p]))
-    cam.show(org,wait=1)
+    cam.show(org,wait=30)
     cam.destroyWindows()

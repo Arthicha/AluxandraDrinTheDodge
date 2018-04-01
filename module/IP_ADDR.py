@@ -292,12 +292,13 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         listOfWord = []
         for i in range(0,len(plate)):
             word = __class__.binarize(plate[i],method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
+
             wx,wy = word.shape
             bou = boundary
             word = 255-np.array(word)
-            word = word[bou:wy-bou,bou:wx-bou]
-            plate[i] = plate[i][bou:wy-bou,bou:wx-bou]
+            word = word[bou:wx-bou,bou:wy-bou]
 
+            plate[i] = plate[i][bou:wx-bou,bou:wy-bou]
             #word = IP.morph(word,mode=IP.OPENING,value=[5,5])
             word = __class__.crop_image(plate[i],word,tol=black_tollerance)
             if word != []:
