@@ -1,0 +1,2 @@
+model_checkpoint_path: "D:\\2560\\FRA361_Robot_Studio\\FIBO_project_Module8-9\\modelCNN.ckpt"
+all_model_checkpoint_paths: "D:\\2560\\FRA361_Robot_Studio\\FIBO_project_Module8-9\\modelCNN.ckpt"
