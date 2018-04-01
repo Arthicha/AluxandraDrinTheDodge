@@ -31,7 +31,7 @@ Word = ["NUM","EN","TH"]
 SAVE_PATH = MAIN_PATH + "\\dataset\\synthesis\\textfile\\"
 Font_Size = 32
 AUGMOUNT = 30
-Image_Shape = (32, 64)
+IMAGE_SHAPE = (32, 64)
 MAGNIFY = [90,110]
 MORPH = [1,5]
 MOVE = [-3,3]
@@ -46,7 +46,7 @@ WORDLIST = ["0","1","2","3","4","5","6","7","8","9",
             "zero","one","two","three","four","five","six","seven","eight","nine",
             "ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","เเปด","เก้า"]
 
-def Gennie(font_path,font,wordlist,waitTime=1,start=0):
+def Gennie(font_path,font,wordlist,percTH=0.04,waitTime=1,start=0):
 
     '''
     :param font_path: path to font
@@ -75,7 +75,7 @@ def Gennie(font_path,font,wordlist,waitTime=1,start=0):
             process += 1
             img = ipaddr.font_to_image(font_path + y, Font_Size, 0, word)
             plate = ipaddr.Get_Plate2(img)
-            plate = ipaddr.Get_Word2(plate,image_size=Image_Shape)
+            plate = ipaddr.Get_Word2(plate,image_size=IMAGE_SHAPE)
             img = np.array(plate[0])
 
             for i in range(0,AUGMOUNT):
@@ -85,7 +85,12 @@ def Gennie(font_path,font,wordlist,waitTime=1,start=0):
                 #image = RND_MOVE(image,MOVE)
                 image = RND_GAMMA(image,GAMMA)
                 image = Zkele(image,sauvola=15,method='3d')
-                stringy = np.array2string(((image.ravel())).astype(int), max_line_width=Image_Shape[0]*Image_Shape[1]*(AUGMOUNT+2),separator=',')
+                white = np.count_nonzero(image)
+                area = IMAGE_SHAPE[0]*IMAGE_SHAPE[1]
+                if (area-white)/(area) < percTH:
+                    i -= 1
+                    continue
+                stringy = np.array2string(((image.ravel())).astype(int), max_line_width=IMAGE_SHAPE[0]*IMAGE_SHAPE[1]*(AUGMOUNT+2),separator=',')
                 write += stringy[1:-1] + "\n"
                 if i == 0:
                     cv2.imshow('image',image)

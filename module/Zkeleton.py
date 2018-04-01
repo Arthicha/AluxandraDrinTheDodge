@@ -36,6 +36,5 @@ def Zkele(image,sauvola=15,method='norm'):
         skeleton = skeletonize(data)
     elif method == '3d':
         skeleton = skeletonize_3d(data)
-    skeleton = skeleton*255.0
-
+    skeleton = skeleton
     return 255.0 - skeleton
