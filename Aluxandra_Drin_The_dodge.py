@@ -170,18 +170,11 @@ while(1):
     # preprocessing image
     for p in range(0,len(plate)):
         plate[p] = Zkele(plate[p],method='3d')
-        #plate[p] = IP.binarize(plate[p],method=IP.SAUVOLA_THRESHOLDING,value=15)
-        #plate[p] = IP.morph(plate[p],mode=IP.ERODE,value=[2,2])
-        #plate[p] = IP.morph(plate[p],mode=IP.DILATE,value=[2,2])
-        #plate[p] = cv2.resize(plate[p],(16,32))
-        #plate[p] = 255 - plate[p]
-        #plate[p] = cv2.GaussianBlur(plate[p],(2,2),0)
     if plate != []:
         # preparing input, convert image to vector
         list_vector = np.resize(np.array(plate),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
         # convert 8 bit image to be in range of 0.00-1.00, dtype = float
         list_vector = list_vector/255
-
 
         if MODEL is ML_CNN:
             pred_result = sess.run(pred_prob,feed_dict={x: list_vector})
