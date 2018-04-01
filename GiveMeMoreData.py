@@ -12,6 +12,7 @@ import os
 from os import listdir
 import copy
 from module.RandomFunction import *
+from module.Zkeleton import Zkele
 
 # set printing resolution of numpy module
 np.set_printoptions(threshold=np.inf)
@@ -30,7 +31,7 @@ Word = ["NUM","EN","TH"]
 SAVE_PATH = MAIN_PATH + "\\dataset\\synthesis\\textfile\\"
 Font_Size = 32
 AUGMOUNT = 30
-Image_Shape = (64, 32)
+Image_Shape = (32, 64)
 MAGNIFY = [90,110]
 MORPH = [1,5]
 MOVE = [-3,3]
@@ -83,6 +84,7 @@ def Gennie(font_path,font,wordlist,waitTime=1,start=0):
                 image = RND_MORPH(image,MORPH)
                 #image = RND_MOVE(image,MOVE)
                 image = RND_GAMMA(image,GAMMA)
+                image = Zkele(image,sauvola=15,method='3d')
                 stringy = np.array2string(((image.ravel())).astype(int), max_line_width=Image_Shape[0]*Image_Shape[1]*(AUGMOUNT+2),separator=',')
                 write += stringy[1:-1] + "\n"
                 if i == 0:
