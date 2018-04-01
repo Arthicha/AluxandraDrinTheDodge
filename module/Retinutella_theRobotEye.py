@@ -93,10 +93,12 @@ class Retinutella():
 
     def getListOfPlate(self):
         image = self.getImage()
-        ret, image = cv2.threshold(image, 100, 255,0)
-        listOfImage = IP.get_plate(image,(64, 32))
+        #ret, image = cv2.threshold(image, 100, 255,0)
+        plate = IP.Get_Plate2(image)
+        plate = IP.Get_Word2(plate)
+        #listOfImage = IP.get_plate(image,(64, 32))
         #print('return from get plate',listOfImage)
-        return image,listOfImage
+        return image,plate
 
 
     def close(self):
@@ -202,56 +204,5 @@ class Retinutella():
         return np.linalg.norm(leftmost-rightmost),np.linalg.norm(topmost-bottommost)
 
 
-def saveImage():
-    amount = [0,0,0,0,0,0,0,0,0,0,
-            0,0,0,0,0,0,0,0,0,0,
-            0,0,0,0,0,0,0,0,0,0,]
-    cam1 = Retinutella('cam1',1,90,cameraMode=0)
-    print('type class separate each image by space')
-    print('\t0-9 is for number 0-9')
-    print('\t10-19 is for word zero-nine')
-    print('\t20-29 is for word in thai')
-    print('\te for exit')
-    print('\tx for dont save that image')
-    print("example 11 x 2 23")
-    while(1):
-        img1,LoI = cam1.getListOfPlate()
-        print('type class separate each image by space')
-        cam1.show(img1,wait=None)
-        for i in range(0,len(LoI)):
-            if i != len(LoI)-1:
-                cam1.show(LoI[i],frame='image'+str(i))
-            else:
-                cam1.show(LoI[i],frame='image'+str(i),wait=0)
-        inputC = input('type >>')
-        if inputC == 'e':
-            break
-        inputC = inputC.split(' ')
-        typeError = False
-        if len(inputC) == len(LoI):
-            for C in inputC:
-                if (C not in [str(i) for i in range(0,30)]) and(C not in ['x','e']):
-                    typeError = True
-                    break
-        else:
-            typeError = True
-
-        if typeError:
-            print('ERROR: input error')
-            continue
-
-
-        for i in range(0,len(inputC)):
-            if inputC[i] != 'x':
-                directory = 'testImage_'+str(inputC[i])
-                if not os.path.exists(directory):
-                    os.makedirs(directory)
-                directory += '\\'+str(amount[int(inputC[i])])+'.jpg'
-                cv2.imwrite(directory,LoI[i])
-                print('image saved at',directory)
-                amount[int(inputC[i])] += 1
-        cam1.destroyWindows()
-
-    cam1.close()
 
 
