@@ -140,7 +140,8 @@ def accuracyPlot(y,graphName,xLabel,yLabel,saveAs):
 *                   main program                   *
 *                                                  *
 *************************************************'''
-
+if not os.path.exists(SAVE_PATH):
+    os.makedirs(SAVE_PATH)
 # read data from compress text file
 test,train,validate = getData(PATH+'\\dataset\\synthesis\\textfile',N_CLASS,IMAGE_SIZE,n=-1,readList=[1],ttv=[1,1,1])
 
