@@ -86,6 +86,9 @@ class Retinutella():
             rows,cols = img.shape
         M = cv2.getRotationMatrix2D((cols/2,rows/2),self.cameraOreintation,1)
         img = cv2.warpAffine(img,M,(cols,rows))
+        path = os.getcwd()
+        if fileName != None:
+            cv2.imwrite(path+fileName,img)
         return img
 
     def getListOfPlate(self):
@@ -97,6 +100,12 @@ class Retinutella():
 
 
     def close(self):
+
+        '''
+            CAM1.close()
+            destroy object of camera.
+        '''
+
         del self.cam
         self.cam = None
 
@@ -104,6 +113,19 @@ class Retinutella():
 
 
     def show(self,image,frame=None,wait=None):
+
+        '''
+        :param image: image to show.
+        :param frame: frame name.If frame name is None, the default frame name is same as
+        camera name.
+        :param wait: wait time to show image. If wait is None, that means no wait time, while
+        wait time is 0 mean untill keyboard interrupt.
+        :return: None
+        example
+                                CAM1.show(image,frame='original',wait=1)
+            this function create frame named 'original', it show image and wait (delay) 1 second.
+        '''
+
         if frame == None:
             frame = self.name
 
@@ -115,6 +137,11 @@ class Retinutella():
 
 
     def destroyWindows(self):
+
+        '''
+        destroy all windows that are shown from this object
+        '''
+
         for window in self.windows:
             cv2.destroyWindow(window)
 
