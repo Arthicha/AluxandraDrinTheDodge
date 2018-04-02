@@ -86,7 +86,7 @@ MORPH = [1,5]
 MOVE = [-3,3]
 
 # convolutional neural network config
-CNN_HIDDEN_LAYER = [32,64,128]
+CNN_HIDDEN_LAYER = [48,64,128]
 KERNEL_SIZE = [[5,5],[3,3]]
 POOL_SIZE = [[4,4],[2,2]]
 STRIDE_SIZE = [4,2]
@@ -105,6 +105,11 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 *************************************************'''
 
 cam = Retinutella('cam1',0,0,cameraMode=1)
+cam2 = Retinutella('cam2',0,0,cameraMode=0)
+
+NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
+            "zero","one","two","three","four","five","six","seven","eight","nine",
+            "soon","nung","song","sam","see","ha","hok","jed","pad","kaow"]
 
 '''*************************************************
 *                                                  *
@@ -160,22 +165,25 @@ while(1):
     # get word from original picture
     # after pass through this section, we get list of word (image) in the variable
     # 'plate'.
+    corg = cam2.getImage()
     org,plate = cam.getListOfPlate(image_size=IMAGE_SIZE)
+
 
     # prediction section
     # pred_result store predicted result from spicified machine learning model.
     pred_result = np.zeros(len(plate))
     list_vector = np.zeros(len(plate))
+    plate2show = copy.deepcopy(plate)
 
     # preprocessing image
     for p in range(0,len(plate)):
         plate[p] = Zkele(plate[p],method='3d')
+
     if plate != []:
         # preparing input, convert image to vector
         list_vector = np.resize(np.array(plate),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
         # convert 8 bit image to be in range of 0.00-1.00, dtype = float
         list_vector = list_vector/255
-
         if MODEL is ML_CNN:
             pred_result = sess.run(pred_prob,feed_dict={x: list_vector})
 
@@ -183,7 +191,10 @@ while(1):
 
     #show and finally destroy those windows.
     for p in range(0,len(plate)):
-        plate[p] = cv2.resize(plate[p],(IMAGE_SIZE[1]*5,IMAGE_SIZE[0]*5))
-        cam.show(plate[p],frame='plate'+str(pred_result[p]))
-    cam.show(org,wait=30)
+        plate[p] = cv2.resize(plate2show[p],(IMAGE_SIZE[1]*5,IMAGE_SIZE[0]*5))
+        cam.show(plate[p],frame='plate_'+str(NUM2WORD[pred_result[p]]))
+        cv2.moveWindow('plate_'+str(NUM2WORD[pred_result[p]]), 700,300);
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(corg, str(NUM2WORD[pred_result[p]]), (50, 400), font, 5, (0, 0, 255), 5, cv2.LINE_AA)
+    cam.show(corg,wait=30)
     cam.destroyWindows()
