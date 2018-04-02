@@ -23,7 +23,7 @@
 + CompressTada.py : compress set image to text file
 + TrainolutionalNeuralNetwork.py : train CNN
 
-#### our first CNN model
+####        our first CNN model can classify first dataset of real world image with more than 90 percent of accuracy.
 ![cnn_confusion_matrix_g2dataset](https://user-images.githubusercontent.com/21967074/38199243-3def17c2-36ba-11e8-9e95-89c0243d04b8.png)
 
 
