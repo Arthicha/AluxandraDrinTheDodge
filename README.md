@@ -21,6 +21,8 @@
 + GiveMeMoreData.py : data generating program
 + CaptureTada.py : capturing and saving image
 + CompressTada.py : compress set image to text file
++ TrainolutionalNeuralNetwork.py : train CNN
+
 
 
 
