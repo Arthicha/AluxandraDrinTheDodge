@@ -8,7 +8,6 @@
 import sys
 import os
 
-import cv2
 from module.detectCascade import multiCascade
 
 def main():
@@ -23,7 +22,10 @@ def main():
         '''test cascade accuracy file files.'''
 
         print('test cascade accuracy files.')
-        hc.testCascade(feature= str(inputKey[1]))
+        output = hc.testCascade(feature= str(inputKey[1]))
+        print(hc.calculateAccuracy(output))
+        hc.displayConclusionMatrix(output)
+        
 
 if __name__ == '__main__':
     main()
