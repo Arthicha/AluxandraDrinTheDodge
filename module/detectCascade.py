@@ -99,13 +99,13 @@ class multiCascade():
     def testCascade(self,feature):
         ''' test classifier by test data. '''	
         
-        name = [i for i in os.listdir('output_data') if len(str(i).split('.')) != 1 ]
-        if name != []:
-            name = name[0]
-        else :
-            name = 'predictHAAR_x.txt'
+        # name = [i for i in os.listdir('output_data') if len(str(i).split('.')) != 1 ]
+        # if name != []:
+        #     name = name[0]
+        # else :
+        #     name = 'predictHAAR_x.txt'
             
-        keepToFile = open('output_data'+str(self.dirCom)+str(name),'w+')
+        # keepToFile = open('output_data'+str(self.dirCom)+str(name),'w+')
         
 
         for suffixSelect in [0] :# ['test','train','validate']

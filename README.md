@@ -9,7 +9,7 @@
 - Chaiyaporn  Boonyasathian     chaiya45689@gmail.com
 - Jirapat     Thasingthong      jirapat.t@mail.kmutt.ac.th
 - Kaewkirati  Boukaew
-- Kitti       Pongaksorn        bosskitti7983@gmail.com
+- Kitti       Phongaksorn       bosskitti7983@gmail.com
 - Lucksawan   Yutthanakorn      wan_whiterose@hotmail.com
 - Naris       Asawalertsak
 - Penpat      Ritprapa          zefirosfenix@gmail.com
