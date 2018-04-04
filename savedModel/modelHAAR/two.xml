@@ -7,9 +7,9 @@
   <width>32</width>
   <stageParams>
     <boostType>GAB</boostType>
-    <minHitRate>9.4999998807907104e-01</minHitRate>
+    <minHitRate>9.5999997854232788e-01</minHitRate>
     <maxFalseAlarm>2.0000000298023224e-01</maxFalseAlarm>
-    <weightTrimRate>3.4999999403953552e-01</weightTrimRate>
+    <weightTrimRate>6.4999997615814209e-01</weightTrimRate>
     <maxDepth>1</maxDepth>
     <maxWeakCount>80</maxWeakCount></stageParams>
   <featureParams>
@@ -20,20 +20,44 @@
   <stages>
     <!-- stage 0 -->
     <_>
-      <maxWeakCount>1</maxWeakCount>
-      <stageThreshold>9.7000002861022949e-01</stageThreshold>
+      <maxWeakCount>3</maxWeakCount>
+      <stageThreshold>7.4497282505035400e-01</stageThreshold>
       <weakClassifiers>
         <_>
           <internalNodes>
-            0 -1 0 1.5941649675369263e-01</internalNodes>
+            0 -1 1 6.5192602574825287e-02</internalNodes>
           <leafValues>
-            -9.9473530054092407e-01 9.7000002861022949e-01</leafValues></_></weakClassifiers></_></stages>
+            -9.0238839387893677e-01 8.3799421787261963e-01</leafValues></_>
+        <_>
+          <internalNodes>
+            0 -1 2 3.7145095411688089e-03</internalNodes>
+          <leafValues>
+            -9.3951207399368286e-01 8.0844688415527344e-01</leafValues></_>
+        <_>
+          <internalNodes>
+            0 -1 0 1.1807529628276825e-01</internalNodes>
+          <leafValues>
+            -7.1337175369262695e-01 8.3891433477401733e-01</leafValues></_></weakClassifiers></_></stages>
   <features>
     <_>
       <rects>
         <_>
-          12 1 8 10 -1.</_>
+          9 1 16 8 -1.</_>
         <_>
-          12 6 8 5 2.</_></rects>
+          9 5 16 4 2.</_></rects>
+      <tilted>0</tilted></_>
+    <_>
+      <rects>
+        <_>
+          13 0 6 14 -1.</_>
+        <_>
+          13 7 6 7 2.</_></rects>
+      <tilted>0</tilted></_>
+    <_>
+      <rects>
+        <_>
+          26 9 6 3 -1.</_>
+        <_>
+          29 9 3 3 2.</_></rects>
       <tilted>0</tilted></_></features></cascade>
 </opencv_storage>

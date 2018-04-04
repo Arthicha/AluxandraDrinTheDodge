@@ -1,5 +1,5 @@
 # ~/virtualenv/ROBOTICS_studios/bin
-# this class for HAAR cascade test detectiona
+# this class for HAAR cascade test detection
 
 '''*************************************************
 *                                                  *
@@ -15,7 +15,7 @@ from time import clock
 
 import numpy as np
 import cv2
-from PIL import Image
+from PIL import Image, ImageOps
 from math import sqrt, pow
 import matplotlib.pyplot as plot
 
@@ -72,13 +72,13 @@ class multiCascade():
         returnData = {}
         for selectClassifier in list(self.multiClassifiers):
             if feature == 'HAAR':
-                output = self.multiClassifiers[selectClassifier].detectMultiScale(img, scaleFactor= 1.2,minNeighbors= 5)
+                output = self.multiClassifiers[selectClassifier].detectMultiScale(img, scaleFactor= 3.2,minNeighbors= 5)
             elif feature == 'LBP':
-                output = self.multiClassifiers[selectClassifier].detectMultiScale(img,  scaleFactor= 1.2,minNeighbors= 5)
+                output = self.multiClassifiers[selectClassifier].detectMultiScale(img,  scaleFactor= 3.2,minNeighbors= 5)
 
             output2 = []
             returnData[str(selectClassifier).split('.')[0]] = 0
-            
+        
             if len(output) != 0:
                 
                 for (x, y, w, h) in output :
@@ -99,16 +99,6 @@ class multiCascade():
 	    
     def testCascade(self,feature):
         ''' test classifier by test data. '''	
-        
-        # name = [i for i in os.listdir('output_data') if len(str(i).split('.')) != 1 ]
-        # if name != []:
-        #     name = name[0]
-        # else :
-        #     name = 'predictHAAR_x.txt'
-            
-        # keepToFile = open('output_data'+str(self.dirCom)+str(name),'w+')
-        
-
         for suffixSelect in [0] :# ['test','train','validate']
             keepData={}
             keepDataAll = {}
@@ -121,6 +111,7 @@ class multiCascade():
             tic = clock()
             
             self.callClassifiers(feature=feature)
+            
             for j in range(0,30): # 30 class
                 object = self.listOfClass[j]
                 f = open( self.datasetPath +self.dirCom+str(j)+'_'+self.suffix[suffixSelect]+'.txt','r')
@@ -131,19 +122,15 @@ class multiCascade():
                 tic_n = clock()
 
                 for i in range(len(image)):
-                    image[i] = np.fromstring(image[i], dtype=float, sep=',')
-                    image[i] = np.array(image[i], dtype=np.uint8)*255
+                    image[i] = np.fromstring(image[i], dtype=int, sep=',')
+                    image[i] = np.array(image[i], dtype=np.uint8)
                     image[i] = np.reshape(image[i],(self.WHfromArray1D(len(image[i]))))
+                    # image[i] = Image.fromarray((image[i]).astype(np.uint8))
+                    # image[i] = ImageOps.invert(image[i]) 
+                    image[i] = 255-image[i]
                     image[i] = cv2.resize(image[i],(int(self.testResizeH/self.scaleWeightHeight),int(self.testResizeH)))
-
-             # keepToFile.close()
-        
-        # saveFileLen = int((len(os.listdir('output_data'+self.dirCom+'keep_predict_test'))+1)/2)
-        # self.displayConclusionMatrix(keepDataAll,str(name).split('.')[0]+'_'+str(saveFileLen))
-        # shutil.copy('output_data'+self.dirCom+str(name),'output_data'+self.dirCom+'keep_predict_test'+self.dirCom+str(name).split('.')[0]+'_'+str(saveFileLen)+'.txt' )
-               # display percentage of class
-                    # if i%int(len(image)/10) == 0:
-                    #     print(str(int(i*100/len(image)))+'/100')
+                    # cv2.imshow('test',image[i])
+                    # cv2.waitKey(0)
                     
                     detect = self.detectFromCascade(image=image[i],feature=feature)
                     keepData[object]+=detect[str(object)]
@@ -186,8 +173,8 @@ class multiCascade():
         ax.set_ylabel('predictions')
         ax.set_xticks(np.arange(30))    
         ax.set_yticks(np.arange(30))
-        # ax.set_xticklabels([str(i) for i in self.listOfClass])
-        # ax.set_yticklabels([str(i) for i in self.listOfClass])
+        ax.set_xticklabels([str(i) for i in self.listOfClass], rotation =90)
+        ax.set_yticklabels([str(i) for i in self.listOfClass])
         # plot.savefig('output_data'+self.dirCom+'keep_predict_test'+self.dirCom+str(name)+'.png')
         plot.show()
 
