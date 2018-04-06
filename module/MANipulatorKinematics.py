@@ -10,8 +10,6 @@ import cv2
 from random import randint
 import sys
 from math import *
-#from sympy import *
-#import sympy
 
 
 '''
@@ -246,9 +244,16 @@ class MANipulator():
 
 '''
                         example program
+position control                        end effector control
+        w : x++                                 j : point left
+        s : x--                                 k : point down
+        d : y++                                 i : point forward
+        a : y--                                 l : point right
+        e : z++
+        q : z--
 '''
-
-'''if 1:
+'''
+if 1:
 
     # define constant
     d1 = 500.0
