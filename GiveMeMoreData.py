@@ -29,7 +29,7 @@ Font_Path = ["\\font\\ENGFONT\\","\\font\\ENGFONT\\","\\font\\THFONT\\"]
 Word = ["NUM","EN","TH"]
 
 
-SAVE_PATH = MAIN_PATH + "\\dataset\\synthesis\\textfile\\"
+SAVE_PATH = MAIN_PATH + "\\dataset\\synthesis\\textfile_norm\\"
 Font_Size = 32
 AUGMOUNT = 30
 IMAGE_SHAPE = (32, 64)
@@ -85,8 +85,8 @@ def Gennie(font_path,font,wordlist,percTH=0.04,waitTime=1,start=0):
                 image = RND_MORPH(image,MORPH)
                 #image = RND_MOVE(image,MOVE)
                 image = RND_GAMMA(image,GAMMA)
-                image = IP.auto_canny(image,sigma=0.33)
-                image = 255-image
+                #image = IP.auto_canny(image,sigma=0.33)
+                #image = 255-image
                 #image = Zkele(image,sauvola=15,method='3d')
                 white = np.count_nonzero(image)
                 area = IMAGE_SHAPE[0]*IMAGE_SHAPE[1]
@@ -123,7 +123,7 @@ for i in range(0,len(Font_Path)):
     font = [x for x in listdir(font_path) if
                     ".ttf" in x or ".otf" in x or ".ttc" in x or ".TTF" in x or ".OTF" in x or ".TTC" in x]
     font =font[:-1]
-    random.shuffle(font)
+    #random.shuffle(font)
 
     if word is "EN":
         wordlist = WORDLIST[10:20]
