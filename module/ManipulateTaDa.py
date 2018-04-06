@@ -38,7 +38,7 @@ def getData(foldername,N_CLASS,IMG_SIZE,n=-1,readList=[0,1,2],ttv=[0,1,2],dtype=
             f.close()
             for i in range(len(image)):
                 image[i] = np.fromstring(image[i], dtype=dtype, sep=',')
-                image[i] = np.array(image[i])
+                image[i] = np.array(image[i])/255.0
                 image[i] = np.reshape(image[i],(IMG_SIZE[0]*IMG_SIZE[1]))
             TestTrainValidate[s] += image
             obj = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

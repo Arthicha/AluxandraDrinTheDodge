@@ -19,7 +19,7 @@ from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_
 *                                                  *
 *************************************************'''
 
-def Zkele(image,sauvola=15,method='norm'):
+def Zkele(image,sauvola=21,method='norm'):
     '''
     :param image: input image
     :param sauvola: size of sauvola kirnel

@@ -71,8 +71,9 @@ PATH = os.getcwd()
 
 IMAGE_SIZE = (32,64)
 N_CLASS = 30
+FROM_IMAGE = 0
 
-GETT_IMG_PATH = PATH + '\\dataset\\DatasetG2'
+GETT_IMG_PATH = PATH + '\\dataset\\setPlate'#'\\dataset\\DatasetG2'
 
 # select machine learning model
 MODEL = ML_CNN
@@ -221,42 +222,76 @@ if GETT_CNN_PATH != None:
 sum_accu = 0
 n_data = 0
 actualVSpredict = [[],[]]
-for num in range(0,10):
-    print('process',num)
-    for type in ['N','E','T']:
-        for font in range(0,5):
-            images = np.array(cv2.imread(GETT_IMG_PATH+'\\'+str(num)+type+str(font)+'.png',0))
+if FROM_IMAGE:
+    for num in range(0,10):
+        print('process',num)
+        for type in ['N','E','T']:
+            for font in range(0,5):
+                images = np.array(cv2.imread(GETT_IMG_PATH+'\\'+str(num)+type+str(font)+'.png',0))
 
-            step =images.shape[1]//100
-            for i in range(step,images.shape[1],step):
-                try:
-                    img = images[:,i-step:i]
-                    img = IP.Get_Word2([img],image_size=IMAGE_SIZE)[0]
-                    img = Zkele(img,method='3d')
-                    plate = np.array([img])
-                    list_vector = np.resize(np.array(plate),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
-                    # convert 8 bit image to be in range of 0.00-1.00, dtype = float
-                    list_vector = list_vector/255
-                    clas = copy.copy(num)
-                    if type == 'E':
-                        clas += 10
-                    elif type == 'T':
-                        clas += 20
-                    pred = sess.run(pred_prob,feed_dict={x: list_vector})
-                    actualVSpredict[1].append(pred)
-                    actualVSpredict[0].append(clas)
-                    if pred == clas:
-                        accu = 1.00
-                    else:
-                        accu = 0.00
-                    sum_accu += accu
-                    n_data += 1
-                    print('accuracy',sum_accu/n_data,'from',n_data)
-                    cv2.imshow('frame',img)
-                    cv2.waitKey(1)
+                step =images.shape[1]//100
+                for i in range(step,images.shape[1],step):
+                    try:
+                        img = images[:,i-step:i]
+                        img = IP.Get_Word2([img],image_size=IMAGE_SIZE)[0]
+                        #img = Zkele(img,method='3d')
+                        img = IP.auto_canny(img,sigma=0.33)
+                        img = 255-img
+                        plate = np.array([img])
+                        list_vector = np.resize(np.array(plate),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
+                        # convert 8 bit image to be in range of 0.00-1.00, dtype = float
+                        list_vector = list_vector/255
+                        clas = copy.copy(num)
+                        if type == 'E':
+                            clas += 10
+                        elif type == 'T':
+                            clas += 20
+                        pred = sess.run(pred_prob,feed_dict={x: list_vector})
+                        actualVSpredict[1].append(pred)
+                        actualVSpredict[0].append(clas)
+                        if pred == clas:
+                            accu = 1.00
+                        else:
+                            accu = 0.00
+                        sum_accu += accu
+                        n_data += 1
+                        print('accuracy',sum_accu/n_data,'from',n_data)
+                        cv2.imshow('frame',img)
+                        cv2.waitKey(1)
 
-                except:
-                    pass
+                    except:
+                        pass
+else:
+    evalu = [0.0,0.0]
+    for c in range(0,30):
+        for f in range(0,10):
+            image_name = str(c)+'_'+str(f)
+
+            print(image_name)
+            img = cv2.imread(GETT_IMG_PATH+'\\'+image_name+'.jpg',0)
+
+            plate = IP.Get_Plate2(img,thres_kirnel=21,morph=True)
+
+            word = IP.Get_Word2(plate,image_size=IMAGE_SIZE)
+            for w in range(0,len(word)):
+                word[w] = Zkele(word[w],method='3d')
+            list_vector = np.resize(np.array(word),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
+            list_vector = list_vector/255
+            clas = c
+            pred = sess.run(pred_prob,feed_dict={x: list_vector})
+            print(pred)
+            for w in range(0,len(word)):
+                if np.count_nonzero(np.array(word[w])) < 0.98*IMAGE_SIZE[0]*IMAGE_SIZE[1]:
+                    if pred[w] == c:
+                        evalu[0] += 1
+                    evalu[1] += 1
+            # loop through each word
+            if 0:
+                for w in range(0,len(word)):
+                    cv2.imshow('word'+str(w),word[w])
+            print(evalu[0]/evalu[1],'percent from', evalu[1],'image')
+            cv2.imshow('org',img)
+            cv2.waitKey(1)
 confusionMat(actualVSpredict[0],actualVSpredict[1])
 
 

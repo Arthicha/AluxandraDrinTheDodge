@@ -94,7 +94,7 @@ class Retinutella():
     def getListOfPlate(self,image_size=(30,60)):
         image = self.getImage()
         #ret, image = cv2.threshold(image, 100, 255,0)
-        plate = IP.Get_Plate2(image)
+        plate = IP.Get_Plate2(image,min_area=0.01)
         plate = IP.Get_Word2(plate,image_size=image_size)
         #listOfImage = IP.get_plate(image,(64, 32))
         #print('return from get plate',listOfImage)

@@ -13,6 +13,7 @@ from os import listdir
 import copy
 from module.RandomFunction import *
 from module.Zkeleton import Zkele
+from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
 
 # set printing resolution of numpy module
 np.set_printoptions(threshold=np.inf)
@@ -84,7 +85,9 @@ def Gennie(font_path,font,wordlist,percTH=0.04,waitTime=1,start=0):
                 image = RND_MORPH(image,MORPH)
                 #image = RND_MOVE(image,MOVE)
                 image = RND_GAMMA(image,GAMMA)
-                image = Zkele(image,sauvola=15,method='3d')
+                image = IP.auto_canny(image,sigma=0.33)
+                image = 255-image
+                #image = Zkele(image,sauvola=15,method='3d')
                 white = np.count_nonzero(image)
                 area = IMAGE_SHAPE[0]*IMAGE_SHAPE[1]
                 if (area-white)/(area) < percTH:

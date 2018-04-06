@@ -265,16 +265,19 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         mask = msk>tol
         return img[np.ix_(mask.any(1),mask.any(0))]
 
-    def Get_Plate2(org,thres_kirnel=21,min_area=0.05,max_area=0.9):
+    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False):
         image = copy.deepcopy(org)
         image = __class__.binarize(image,method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
         image_area = image.shape[0]*image.shape[1]
+        if morph:
+            image = __class__.morph(image,mode=__class__.ERODE,value=[5,5])
+
         img, contours, hierarchy = cv2.findContours(image, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
         plate = []
         for i in range(0,len(contours)):
             cnt = contours[i]
             hi = hierarchy[0][i]
-            epsilon = 0.1*cv2.arcLength(cnt,True)
+            epsilon = lengPercent*cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,epsilon,True)
             area = cv2.contourArea(cnt)
             if (area>min_area*image_area) and (area < image_area*max_area)and(len(approx) == 4) and(hi[2]!=-1)and(hi[1]==-1):
@@ -305,7 +308,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
 
             if word != []:
                 word = cv2.resize(word,(image_size[1],image_size[0]))
-            listOfWord.append(word)
+                listOfWord.append(word)
         return listOfWord
 
     def magnifly(image, percentage=100, shiftxy=[0, 0]):
