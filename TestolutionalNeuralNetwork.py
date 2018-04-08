@@ -30,6 +30,7 @@ from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_
 from module.Retinutella_theRobotEye import Retinutella
 from module.RandomFunction import *
 from module.Zkeleton import Zkele
+from module.ManipulateTaDa import getData
 
 # 5. visualization module
 import matplotlib.pyplot as plt
@@ -71,16 +72,26 @@ PATH = os.getcwd()
 
 IMAGE_SIZE = (32,64)
 N_CLASS = 30
-FROM_IMAGE = 0
 
-GETT_IMG_PATH = PATH + '\\dataset\\setPlate'#'\\dataset\\DatasetG2'
 
+
+FROM_LIST = 0
+FROM_IMAGE = 1
+FROM_WORD = 2
+FROM_COMPRESS = 3
+
+MODE = FROM_LIST
+FONTSHIFT = 0
+NUM_IMG = 100
+
+GETT_IMG_PATH = PATH + '\\dataset\\DatasetG2'#'\\dataset\\DatasetG2'
+GETT_COMPRESS_PATH = PATH + '\\dataset\\synthesis\\textfile_skele'
 # select machine learning model
 MODEL = ML_CNN
 
 # restore save model
 # for example, PATH+"\\savedModel\\modelCNN"
-GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN"
+GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN_skele"
 GETT_KNN_PATH = PATH
 GETT_RF_PATH = PATH
 GETT_HAR_PATH = PATH
@@ -139,7 +150,7 @@ def plot_confusion_matrix(cm, classes,
     else:
         print('Confusion matrix, without normalization')
 
-    print(cm)
+    #print(cm)
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
@@ -164,21 +175,43 @@ def confusionMat(correct_Labels, Predicted_Labels):
     plt.figure()
     np.set_printoptions(precision=2)
     con_mat = confusion_matrix(correct_Labels, Predicted_Labels,labels=labels)
-    print(con_mat)
-    print(con_mat.shape)
+    #print(con_mat)
+    #print(con_mat.shape)
     siz = con_mat.shape
     size = siz[0]
     total_pres = 0
+
+    sumVerHor = np.zeros((2,30))
+    Precision = np.zeros(30)
+    Recall = np.zeros(30)
+    F1 = np.zeros(30)
+    for i in range(size):
+        for j in range(size):
+            sumVerHor[0][i] += con_mat[j,i]
+            sumVerHor[1][i] += con_mat[i,j]
+        Precision[i] = con_mat[i,i]/sumVerHor[0,i]
+        Recall[i] = con_mat[i,i]/sumVerHor[1,i]
+        F1[i] = (Recall[i] * Precision[i] * 2.00) / (Recall[i] + Precision[i])
     for i in range(size):
         total_pres = total_pres + (con_mat[i, i])
-        print('Class accuracy '+str(i)+': '+str(con_mat[i, i] / float(np.sum(con_mat[i, :]))))
+        print('---------------------------------------------------')
+        print('Class',i)
+        print('\t\taccuracy '+': '+str(con_mat[i, i] / float(np.sum(con_mat[i, :]))))
+        print('\t\tprecision ' + ': ' + str(Precision[i]))
+        print('\t\trecall ' + ': ' + str(Recall[i]))
+        print('\t\tf1-score ' + ': ' + str(F1[i]))
+
     print('total_accuracy : ' + str(total_pres/float(np.sum(con_mat))))
+    print('average_precision :',np.sum(Precision)/size)
+    print('average_recall :',np.sum(Recall)/size)
+    print('average_f1-score',np.sum(F1)/size)
     df = pd.DataFrame (con_mat)
     filepath = 'D:\\2560\\FRA361_Robot_Studio\\FIBO_project_Module8-9\\my_excel_file_PIC.xlsx'
     plot_confusion_matrix(con_mat, classes=labels,
                       title='Confusion matrix, without normalization')
     df.to_excel(filepath, index=False)
     plt.show()
+
 
 '''*************************************************
 *                                                  *
@@ -222,46 +255,60 @@ if GETT_CNN_PATH != None:
 sum_accu = 0
 n_data = 0
 actualVSpredict = [[],[]]
-if FROM_IMAGE:
+if MODE == FROM_LIST:
     for num in range(0,10):
         print('process',num)
         for type in ['N','E','T']:
-            for font in range(0,5):
+            for font in range(0+FONTSHIFT,5+FONTSHIFT):
+
                 images = np.array(cv2.imread(GETT_IMG_PATH+'\\'+str(num)+type+str(font)+'.png',0))
 
-                step =images.shape[1]//100
+                step =100
+                img_count = 0
                 for i in range(step,images.shape[1],step):
-                    try:
-                        img = images[:,i-step:i]
-                        img = IP.Get_Word2([img],image_size=IMAGE_SIZE)[0]
-                        #img = Zkele(img,method='3d')
-                        img = IP.auto_canny(img,sigma=0.33)
-                        img = 255-img
-                        plate = np.array([img])
-                        list_vector = np.resize(np.array(plate),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
-                        # convert 8 bit image to be in range of 0.00-1.00, dtype = float
-                        list_vector = list_vector/255
-                        clas = copy.copy(num)
-                        if type == 'E':
-                            clas += 10
-                        elif type == 'T':
-                            clas += 20
-                        pred = sess.run(pred_prob,feed_dict={x: list_vector})
-                        actualVSpredict[1].append(pred)
-                        actualVSpredict[0].append(clas)
-                        if pred == clas:
-                            accu = 1.00
-                        else:
-                            accu = 0.00
-                        sum_accu += accu
-                        n_data += 1
-                        print('accuracy',sum_accu/n_data,'from',n_data)
-                        cv2.imshow('frame',img)
-                        cv2.waitKey(1)
-
-                    except:
-                        pass
-else:
+                    if images.shape[0] > step:
+                        step_row = 100
+                    else:
+                        step_row = 0
+                    for j in range(0,images.shape[0]-step_row,step):
+                        try:
+                            if step_row == 0:
+                                img = images[:, i - step:i]
+                            else:
+                                img = images[j:j+step,i-step:i]
+                            img = IP.Get_Word2([img],image_size=IMAGE_SIZE)[0]
+                            img = Zkele(img,method='3d')
+                            #img = IP.auto_canny(img,sigma=0.33)
+                            #img = 255-img
+                            plate = np.array([img])
+                            list_vector = np.resize(np.array(plate),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
+                            # convert 8 bit image to be in range of 0.00-1.00, dtype = float
+                            list_vector = list_vector/255
+                            clas = copy.copy(num)
+                            if type == 'E':
+                                clas += 10
+                            elif type == 'T':
+                                clas += 20
+                            pred = sess.run(pred_prob,feed_dict={x: list_vector})
+                            actualVSpredict[1].append(pred)
+                            actualVSpredict[0].append(clas)
+                            if pred == clas:
+                                accu = 1.00
+                            else:
+                                accu = 0.00
+                            sum_accu += accu
+                            n_data += 1
+                            print('accuracy',sum_accu/n_data,'from',n_data)
+                            cv2.imshow('frame',img)
+                            cv2.waitKey(1)
+                            img_count += 1
+                            if img_count > NUM_IMG:
+                                break
+                        except:
+                            pass
+                    if img_count > NUM_IMG:
+                        break
+elif MODE == FROM_IMAGE:
     evalu = [0.0,0.0]
     for c in range(0,30):
         for f in range(0,10):
@@ -292,6 +339,16 @@ else:
             print(evalu[0]/evalu[1],'percent from', evalu[1],'image')
             cv2.imshow('org',img)
             cv2.waitKey(1)
+elif MODE == FROM_COMPRESS:
+    true_label = []
+    actualVSpredict = [[],[]]
+    for i in range(0,300,50):
+        print('testing section',i,'from',1000)
+        testingset,trainingset,validationset = getData(GETT_COMPRESS_PATH,30,IMAGE_SIZE,ni=i,n=i+50,readList=[0,0,0],ttv=[0,0,0])
+        pred = sess.run(pred_prob,feed_dict={x: testingset[0]})
+        true_label = np.argmax(testingset[1],axis=1)
+        actualVSpredict[0] += list(pred)
+        actualVSpredict[1] += list(true_label)
 confusionMat(actualVSpredict[0],actualVSpredict[1])
 
 

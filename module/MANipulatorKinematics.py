@@ -252,7 +252,7 @@ position control                        end effector control
         e : z++
         q : z--
 '''
-'''
+
 if 1:
 
     # define constant
@@ -376,4 +376,4 @@ if 1:
             key = MAN.plot(H_a,matplotLibs=False,plotTarget=[x,y,z])
     elif MODE is MOD_JACOBIAN:
         J = MAN.Jackobian([0,0,0,0,0,0],a1=DH_param[0][2],a2=DH_param[1][2],a3=DH_param[1][2],d4=DH_param[3][1],d6=DH_param[5][1])
-        print(J)'''
+        print(J)

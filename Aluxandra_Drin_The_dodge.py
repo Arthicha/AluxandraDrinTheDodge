@@ -86,7 +86,7 @@ MORPH = [1,5]
 MOVE = [-3,3]
 
 # convolutional neural network config
-CNN_HIDDEN_LAYER = [32,64,128]
+CNN_HIDDEN_LAYER = [48,64,128]
 KERNEL_SIZE = [[5,5],[3,3]]
 POOL_SIZE = [[4,4],[2,2]]
 STRIDE_SIZE = [4,2]
@@ -106,8 +106,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 *                                                  *
 *************************************************'''
 
-cam = Retinutella('cam1',1,0,cameraMode=1)
-cam2 = Retinutella('cam2',1,0,cameraMode=0)
+cam = Retinutella('cam1',0,0,cameraMode=1)
+cam2 = Retinutella('cam2',0,0,cameraMode=0)
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
             "zero","one","two","three","four","five","six","seven","eight","nine",
@@ -179,8 +179,9 @@ while(1):
 
     # preprocessing image
     for p in range(0,len(plate)):
-        plate[p] = IP.auto_canny(plate[p])
-        #plate[p] = Zkele(plate[p],method='3d')
+        #plate[p] = IP.auto_canny(plate[p])
+        #plate[p] = 255 - plate[p]
+        plate[p] = Zkele(plate[p],method='3d')
 
     if plate != []:
         # preparing input, convert image to vector
@@ -194,7 +195,7 @@ while(1):
 
     #show and finally destroy those windows.
     for p in range(0,len(plate)):
-        plate[p] = cv2.resize(plate2show[p],(IMAGE_SIZE[1]*5,IMAGE_SIZE[0]*5))
+        plate[p] = cv2.resize(plate[p],(IMAGE_SIZE[1]*5,IMAGE_SIZE[0]*5))
         cam.show(plate[p],frame='plate_'+str(NUM2WORD[pred_result[p]]))
         cv2.moveWindow('plate_'+str(NUM2WORD[pred_result[p]]), 700,300);
         font = cv2.FONT_HERSHEY_SIMPLEX

@@ -7,7 +7,7 @@ import os
 import random
 import copy
 
-def getData(foldername,N_CLASS,IMG_SIZE,n=-1,readList=[0,1,2],ttv=[0,1,2],dtype=np.uint8):
+def getData(foldername,N_CLASS,IMG_SIZE,ni=0,n=-1,readList=[0,1,2],ttv=[0,1,2],dtype=np.uint8):
 
     '''
     this function get dataset from compress file in
@@ -31,10 +31,13 @@ def getData(foldername,N_CLASS,IMG_SIZE,n=-1,readList=[0,1,2],ttv=[0,1,2],dtype=
         print('STATUS: process data',str(100.0*s/3.0))
         for j in range(0,N_CLASS):
             object = listOfClass[j]
-            print('PROCESS:',foldername+'\\'+str(object)+'_'+suffix[s]+'.txt')
+            #print('PROCESS:',foldername+'\\'+str(object)+'_'+suffix[s]+'.txt')
             f = open(foldername+'\\'+str(object)+'_'+suffix[s]+'.txt','r')
+            readText = str(f.read()).split('\n')
+            if n >= len(readText):
+                continue
+            image = readText[ni:n]
 
-            image = str(f.read()).split('\n')[:n]
             f.close()
             for i in range(len(image)):
                 image[i] = np.fromstring(image[i], dtype=dtype, sep=',')
@@ -57,6 +60,8 @@ def getData(foldername,N_CLASS,IMG_SIZE,n=-1,readList=[0,1,2],ttv=[0,1,2],dtype=
                 print('STATIS: complete shuffle-ing')
         del image
         del object
+    if ttv[1] != 1:
+        trainingSet = [TestTrainValidate[ttv[1]],LabelTTT[ttv[1]]]
     testingSet  = [TestTrainValidate[ttv[0]],LabelTTT[ttv[0]]]
     validationSet = [TestTrainValidate[ttv[2]],LabelTTT[ttv[2]]]
     return testingSet,trainingSet,validationSet
