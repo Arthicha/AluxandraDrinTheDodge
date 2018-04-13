@@ -80,18 +80,18 @@ FROM_IMAGE = 1
 FROM_WORD = 2
 FROM_COMPRESS = 3
 
-MODE = FROM_LIST
-FONTSHIFT = 0
+MODE = FROM_COMPRESS
+FONTSHIFT = 1
 NUM_IMG = 100
 
-GETT_IMG_PATH = PATH + '\\dataset\\DatasetG2'#'\\dataset\\DatasetG2'
-GETT_COMPRESS_PATH = PATH + '\\dataset\\synthesis\\textfile_skele'
+GETT_IMG_PATH = PATH + '\\dataset\\DatasetG4'#'\\dataset\\DatasetG2'
+GETT_COMPRESS_PATH = PATH + '\\dataset\\synthesis\\textfile_edge'
 # select machine learning model
 MODEL = ML_CNN
 
 # restore save model
 # for example, PATH+"\\savedModel\\modelCNN"
-GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN_skele"
+GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN_Real_edge"
 GETT_KNN_PATH = PATH
 GETT_RF_PATH = PATH
 GETT_HAR_PATH = PATH
@@ -189,9 +189,14 @@ def confusionMat(correct_Labels, Predicted_Labels):
         for j in range(size):
             sumVerHor[0][i] += con_mat[j,i]
             sumVerHor[1][i] += con_mat[i,j]
-        Precision[i] = con_mat[i,i]/sumVerHor[0,i]
-        Recall[i] = con_mat[i,i]/sumVerHor[1,i]
-        F1[i] = (Recall[i] * Precision[i] * 2.00) / (Recall[i] + Precision[i])
+        if con_mat[i,i] != 0:
+            Precision[i] = con_mat[i,i]/sumVerHor[0,i]
+            Recall[i] = con_mat[i,i]/sumVerHor[1,i]
+            F1[i] = (Recall[i] * Precision[i] * 2.00) / (Recall[i] + Precision[i])
+        else:
+            Precision[i] = 0.00
+            Recall[i] = 0.00
+            F1[i] = 0.00
     for i in range(size):
         total_pres = total_pres + (con_mat[i, i])
         print('---------------------------------------------------')
@@ -342,9 +347,10 @@ elif MODE == FROM_IMAGE:
 elif MODE == FROM_COMPRESS:
     true_label = []
     actualVSpredict = [[],[]]
+    sett = 0
     for i in range(0,300,50):
-        print('testing section',i,'from',1000)
-        testingset,trainingset,validationset = getData(GETT_COMPRESS_PATH,30,IMAGE_SIZE,ni=i,n=i+50,readList=[0,0,0],ttv=[0,0,0])
+        print('testing section',i)
+        testingset,trainingset,validationset = getData(GETT_COMPRESS_PATH,30,IMAGE_SIZE,ni=i,n=i+50,readList=[sett,sett,sett],ttv=[sett,sett,sett])
         pred = sess.run(pred_prob,feed_dict={x: testingset[0]})
         true_label = np.argmax(testingset[1],axis=1)
         actualVSpredict[0] += list(pred)

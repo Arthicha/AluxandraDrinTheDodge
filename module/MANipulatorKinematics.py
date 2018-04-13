@@ -282,7 +282,6 @@ if 1:
                   [-math.pi,math.pi],
                   [-3*math.pi/4,3*math.pi/4],
                   [-math.pi/2,math.pi/2],
-                  [-2*math.pi,2*math.pi],
                   [-math.pi/2,math.pi/2]]
 
     DELTA = 1
@@ -317,24 +316,34 @@ if 1:
             # define position
             if key == 115:
                 x -= step
+                print('\tKEYBOARDINPUT:','s')
             elif key == 119:
                 x += step
+                print('\tKEYBOARDINPUT:', 'w')
             elif key == 97:
                 y -= step
+                print('\tKEYBOARDINPUT:', 'a')
             elif key == 100:
                 y += step
+                print('\tKEYBOARDINPUT:', 'd')
             elif key == 101:
                 z += step
+                print('\tKEYBOARDINPUT:', 'e')
             elif key == 113:
                 z -= step
+                print('\tKEYBOARDINPUT:', 'q')
             elif key == 105:
                 R_e = RE_F
+                print('\tKEYBOARDINPUT:', 'i')
             elif key == 106:
                 R_e = RE_R
+                print('\tKEYBOARDINPUT:', 'j')
             elif key == 107:
                 R_e = RE_B
+                print('\tKEYBOARDINPUT:', 'k')
             elif key == 108:
                 R_e = RE_L
+                print('\tKEYBOARDINPUT:', 'l')
 
 
             #x = randint(0,500)
@@ -363,7 +372,7 @@ if 1:
                 H,_ = MAN.forward_kin(DH_param,ans_q)
                 P = H[:3,-1]
                 error = abs(x-P[0])+abs(y-P[1])+abs(z-P[2])
-                print('error:',error)
+                #print('error:',error)
             if len(ans) == 0:
                 sys.exit('joint limit fail')
             H_a = []
