@@ -85,8 +85,8 @@ def Gennie(font_path,font,wordlist,percTH=0.04,waitTime=1,start=0):
                 image = RND_MORPH(image,MORPH)
                 #image = RND_MOVE(image,MOVE)
                 image = RND_GAMMA(image,GAMMA)
-                #image = IP.auto_canny(image,sigma=0.33)
-                #image = 255-image
+                image = IP.auto_canny(image,sigma=0.33)
+                image = 255-image
                 #image = Zkele(image,sauvola=15,method='3d')
                 white = np.count_nonzero(image)
                 area = IMAGE_SHAPE[0]*IMAGE_SHAPE[1]
@@ -96,9 +96,10 @@ def Gennie(font_path,font,wordlist,percTH=0.04,waitTime=1,start=0):
                 stringy = np.array2string(((image.ravel())).astype(int), max_line_width=IMAGE_SHAPE[0]*IMAGE_SHAPE[1]*(AUGMOUNT+2),separator=',')
                 write += stringy[1:-1] + "\n"
                 if i == 0:
+                    #cv2.imwrite(MAIN_PATH+'\\dataset\\synthesis\\image\\'+str(w+start)+'_'+str(process)+'.png',image)
                     cv2.imshow('image',image)
                     cv2.waitKey(waitTime)
-            if process==len(font)*0.2:
+            '''if process==len(font)*0.2:
                 open(SAVE_PATH+FILENAME[w+start]+"_"+"test" + '.txt', 'w').close()
                 file = open(SAVE_PATH+FILENAME[w+start] +"_"+"test"+ '.txt', 'a')
                 file.write(write)
@@ -114,7 +115,7 @@ def Gennie(font_path,font,wordlist,percTH=0.04,waitTime=1,start=0):
                 open(SAVE_PATH+FILENAME[w+start] + "_" + "train" + '.txt', 'w').close()
                 file = open(SAVE_PATH+FILENAME[w+start] + "_" + "train"+ '.txt', 'a')
                 file.write(write)
-                file.close()
+                file.close()'''
 
 for i in range(0,len(Font_Path)):
     # loop through NUM, ENG and THAI

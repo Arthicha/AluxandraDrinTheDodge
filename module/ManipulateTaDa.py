@@ -7,6 +7,9 @@ import os
 import random
 import copy
 
+# set numpy to print/show all every element in matrix
+np.set_printoptions(threshold=np.inf)
+
 def getData(foldername,N_CLASS,IMG_SIZE,ni=0,n=-1,readList=[0,1,2],ttv=[0,1,2],dtype=np.uint8):
 
     '''

@@ -32,13 +32,18 @@ import matlab.engine
 *************************************************'''
 
 def callMatFunc(funcname,argumentDict,outputs):
-    eng = matlab.engine.start_matlab()
     getRes = getattr(eng,str(funcname))(argumentDict,nargout=outputs)
     return getRes
-
 
 def callSimulink(simulinkName,blockName):
     eng = matlab.engine.start_matlab()
     Sim = eng.sim(simulinkName,'SimulationMode','normal')
     getSim = Sim.get(blockName)
     return getSim
+
+# send array to matlab function and return
+# eng = matlab.engine.start_matlab()
+# A = matlab.int8([1,2,3,4,5])
+# y = {'arg1': A , 'arg2': A}
+# r = callMatFunc('yourfunc',y,1)
+# print(r)
