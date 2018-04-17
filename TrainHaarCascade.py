@@ -1,4 +1,4 @@
-# ~/virtualenv/ROBOTICS_studios/bin/python
+# !#/home/kitti/virtualenv/ROBOTICS_studios/bin/python
 
 '''*************************************************
 *                                                  *
@@ -8,16 +8,16 @@
 import sys
 import os
 
-from module.trainCascade import trainCascade
+from module.HaarLikeFeature import trainCascade
 
 scaleWeightHeight = 0.5
-scalePosNeg = 1
+scalePosNeg = 0.6
 memoryUse = 4096
 multiPos = 1
 
-minHitRate = 0.960
-maxFalseAlarmRate = 0.200
-weightTrimRate = 0.65
+minHitRate = 0.980
+maxFalseAlarmRate = 0.2
+weightTrimRate = 0.995
 maxDepth = 1
 maxWeakCount = 80
 
@@ -28,6 +28,6 @@ hc.settingHyperParameter(scaleWeightHeight=scaleWeightHeight, scalePosNeg=scaleP
                         maxFalseAlarmRate=maxFalseAlarmRate, weightTrimRate=weightTrimRate,
                         maxDepth=maxDepth, maxWeakCount=maxWeakCount)
 
-hc.AutoGenerateClassification(numberPerClass=1400,numstate=2, size=16)
+hc.AutoGenerateClassification(numberPerClass=0,numstate=1, size=16)
 
 # hc.removeOldData()
