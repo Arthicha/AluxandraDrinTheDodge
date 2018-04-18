@@ -11,13 +11,13 @@ import os
 from module.HaarLikeFeature import trainCascade
 
 scaleWeightHeight = 0.5
-scalePosNeg = 0.6
+scalePosNeg = 0.5
 memoryUse = 4096
 multiPos = 1
 
 minHitRate = 0.980
-maxFalseAlarmRate = 0.2
-weightTrimRate = 0.995
+maxFalseAlarmRate = 0.08
+weightTrimRate = 0.95
 maxDepth = 1
 maxWeakCount = 80
 
@@ -29,5 +29,5 @@ hc.settingHyperParameter(scaleWeightHeight=scaleWeightHeight, scalePosNeg=scaleP
                         maxDepth=maxDepth, maxWeakCount=maxWeakCount)
 
 hc.AutoGenerateClassification(numberPerClass=0,numstate=1, size=16)
-
+# hc.copyUsedModel()
 # hc.removeOldData()

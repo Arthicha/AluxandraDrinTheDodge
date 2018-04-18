@@ -18,6 +18,8 @@ def PReF1(model='', test_data=[]):
     from module.HaarLikeFeature import HaarLikeFeature
 
     keepValue = np.zeros((31,4))
+
+    # for data in test_data:
     if model == 'KNN':
         pass
     elif model == 'RF':
@@ -26,7 +28,9 @@ def PReF1(model='', test_data=[]):
         hc = HaarLikeFeature()
         hc.settingHyperParameter(scaleFactor=1.2, minNeighbors= 3)
         value = hc.testCascade()
-    
+
+        hc.displayConfusionMatrix(value)
+            #value = hc.predict(data=data,Return='prob')
     keepFN = 0
     keepTP = 0
     keepFP = 0

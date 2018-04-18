@@ -22,7 +22,7 @@ from module import FAI
 
 dirSep = os.path.sep
 
-dataSetPath = 'dataset'+dirSep+'synthesis'+dirSep+'textfile_skele'
+dataSetPath = 'dataset'+dirSep+'synthesis'+dirSep+'textfile_norm'
 
 class HaarLikeFeature:
     '''for detect text from camera with 30 haar-cascade classifier and manage classifier files
@@ -125,46 +125,30 @@ class HaarLikeFeature:
                     multiCascade.testCascade(feature='HAAR')\n
                     this function test cascade by use haar classifier method '''	
         # for suffixSelect in [0] :# ['test','train','validate']
-        keep =0
-        for j in range(len(data)): 
-            object = self.listOfClass[int((str(data[j]).split('_'))[0])]
-            f = open( self.datasetPath +dirSep+str(data[j])+'.txt','r')
-            keep += len( str(f.read()).split('\n')[:-1])
-            f.close()
-        keepData=np.zeros((keep,30 ))
-        keepDataAll = {}
-        for i in range(0,30): # 30 class
-            keepDataAll[str(self.listOfClass[i])]={}
-            for j in range(0,30): # inloop 30 class
-                keepDataAll[str(self.listOfClass[i])].update({str(self.listOfClass[j]):0})
+
+        keepData=np.zeros((len(data),30 ))
 
         imageCount = 0
-        tic = clock()
         
         self.callClassifiers(feature='HAAR')
         keep =0
-        for j in range(len(data)): 
-            object = self.listOfClass[int((str(data[j]).split('_'))[0])]
-            f = open( self.datasetPath +dirSep+str(data[j])+'.txt','r')
-            image = str(f.read()).split('\n')[:-1]
-            f.close()
             			
-            imageCount += len(image)
 
-            for i in range(len(image)):
-                image[i] = np.fromstring(image[i], dtype=int, sep=',')
-                image[i] = np.array(image[i], dtype=np.uint8)
-                image[i] = np.reshape(image[i],(self.WHfromArray1D(len(image[i]))))
-                # image[i] = 255-image[i]
-                if image[i].shape[:2] != (int(self.testResizeH/self.scaleWeightHeight),int(self.testResizeH)):
-                    image[i] = cv2.resize(image[i],(int(self.testResizeH/self.scaleWeightHeight),int(self.testResizeH)))
+        for i in range(len(data)):
+            data[i] = np.fromstring(data[i], dtype=int, sep=',')
+            data[i] = np.array(data[i], dtype=np.uint8)
+            data[i] = np.reshape(data[i],(self.WHfromArray1D(len(data[i]))))
+            # data[i] = 255-data[i]
+            if data[i].shape[:2] != (int(self.testResizeH/self.scaleWeightHeight),int(self.testResizeH)):
+                data[i] = cv2.resize(data[i],(int(self.testResizeH/self.scaleWeightHeight),int(self.testResizeH)))
 
 
-                detect = self.detectFromCascade(image=image[i])
-                
-                for det in detect:
+            detect = self.detectFromCascade(image=data[i])
+            
+            for det in detect:
 
-                    keepData[keep,int(det)] += 1
+                keepData[keep,int(det)] += 1
+            keep +=1
 
         if Return == 'prob':
             return  keepData
@@ -212,9 +196,9 @@ class HaarLikeFeature:
                     detect = self.detectFromCascade(image=image[i])
                     # keepData[object]+=detect[str(object)]
                     
-                    
-                    for obj in range(30):
-                        keepDataAll[j][obj] += int(detect[str(j)])
+                    # print (detect)
+                    for obj in detect:
+                        keepDataAll[j][int(obj)] += int(detect[obj])
 
                 toc_n = clock()
 
@@ -415,13 +399,15 @@ class trainCascade:
             example\n
                     trainCascade.copyUsedModel()\n'''
         keep =0
+        a = {}
+        for i in range(30):
+            a[str(self.listOfClass[i])] = i
         for filePath in os.listdir(self.mainOutputPath):
             shutil.copy(self.mainOutputPath+dirSep+filePath+dirSep+
                         'cascade.xml',self.trainModelPath+ dirSep+ 
-                        str(keep)+'.xml')
-            keep +=1
-
-        return 0 
+                        str(a[filePath])+'.xml')
+        
+        return 0
 
     def settingHyperParameter(self, scaleWeightHeight=0.5, scalePosNeg=10,
                                 memoryUse=1024, multiPos=1, minHitRate=0.950,

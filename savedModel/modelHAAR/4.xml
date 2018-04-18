@@ -8,8 +8,8 @@
   <stageParams>
     <boostType>GAB</boostType>
     <minHitRate>9.8000001907348633e-01</minHitRate>
-    <maxFalseAlarm>2.0000000298023224e-01</maxFalseAlarm>
-    <weightTrimRate>9.9500000476837158e-01</weightTrimRate>
+    <maxFalseAlarm>7.9999998211860657e-02</maxFalseAlarm>
+    <weightTrimRate>9.4999998807907104e-01</weightTrimRate>
     <maxDepth>1</maxDepth>
     <maxWeakCount>80</maxWeakCount></stageParams>
   <featureParams>
@@ -20,20 +20,44 @@
   <stages>
     <!-- stage 0 -->
     <_>
-      <maxWeakCount>1</maxWeakCount>
-      <stageThreshold>9.7123289108276367e-01</stageThreshold>
+      <maxWeakCount>3</maxWeakCount>
+      <stageThreshold>5.5930405855178833e-01</stageThreshold>
       <weakClassifiers>
         <_>
           <internalNodes>
-            0 -1 0 1.0413835942745209e-01</internalNodes>
+            0 -1 2 -6.2119234353303909e-03</internalNodes>
           <leafValues>
-            -9.5656108856201172e-01 9.7123289108276367e-01</leafValues></_></weakClassifiers></_></stages>
+            8.7568157911300659e-01 -9.5876288414001465e-01</leafValues></_>
+        <_>
+          <internalNodes>
+            0 -1 0 -2.6941627264022827e-01</internalNodes>
+          <leafValues>
+            7.7804964780807495e-01 -9.5932292938232422e-01</leafValues></_>
+        <_>
+          <internalNodes>
+            0 -1 1 9.4566540792584419e-03</internalNodes>
+          <leafValues>
+            -9.0712636709213257e-01 7.4001723527908325e-01</leafValues></_></weakClassifiers></_></stages>
   <features>
     <_>
       <rects>
         <_>
-          18 0 13 16 -1.</_>
+          0 0 30 16 -1.</_>
         <_>
-          18 8 13 8 2.</_></rects>
+          15 0 15 16 2.</_></rects>
+      <tilted>0</tilted></_>
+    <_>
+      <rects>
+        <_>
+          16 5 3 6 -1.</_>
+        <_>
+          16 7 3 2 3.</_></rects>
+      <tilted>0</tilted></_>
+    <_>
+      <rects>
+        <_>
+          16 8 2 4 -1.</_>
+        <_>
+          16 10 2 2 2.</_></rects>
       <tilted>0</tilted></_></features></cascade>
 </opencv_storage>
