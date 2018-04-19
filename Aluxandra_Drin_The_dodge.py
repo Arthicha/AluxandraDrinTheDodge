@@ -15,7 +15,6 @@ import copy
 
 # 2. machine learning module
 import tensorflow as tf
-from sklearn.externals import joblib
 
 # 3. mathematical module
 import numpy as np
@@ -28,8 +27,7 @@ from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_
 from module.Retinutella_theRobotEye import Retinutella
 from module.RandomFunction import *
 from module.Zkeleton import Zkele
-from module.PuenBan_K_Tua import PuenBan_K_Tua
-from module import PaZum
+
 # 5. visualization module
 import matplotlib.pyplot as plt
 
@@ -58,7 +56,7 @@ ML_RF = 2
 ML_HAR = 3
 
 PATH = os.getcwd()
-sep = os.path.sep
+
 
 '''*************************************************
 *                                                  *
@@ -76,9 +74,9 @@ MODEL = ML_CNN
 
 # restore save model
 # for example, PATH+"\\savedModel\\modelCNN"
-GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN"
-GETT_KNN_PATH = PATH+sep+'savedModel'+sep+'modelKNN'
-GETT_RF_PATH = PATH+"\\savedModel\\modelRandomForest\\Random_Forest_best_run.pkl"
+GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN_edge"
+GETT_KNN_PATH = PATH
+GETT_RF_PATH = PATH
 GETT_HAR_PATH = PATH
 
 CONTINUE = False
@@ -108,22 +106,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 *                                                  *
 *************************************************'''
 
-cam = Retinutella('cam1',1,0,cameraMode=1)
+cam = Retinutella('cam1',0,0,cameraMode=1)
 cam2 = Retinutella('cam2',0,0,cameraMode=0)
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
             "zero","one","two","three","four","five","six","seven","eight","nine",
             "soon","nung","song","sam","see","ha","hok","jed","pad","kaow"]
-
-'''*************************************************
-*                                                  *
-*                 function                         *
-*                                                  *
-*************************************************'''
-def log_prob(prob_1,prob_2,prob_3):
-    sum_of_all = list(map(lambda x,y,z: np.add(np.add(x,y),z),prob_1,prob_2,prob_3))
-    class_of_all = list(map(lambda x: np.argmax(x),sum_of_all))
-    return class_of_all
 
 '''*************************************************
 *                                                  *
@@ -169,53 +157,6 @@ if GETT_CNN_PATH != None:
 
 '''*************************************************
 *                                                  *
-*                    KNN model                     *
-*                                                  *
-*************************************************'''
-
-testKNN = PuenBan_K_Tua()
-
-def predictKNN(img=[]):
-    hog = testKNN.HOG_int()
-
-    test_hog_descriptors = []
-    rePred = []
-
-    for imgCount in range(len(img)):
-    # data = np.random.sample((32*64)) *255
-        data = img[imgCount].astype(np.uint8)
-
-        data = data.reshape(-1,(64))
-        imgs = data.astype(np.uint8)
-
-        imgs = testKNN.deskew(imgs)
-        try :
-            test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
-            test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
-
-            test_hog_descriptors = np.squeeze(test_hog_descriptors)
-            model = joblib.load(GETT_KNN_PATH+ sep+ 'knn_model_real.pkl','r')
-
-            pred = model.predict(test_hog_descriptors.tolist())
-            rePred.append(int(pred[0]))
-        except:
-            rePred.append(int(pred[0]))
-    return rePred
-
-
-'''*************************************************
-*                                                  *
-*             Random Forest model                  *
-*                                                  *
-*************************************************'''
-if MODEL == ML_RF:
-    if GETT_RF_PATH != None:
-        forest = PaZum.PaZum(GETT_RF_PATH)
-    else:
-        raise SyntaxError(" If u give us no path to the model how could we restore it!!!")
-
-'''*************************************************
-*                                                  *
 *                   main program                   *
 *                                                  *
 *************************************************'''
@@ -250,12 +191,6 @@ while(1):
         if MODEL is ML_CNN:
             pred_result = sess.run(pred_prob,feed_dict={x: list_vector})
 
-        if MODEL is ML_KNN:
-            pred_result = predictKNN(list_vector*255)
-
-        if MODEL is ML_RF:
-            pred_result = forest.predict(plate,'class')
-
 
 
     #show and finally destroy those windows.
@@ -267,4 +202,3 @@ while(1):
         cv2.putText(corg, str(NUM2WORD[pred_result[p]]), (50, 400), font, 5, (0, 0, 255), 5, cv2.LINE_AA)
     cam.show(corg,wait=30)
     cam.destroyWindows()
-
