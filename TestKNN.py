@@ -58,15 +58,17 @@ def detect(img=[]):
         imgs = data.astype(np.uint8)
 
         imgs = testKNN.deskew(imgs)
-        test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
-        test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
+        try :
+            test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
+            test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
 
-        test_hog_descriptors = np.squeeze(test_hog_descriptors)
-        model = joblib.load(savepath+ dirSep+ 'knn_model_real.pkl','r')
+            test_hog_descriptors = np.squeeze(test_hog_descriptors)
+            model = joblib.load(savepath+ dirSep+ 'knn_model_real.pkl','r')
 
-        pred = model.predict(test_hog_descriptors.tolist())    
-        rePred.append([pred[i] for i in range(int(len(pred)/2))][0])
-
+            pred = model.predict(test_hog_descriptors.tolist())    
+            rePred.append(pred[0])
+        except:
+            rePred.append(pred[0])
     return rePred
 
 '''---------------------------------------'''
@@ -154,10 +156,9 @@ if testCode == 1:
             # list_vector = list_vector/255
             
             outp = detect(list_vector)
-            print(outp)
+
         #show and finally destroy those windows.
         for p in range(0,len(plate)):
-            print(outp[p])
             plate[p] = cv2.resize(plate[p],(IMAGE_SIZE[1]*5,IMAGE_SIZE[0]*5))
             cam.show(plate[p],frame='plate_'+str(NUM2WORD[int(outp[p])]))
             
