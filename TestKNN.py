@@ -12,7 +12,7 @@ from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_
 from module.Retinutella_theRobotEye import Retinutella
 from module.RandomFunction import *
 from module.Zkeleton import Zkele
-
+from random import choice
 import matplotlib.pyplot as plt
 '''*************************************************
 *                                                  *
@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 *                                                  *
 *************************************************'''
 
-testCode = 1
+testCode = 2
 
 testKNN = PuenBan_K_Tua()
 
@@ -42,13 +42,17 @@ hog_descriptors = []
 
 dirSep = os.path.sep
 
+path = os.getcwd() +  dirSep + 'dataset' + dirSep + 'synthesis' + dirSep + 'textfile_skele'
+# path = os.getcwd() +  dirSep + 'dataset' + dirSep + 'real'
+dirs = os.listdir(path)
+savepath = os.getcwd() + dirSep + 'savedModel' + dirSep + 'modelKNN'
+
 '''---------------------------------------'''
 
 # model parameters
 def detect(img=[]):
     test_hog_descriptors = []
     rePred = []
-    savepath = os.getcwd() + dirSep + 'savedModel' + dirSep + 'modelKNN'
 
     for imgCount in range(len(img)):
     # data = np.random.sample((32*64)) *255
@@ -79,10 +83,7 @@ if testCode ==0:
     test_lables = []
     val_hog_descriptors = []
     val_lables = []
-    path = os.getcwd() +  dirSep + 'dataset' + dirSep + 'synthesis' + dirSep + 'textfile_skele'
-    # path = os.getcwd() +  dirSep + 'dataset' + dirSep + 'real'
-    dirs = os.listdir(path)
-    savepath = os.getcwd() + dirSep + 'savedModel' + dirSep + 'modelKNN'
+
 
     TEST_SC = []
     K = []
@@ -167,3 +168,47 @@ if testCode == 1:
             cv2.putText(corg, str(NUM2WORD[int(outp[p])]), (50, 400), font, 5, (0, 0, 255), 5, cv2.LINE_AA)
         cam.show(corg,wait=30)
         cam.destroyWindows()
+
+'''---------------------------------------'''
+
+if testCode ==2:
+
+
+    K = {}
+    accuracy = {}
+    colorKeep = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    color = colorKeep
+
+    numberData = 0
+    for data in dirs:
+        with open(path+dirSep+data,'r') as f:
+            numberData += len(str(f.read()).split('\n'))-1
+
+    listKey = [i for i in os.listdir(savepath) if str(i).split('.')[1] == 'txt']
+    listKey = sorted([int(str(str(i).split('Accuracy')[1]).split('.')[0]) for i in listKey ],reverse=True)
+    listKey = ['kAccuracy'+str(i)+'.txt' for i in listKey]
+
+    for dataAcc in listKey:
+        
+        nameK = str(str(dataAcc).split('Accuracy')[1]).split('.')[0]
+        K[nameK] = []
+        accuracy[nameK] = []
+        f = open(savepath+dirSep+dataAcc,'r')
+        accu = f.read()
+        f.close()
+        accu = accu.split('\n')
+        
+        for acc in accu[:-1]:
+            K[nameK].append( float(str(acc).split(':')[0]) )
+            accuracy[nameK].append( float(str(acc).split(':')[1]) )
+
+        colorK = choice(color)
+        color.remove(colorK)
+        if color == []:
+            color = colorKeep
+        
+        plt.plot(K[nameK],accuracy[nameK],colorK,label = str(int(int(nameK)*numberData/100))+' datas' )
+    plt.xlabel('K')
+    plt.ylabel('accuracy')
+    plt.legend()
+    plt.show()

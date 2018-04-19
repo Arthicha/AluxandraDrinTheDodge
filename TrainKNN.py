@@ -6,13 +6,16 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.externals import joblib
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.feature_selection import SelectFromModel
+from random import shuffle
+from time import time
+
 '''*************************************************
 *                                                  *
 *                 configuration                    *
 *                                                  *
 *************************************************'''
 
-testKNN = PuenBan_K_Tua()
+trainKNN = PuenBan_K_Tua()
 
 # HOG parameters
 winSize = (16,16)
@@ -27,7 +30,7 @@ L2HysThreshold = 0.2
 gammaCorrection = 1
 nlevels = 64
 signedGradients = True
-hog = testKNN.HOG_int()
+hog = trainKNN.HOG_int()
 hog_descriptors = []
 
 dirSep = os.path.sep
@@ -45,14 +48,16 @@ savepath = os.getcwd() + dirSep + 'savedModel' + dirSep + 'modelKNN'
 TEST_SC = []
 K = []
 
-
+maxDataCount = 0.15
+if maxDataCount > 1.00:
+    maxDataCount == 1.00
 
 '''*************************************************
 *                                                  *
 *                 main function                    *
 *                                                  *
 *************************************************'''
-
+print('select data '+str(int(maxDataCount*100)) +' %' ) 
 #Import test and training data
 for files in dirs:
     a = files.split('_')
@@ -64,6 +69,9 @@ for files in dirs:
         director.close()
         data=data.split('\n')
         data=data[:-1]
+        shuffle(data)
+        data = data[:int(len(data)*maxDataCount)]
+
         num =0
         for x in data:
             lisss=x.split(',')
@@ -71,7 +79,7 @@ for files in dirs:
             img = img.reshape(-1,(64))
             img = img.astype(np.uint8)
             num += 1
-            img = testKNN.deskew(img)
+            img = trainKNN.deskew(img)
             hog_descriptors.append(hog.compute(img,winStride=(16,16)))
             lables.append(str(lab))
         # print('appended train '+str(files))
@@ -82,6 +90,9 @@ for files in dirs:
         directors.close()
         datas=datas.split('\n')
         datas=datas[:-1]
+        shuffle(datas)
+        datas = datas[:int(len(datas)*maxDataCount)]
+
         num =0
         for z in datas:
             lisss=z.split(',')
@@ -89,7 +100,7 @@ for files in dirs:
             imgs = imgs.reshape(-1,(64))
             imgs = imgs.astype(np.uint8)
             num += 1
-            imgs = testKNN.deskew(imgs)
+            imgs = trainKNN.deskew(imgs)
             test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
             test_lables.append(str(labs))
         # print('appended test '+str(files))
@@ -100,6 +111,9 @@ for files in dirs:
         directors.close()
         datas=datas.split('\n')
         datas=datas[:-1]
+        shuffle(datas)
+        datas = datas[:int(len(datas)*maxDataCount)]
+
         num =0
         for z in datas:
             lisss=z.split(',')
@@ -107,10 +121,14 @@ for files in dirs:
             imgs = imgs.reshape(-1,(64))
             imgs = imgs.astype(np.uint8)
             num += 1
-            imgs = testKNN.deskew(imgs)
+            imgs = trainKNN.deskew(imgs)
             val_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
             val_lables.append(str(labs))
         # print('appended test '+str(files))
+
+# print((len(val_hog_descriptors),len(hog_descriptors),len(test_hog_descriptors) ))
+
+
 hog_descriptors = np.squeeze(hog_descriptors)
 lables = np.squeeze(lables)
 
@@ -120,7 +138,6 @@ test_lables = np.squeeze(test_lables)
 val_hog_descriptors = np.squeeze(val_hog_descriptors)
 val_lables = np.squeeze(val_lables)
 
-print(hog_descriptors.shape)
 
 print('Begining feature selection...')
 #feature selection
@@ -131,13 +148,16 @@ X_new = modeltree.transform(hog_descriptors)
 test_new = modeltree.transform(test_hog_descriptors)
 
 #change the range of m to find k parameter
-for m in range(8,9):
+ticAll = time()
+for m in range(3,15):
     print('REAL DATA FILE TRAINING********************************************* K :'+str(m))
+    tic = time()
     # print('Begining Knn fitting...')
     neigh = KNeighborsClassifier(n_neighbors=m)
     neigh.fit(X_new, lables)
+    s = neigh
     # save model
-    joblib.dump(neigh, savepath+ dirSep+ 'knn_model_real.pkl')
+    joblib.dump(s, savepath+ dirSep+ 'knn_model_real_'+str(int(maxDataCount*100))+'.pkl')
     print('Model saved!')
     pred = neigh.predict(test_new)
     print('predicted....')
@@ -153,7 +173,7 @@ for m in range(8,9):
             # print("train score :   " + str(train_score))
             test_score = neigh.score(all_hog_descriptors[(i+2)%3].tolist(), all_target[(i+2)%3].tolist())
             # print("test score :   " + str(test_score))
-            print(all_hog_descriptors[(i+2)%3].tolist())
+            # print(all_hog_descriptors[(i+2)%3].tolist())
             Label_Pred = neigh.predict(all_hog_descriptors[(i+2)%3].tolist())
             # confusionMat(all_target[(i+2)%3].tolist(), Label_Pred)
             # print(classification_report( all_target[(i+2)%3].tolist(), Label_Pred))
@@ -162,12 +182,21 @@ for m in range(8,9):
                 best_test_target =all_target[(i+2)%3].tolist()
                 best_pred=Label_Pred
                 s = neigh
-    joblib.dump(s, savepath+ dirSep+ 'knn_model_real.pkl')
-    print('Model saved!')
-    testKNN.confusionMat(best_test_target, best_pred)
+                joblib.dump(s, savepath+ dirSep+ 'knn_model_real_'+str(int(maxDataCount*100))+'.pkl')                
+    
+    # trainKNN.confusionMat(best_test_target, best_pred)
     print(best_score)
     TEST_SC.append(best_score)
     K.append(m)
+    toc = time()
+    print('estimated time per K : ' + str(int((toc-tic)/3600)) +' h ' + str(int(((toc-tic)/60)%60)) +' m ' +str(int((toc-tic)%60)) +' s ' )
+    print('estimated time at start : ' + str(int((toc-ticAll)/3600)) +' h ' + str(int(((toc-ticAll)/60)%60)) +' m ' +str(int((toc-ticAll)%60)) +' s ' )
     print('*************************************************************************************')
-testKNN.plotKgraph(K, TEST_SC)
+trainKNN.confusionMat(best_test_target, best_pred)
+trainKNN.plotKgraph(K, TEST_SC)
+joblib.dump(s, savepath+ dirSep+ 'knn_model_real_'+str(int(maxDataCount*100))+'.pkl')
+print('Model saved!')
 
+with open(savepath+dirSep+'kAccuracy'+str(int(maxDataCount*100))+'.txt' ,'w') as  f:
+    for i in range(len(K)):
+        f.write(str(K[i])+':'+str(TEST_SC[i])+'\n' )
