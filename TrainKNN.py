@@ -15,10 +15,10 @@ from sklearn.feature_selection import SelectFromModel
 testKNN = PuenBan_K_Tua()
 
 # HOG parameters
-winSize = (20,20)
-blockSize = (10,10)
-blockStride = (5,5)
-cellSize = (10,10)
+winSize = (16,16)
+blockSize = (8,8)
+blockStride = (4,4)
+cellSize = (8,8)
 nbins = 9
 derivAperture = 1
 winSigma = -1.
@@ -72,7 +72,7 @@ for files in dirs:
             img = img.astype(np.uint8)
             num += 1
             img = testKNN.deskew(img)
-            hog_descriptors.append(hog.compute(img,winStride=(20,20)))
+            hog_descriptors.append(hog.compute(img,winStride=(16,16)))
             lables.append(str(lab))
         # print('appended train '+str(files))
     if d == 'test.txt':
@@ -90,7 +90,7 @@ for files in dirs:
             imgs = imgs.astype(np.uint8)
             num += 1
             imgs = testKNN.deskew(imgs)
-            test_hog_descriptors.append(hog.compute(imgs,winStride=(20,20)))
+            test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
             test_lables.append(str(labs))
         # print('appended test '+str(files))
     if d == 'validate.txt':
@@ -108,7 +108,7 @@ for files in dirs:
             imgs = imgs.astype(np.uint8)
             num += 1
             imgs = testKNN.deskew(imgs)
-            val_hog_descriptors.append(hog.compute(imgs,winStride=(20,20)))
+            val_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
             val_lables.append(str(labs))
         # print('appended test '+str(files))
 hog_descriptors = np.squeeze(hog_descriptors)
@@ -151,6 +151,7 @@ for m in range(8,9):
             # print("train score :   " + str(train_score))
             test_score = neigh.score(all_hog_descriptors[(i+2)%3].tolist(), all_target[(i+2)%3].tolist())
             # print("test score :   " + str(test_score))
+            print(all_hog_descriptors[(i+2)%3].tolist())
             Label_Pred = neigh.predict(all_hog_descriptors[(i+2)%3].tolist())
             # confusionMat(all_target[(i+2)%3].tolist(), Label_Pred)
             # print(classification_report( all_target[(i+2)%3].tolist(), Label_Pred))
@@ -159,6 +160,8 @@ for m in range(8,9):
                 best_test_target =all_target[(i+2)%3].tolist()
                 best_pred=Label_Pred
                 s = neigh
+    joblib.dump(s, savepath+ dirSep+ 'knn_model_real.pkl')
+    print('Model saved!')
     testKNN.confusionMat(best_test_target, best_pred)
     print(best_score)
     TEST_SC.append(best_score)
