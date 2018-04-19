@@ -202,3 +202,8 @@ while(1):
         cv2.putText(corg, str(NUM2WORD[pred_result[p]]), (50, 400), font, 5, (0, 0, 255), 5, cv2.LINE_AA)
     cam.show(corg,wait=30)
     cam.destroyWindows()
+
+def log_prob(prob_1,prob_2,prob_3):
+    sum_of_all = list(map(lambda x,y,z: x+y+z,prob_1,prob_2,prob_3))
+    class_of_all = list(map(lambda x: x,sum_of_all))
+    return class_of_all
