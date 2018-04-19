@@ -17,7 +17,7 @@ import itertools
 # 2. machine learning module
 import tensorflow as tf
 from sklearn.metrics import confusion_matrix
-
+from sklearn.externals import joblib
 # 3. mathematical module
 import numpy as np
 import pandas as pd
@@ -31,6 +31,8 @@ from module.Retinutella_theRobotEye import Retinutella
 from module.RandomFunction import *
 from module.Zkeleton import Zkele
 from module.ManipulateTaDa import getData
+from module.PuenBan_K_Tua import PuenBan_K_Tua
+from module import PaZum
 
 # 5. visualization module
 import matplotlib.pyplot as plt
@@ -85,15 +87,16 @@ FONTSHIFT = 1
 NUM_IMG = 100
 
 GETT_IMG_PATH = PATH + '\\dataset\\DatasetG4'#'\\dataset\\DatasetG2'
-GETT_COMPRESS_PATH = PATH + '\\dataset\\synthesis\\textfile_edge'
+GETT_COMPRESS_PATH = PATH + '\\dataset\\synthesis\\textfile_skele'
 # select machine learning model
 MODEL = ML_CNN
+sep = os.path.sep
 
 # restore save model
 # for example, PATH+"\\savedModel\\modelCNN"
-GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN_Real_edge"
-GETT_KNN_PATH = PATH
-GETT_RF_PATH = PATH
+GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN_skele"
+GETT_KNN_PATH = PATH+sep+'savedModel'+sep+'modelKNN'
+GETT_RF_PATH = PATH+"\\savedModel\\modelRandomForest\\Random_Forest_best_run.pkl"
 GETT_HAR_PATH = PATH
 
 CONTINUE = False
@@ -220,6 +223,16 @@ def confusionMat(correct_Labels, Predicted_Labels):
 
 '''*************************************************
 *                                                  *
+*                 function                         *
+*                                                  *
+*************************************************'''
+def log_prob(prob_1,prob_2,prob_3):
+    sum_of_all = list(map(lambda x,y,z: np.add(np.add(x,y),z),prob_1,prob_2,prob_3))
+    class_of_all = list(map(lambda x: np.argmax(x),sum_of_all))
+    return class_of_all
+
+'''*************************************************
+*                                                  *
 *                    CNN model                     *
 *                                                  *
 *************************************************'''
@@ -249,6 +262,53 @@ sess.run(tf.global_variables_initializer())
 if GETT_CNN_PATH != None:
     saver.restore(sess, GETT_CNN_PATH+'\\modelCNN.ckpt')
     print("Get model from path: %s" % GETT_CNN_PATH+'\\modelCNN.ckpt')
+
+'''*************************************************
+*                                                  *
+*                    KNN model                     *
+*                                                  *
+*************************************************'''
+
+testKNN = PuenBan_K_Tua()
+
+def predictKNN(img=[]):
+    hog = testKNN.HOG_int()
+
+    test_hog_descriptors = []
+    rePred = []
+
+    for imgCount in range(len(img)):
+    # data = np.random.sample((32*64)) *255
+        data = img[imgCount].astype(np.uint8)
+
+        data = data.reshape(-1,(64))
+        imgs = data.astype(np.uint8)
+
+        imgs = testKNN.deskew(imgs)
+        try :
+            test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
+            test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
+
+            test_hog_descriptors = np.squeeze(test_hog_descriptors)
+            model = joblib.load(GETT_KNN_PATH+ sep+ 'knn_model_real.pkl','r')
+
+            pred = model.predict(test_hog_descriptors.tolist())
+            rePred.append(int(pred[0]))
+        except:
+            rePred.append(int(pred[0]))
+    return rePred
+
+'''*************************************************
+*                                                  *
+*             Random Forest model                  *
+*                                                  *
+*************************************************'''
+if 1:
+    if GETT_RF_PATH != None:
+        forest = PaZum.PaZum(GETT_RF_PATH)
+    else:
+        raise SyntaxError(" If u give us no path to the model how could we restore it!!!")
+
 
 '''*************************************************
 *                                                  *
@@ -351,7 +411,11 @@ elif MODE == FROM_COMPRESS:
     for i in range(0,300,50):
         print('testing section',i)
         testingset,trainingset,validationset = getData(GETT_COMPRESS_PATH,30,IMAGE_SIZE,ni=i,n=i+50,readList=[sett,sett,sett],ttv=[sett,sett,sett])
-        pred = sess.run(pred_prob,feed_dict={x: testingset[0]})
+        # pred = sess.run(y_pred,feed_dict={x: testingset[0]})
+        pred_result1 = sess.run(y_pred, feed_dict={x: testingset[0]})
+        pred_result2 = predictKNN(testingset[0] * 255)
+        pred_result3 = forest.predict(testingset[0], 'prob')
+        pred = log_prob(pred_result1, pred_result2, pred_result3)
         true_label = np.argmax(testingset[1],axis=1)
         actualVSpredict[0] += list(pred)
         actualVSpredict[1] += list(true_label)
