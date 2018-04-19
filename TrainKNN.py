@@ -120,6 +120,8 @@ test_lables = np.squeeze(test_lables)
 val_hog_descriptors = np.squeeze(val_hog_descriptors)
 val_lables = np.squeeze(val_lables)
 
+print(hog_descriptors.shape)
+
 print('Begining feature selection...')
 #feature selection
 forest = ExtraTreesClassifier()

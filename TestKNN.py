@@ -79,8 +79,8 @@ if testCode ==0:
     test_lables = []
     val_hog_descriptors = []
     val_lables = []
-    # path = os.getcwd() +  dirSep + 'dataset' + dirSep + 'synthesis' + dirSep + 'textfile_skele'
-    path = os.getcwd() +  dirSep + 'dataset' + dirSep + 'real'
+    path = os.getcwd() +  dirSep + 'dataset' + dirSep + 'synthesis' + dirSep + 'textfile_skele'
+    # path = os.getcwd() +  dirSep + 'dataset' + dirSep + 'real'
     dirs = os.listdir(path)
     savepath = os.getcwd() + dirSep + 'savedModel' + dirSep + 'modelKNN'
 
@@ -106,7 +106,7 @@ if testCode ==0:
             imgs = testKNN.deskew(imgs)
             
             test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
-            break    
+            # break    
     test_hog_descriptors = np.squeeze(test_hog_descriptors)
 
 
