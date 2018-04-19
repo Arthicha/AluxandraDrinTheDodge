@@ -15,6 +15,7 @@ import copy
 
 # 2. machine learning module
 import tensorflow as tf
+from sklearn.externals import joblib
 
 # 3. mathematical module
 import numpy as np
@@ -27,6 +28,7 @@ from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_
 from module.Retinutella_theRobotEye import Retinutella
 from module.RandomFunction import *
 from module.Zkeleton import Zkele
+from module.PuenBan_K_Tua import PuenBan_K_Tua
 
 # 5. visualization module
 import matplotlib.pyplot as plt
@@ -56,7 +58,7 @@ ML_RF = 2
 ML_HAR = 3
 
 PATH = os.getcwd()
-
+sep = os.path.sep
 
 '''*************************************************
 *                                                  *
@@ -75,7 +77,7 @@ MODEL = ML_CNN
 # restore save model
 # for example, PATH+"\\savedModel\\modelCNN"
 GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN"
-GETT_KNN_PATH = PATH
+GETT_KNN_PATH = PATH+sep+'savedModel'+sep+'modelKNN'
 GETT_RF_PATH = PATH
 GETT_HAR_PATH = PATH
 
@@ -157,6 +159,41 @@ if GETT_CNN_PATH != None:
 
 '''*************************************************
 *                                                  *
+*                    KNN model                     *
+*                                                  *
+*************************************************'''
+
+testKNN = PuenBan_K_Tua()
+
+def predictKNN(img=[]):
+    hog = testKNN.HOG_int()
+    
+    test_hog_descriptors = []
+    rePred = []
+
+    for imgCount in range(len(img)):
+    # data = np.random.sample((32*64)) *255
+        data = img[imgCount].astype(np.uint8)
+        
+        data = data.reshape(-1,(64))
+        imgs = data.astype(np.uint8)
+
+        imgs = testKNN.deskew(imgs)
+        try :
+            test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
+            test_hog_descriptors.append(hog.compute(imgs,winStride=(16,16)))
+
+            test_hog_descriptors = np.squeeze(test_hog_descriptors)
+            model = joblib.load(GETT_KNN_PATH+ sep+ 'knn_model_real.pkl','r')
+
+            pred = model.predict(test_hog_descriptors.tolist())    
+            rePred.append(int(pred[0]))
+        except:
+            rePred.append(int(pred[0]))
+    return rePred
+
+'''*************************************************
+*                                                  *
 *                   main program                   *
 *                                                  *
 *************************************************'''
@@ -190,6 +227,9 @@ while(1):
         list_vector = list_vector/255
         if MODEL is ML_CNN:
             pred_result = sess.run(pred_prob,feed_dict={x: list_vector})
+
+        if MODEL is ML_KNN:
+            pred_result = predictKNN(list_vector*255)
 
 
 
