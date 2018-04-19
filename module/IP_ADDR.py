@@ -70,6 +70,29 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
 
 
     def binarize(image, method=OTSU_THRESHOLDING, value=None):
+        '''
+        :param method: Method use to binarize the image (to be safe use grayscale image)
+                        OTSU_THRESHOLDING 
+                        ADAPTIVE_CONTRAST_THRESHOLDING 
+                        NIBLACK_THRESHOLDING
+                        SAUVOLA_THRESHOLDING
+                        BERNSEN_THRESHOLDING
+                        LMM_THRESHOLDING
+        :param value: Value use to tune Binarization
+                        OTSU_THRESHOLDING                   None (can't tune)
+                        ADAPTIVE_CONTRAST_THRESHOLDING      [sliding_window_size,weight]    in int and float
+                        NIBLACK_THRESHOLDING                [window_size , weight]          in int and float
+                        SAUVOLA_THRESHOLDING                window_size                     in int
+                        BERNSEN_THRESHOLDING                None (can't tune)
+                        LMM_THRESHOLDING                    None (can't tune)
+        :return: grayscale image value is 0 or 255  datatype is np.uint8
+        :example:
+            from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+            img = cv2.imread('one.jpg',0)
+            img = ipaddr.binarize(img,method=ipaddr.SAUVOLA_THRESHOLDING , value=35)
+            cv2.imshow('img',img)
+            cv2.waitKey(0)
+        '''
         if method == __class__.OTSU_THRESHOLDING:
             img = Binarization.Binarization_Otsu(image)
         elif method == __class__.ADAPTIVE_CONTRAST_THRESHOLDING:
@@ -85,15 +108,25 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         else:
             sys.exit("Unknown method\n")
         return img.astype(np.uint8)
-    # Binarize image into two value 255 or 0
-    # example
-    '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr
-       img = cv2.imread('one.jpg',0)
-       img = ipaddr.binarize(img,method=ipaddr.OTSU_THRESHOLDING)
-       cv2.imshow('img',img)
-       cv2.waitKey(0)'''
 
     def remove_noise(image, method=KUWAHARA, value=5):
+        '''
+        :param method:  Method use to filter the image (to be safe use grayscale image)
+                        KUWAHARA
+                        WIENER
+                        MEDIAN 
+        :param value: Value use to adjust filter 
+                        KUWAHARA            window_size                 in int
+                        WIENER              [window_size,how many time] in int
+                        MEDIAN              window_size                 in int
+        :return: image that have already pass the filter
+        :example:
+                from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+                img = cv2.imread('one.jpg',0)
+                img = ipaddr.remove_noise(img,method=ipaddr.KUWAHARA , value=5)
+                cv2.imshow('img',img)
+                cv2.waitKey(0)
+        '''
         if method == __class__.KUWAHARA:
             img = Filter.Filter_Kuwahara(image, value)
         elif method == __class__.WIENER:
@@ -103,39 +136,73 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         else:
             sys.exit("Unknown method\n")
         return img
-    # reduce image noise such as salt and pepper noise
-    # example
-    '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr
-       img = cv2.imread('one.jpg',0)
-       img = ipaddr.remove_noise(img,method=ipaddr.KUWAHARA , value=5)
-       cv2.imshow('img',img)
-       cv2.waitKey(0)'''
+
 
     def resize(image, shape=SHAPE, method=INTER_LINEAR):
+        '''
+        :param image: image to be resize
+        :param shape:  shape of output image
+                        (x,y) int     
+        :param method:  method to approximate value
+                    INTER_LINEAR 
+                    INTER_AREA 
+                    INTER_CUBIC 
+                    INTER_NEAREST
+                    INTER_LANCZOS4 
+                    INTER_MAX
+                    WARP_FILL_OUTLIERS 
+                    WARP_INVERSE_MAP
+        :return: image of size shape
+        :example:
+                from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+                img = cv2.imread('one.jpg',0)
+                img = ipaddr.resize(img,(28,28) )
+                cv2.imshow('img',img)
+                cv2.waitKey(0)
+        '''
         img = cv2.resize(image, shape, interpolation=method)
         return img
-    # change image size
-    # example
-    '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr
-       img = cv2.imread('one.jpg',0)
-       img = ipaddr.resize(img,(28,28) )
-       cv2.imshow('img',img)
-       cv2.waitKey(0)'''
+
 
     def capture(cam, size=SHAPE, mode=GRAY_SCALE, config=None):
+        '''
+        :param cam:     cv2 camera object
+        :param size:    shape of capture image
+                        [x,y] int
+        :param mode:    capture as Gray_scale BGR or whatever
+                            GRAY_SCALE 
+                            RGB 
+                            HSV 
+                            BGR 
+        :param config: additional configuration Well in case you really need it
+        :return: capture image as specify color code 
+        :example:
+            from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+            camera = cv2.videoCapture(0)
+            img = ipaddr.capture( camera)
+            cv2.imshow('img',img)
+            cv2.waitKey(0)
+        '''
         ret, image = cam.read()
         if mode != __class__.BGR:
             image = cv2.cvtColor(image, mode, config)
         image = cv2.resize(image, size)
         return image
-    # change image size
-    # example
-    '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr
-       camera = cv2.videoCapture(0)
-       img = ipaddr.capture( camera)
-       cv2.imshow('img',img)
-       cv2.waitKey(0)'''
+
     def translate(image, value, config=None):
+        '''
+        :param image:   image to be translate
+        :param value:   distance to be translate in pixel
+                        (x,y)  int
+        :param config:   additional configuration Well in case you really need it
+        :return:        image after translate
+        :example: 
+            from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+            img = cv2.imread('one.jpg',0)
+            img = ipaddr.translate(img,(1,1))
+            cv2.imshow('img',img)
+            cv2.waitKey(0)
+        '''
         matrix = np.float32([[1, 0, value[0]], [0, 1, value[1]]])
         if config is None:
             img = cv2.warpAffine(image, dst=None, M=matrix, dsize=(image.shape[1],image.shape[0]))
@@ -145,17 +212,36 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         else:
             img = cv2.warpAffine(image, dst=None, M=matrix, dsize=(image.shape[1],image.shape[0]), flags=config[0],
                                  borderMode=config[1])
-
         return img
-    # translate image (move to the left right or whatever by value)
-    # example
-    '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr
-       img = cv2.imread('one.jpg',0)
-       img = ipaddr.translate(img,(1,1))
-       cv2.imshow('img',img)
-       cv2.waitKey(0)'''
 
     def blur(image, method=AVERAGING, value=5):
+        '''
+        :param image :  image to be blur to be sure use grayscale
+        :param method:  method of blurring
+                         GAUSSIAN 
+                         AVERAGING
+                         BILATERAL
+        :param value:    use to adjust blur
+                        GAUSSIAN            n (dimension of kernel  result kernel will be (kernel n*n)/n^2)
+                        AVERAGING           n (dimension of kernel  result kernel will be (kernel n*n)/n^2)
+                        BILATERAL           [d	Diameter of each pixel neighborhood that is used during filtering. 
+                                                If it is non-positive, it is computed from sigmaSpace.  ,
+                                            sigmaColor	Filter sigma in the color space. A larger value of the parameter
+                                             means that farther colors within the pixel neighborhood (see sigmaSpace)
+                                              will be mixed together, resulting in larger areas of semi-equal color.  ,
+                                            sigmaSpace	Filter sigma in the coordinate space. A larger value of the 
+                                            parameter means that farther pixels will influence each other as long as 
+                                            their colors are close enough (see sigmaColor ). When d>0, it specifies 
+                                            the neighborhood size regardless of sigmaSpace. Otherwise, d is proportional
+                                             to sigmaSpace.]
+        :return: blur image
+        :example:
+                from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+                img = cv2.imread('one.jpg',0)
+                img = ipaddr.blur(img,ipaddr.AVERAGING,3)
+                cv2.imshow('img',img)
+                cv2.waitKey(0)
+        '''
         if method == __class__.MEDIAN:
             img = cv2.medianBlur(image, value)
         elif method == __class__.AVERAGING:
@@ -168,63 +254,101 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         else:
             sys.exit("Unknown method\n")
         return img
-    # blur image with three method
-    # example
-    '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr
-       img = cv2.imread('one.jpg',0)
-       img = ipaddr.blur(img,ipaddr.AVERAGING,3)
-       cv2.imshow('img',img)
-       cv2.waitKey(0)'''
 
     def morph(image, mode=DILATE, value=[3, 3]):
+        '''
+        :param image:   image to be morph
+        :param mode:    morphological operation
+                        ERODE 
+                        DILATE 
+                        OPENING 
+                        CLOSING 
+                        GRADIENT 
+                        TOP_HAT 
+                        BLACK_HAT 
+        :param value:   kernel size 
+                        [x,y]
+        :return:        image passing operation
+        :example :
+                        from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+                        img = cv2.imread('one.jpg',0)
+                        img = ipaddr.morph(img,ipaddr.DILATE,[15,15])
+                        cv2.imshow('img',img)
+                        cv2.waitKey(0)
+        '''
         matrix = np.ones((value[0], value[1]), np.float32)
         img = cv2.morphologyEx(image, mode, matrix)
         return img
-    # morph image acording to mode and value use to construct kernel
-    # example
-    '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr
-       img = cv2.imread('one.jpg',0)
-       img = ipaddr.morph(img,ipaddr.DILATE,[15,15])
-       cv2.imshow('img',img)
-       cv2.waitKey(0)'''
-
-
 
     def rotation(image, center_of_rotation, angle):
+        '''
+        :param image: image to be rotated
+        :param center_of_rotation:  center of rotation 
+                        [x,y] int in pixel
+        :param angle:   angle of rotation in degree 
+                        int 
+        :return: image after getting rotate
+        :example:
+                from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+                img = cv2.imread('one.jpg',0)
+                img = ipaddr.rotation(img,(img.shape[1]/2,img.shape[2]/2),15)
+                cv2.imshow('img',img)
+                cv2.waitKey(0)
+        '''
         matrix = cv2.getRotationMatrix2D((center_of_rotation[0], center_of_rotation[1]), angle, 1)
-        # print(matrix)
-        # print(image.shape)
         img = cv2.warpAffine(image, matrix, (image.shape[1],image.shape[0]), borderMode=__class__.BORDER_CONSTANT,
                              borderValue=255)
-        # print(img.shape)
         return img
-    # rotate image according to center of rotation and angle
-    # example
-    '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr
-       img = cv2.imread('one.jpg',0)
-       img = ipaddr.rotation(img,(img.shape[1]/2,img.shape[2]/2),15)
-       cv2.imshow('img',img)
-       cv2.waitKey(0)'''
 
-    def font_to_image(font, size=CREATE_SHAPE, index=0, string="0"):
-        # Create Plate from font and word
-        # Example
-        # from IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
-        # image = ipaddr.font_to_image("angsana.ttc", 10, 0, "หนึ่ง")
-        # cv2.imshow("one", image)
-        # cv2.waitKey(0)
 
+    def font_to_image(font, size=32, index=0, string="0", output_shape = [320,320],border_thickness=2):
+        '''
+        :param font:    font only trutype 
+                        string of font file / path to font
+        :param size:    size of character according to font
+                        int
+        :param index:   index of font some font have many layer
+                        int  
+        :param output_shape: shape of output image
+                            [x,y]
+        :param string:  string to create word
+                        string/chracter
+        :return: image containing border and word
+                from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+                image = ipaddr.font_to_image("angsana.ttc", 10, 0, "หนึ่ง")
+                cv2.imshow("one", image)
+                cv2.waitKey(0)
+        '''
         Text_Font = ImageFont.truetype(font, size, index, encoding="unic")
         w, h = Text_Font.getsize(string)
-        img = Image.new("L", __class__.CREATE_SHAPE, color=255)
+        img = Image.new("L",output_shape , color=255)
         image = ImageDraw.Draw(img)
-        image.text(((__class__.CREATE_SHAPE[0] - w) / 2, (__class__.CREATE_SHAPE[1] - h) / 2), string, font=Text_Font,
+        image.text(((output_shape [0] - w) / 2, (output_shape [1] - h) / 2), string, font=Text_Font,
                    fill="black")
         img = np.array(img)
-        cv2.rectangle(img, (60, 60), (__class__.CREATE_SHAPE[0] - 60, __class__.CREATE_SHAPE[1] - 60), 0, thickness=2)
+        cv2.rectangle(img, (60, 60), (output_shape [0] - 60,output_shape [1] - 60), 0, thickness=border_thickness)
         return img
 
     def distorse(img, function=None, axis='x', alpha=1.0, beta=1.0):
+        '''
+        :param img:         image to be distorted
+        :param function:    distorted function
+                            'sine'
+                            'linear'
+                            'inv_linear'
+        :param axis:        axis of distortion
+                            'x' or 'y'
+        :param alpha:       coefficient of function
+        :param beta:        constant add behind function
+        :return: distorted img
+        :example: 
+                from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as ipaddr
+                img = cv2.imread('one.jpg',0)
+                img = ipaddr.distorse(img,function='sine',axis='x',alpha=20,beta=2)
+                img = ipaddr.distorse(img,function='sine',axis='y',alpha=20,beta=2)
+                cv2.imshow('img',img)
+                cv2.waitKey(0)
+        '''
         # can use with color or gray scale image
         # example code
 
@@ -260,12 +384,55 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
 
 
     def crop_image(img,msk,tol=0):
+        '''
+        :param img: image to be crop
+        :param msk: mask use for crop
+        :param tol: tolerance
+        :return: crop image
+        '''
         # img is image data
         # tol  is tolerance
         mask = msk>tol
         return img[np.ix_(mask.any(1),mask.any(0))]
 
-    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False):
+    def line_intersection(line1, line2):
+        xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+        ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])  # Typo was here
+        def det(a, b):
+            return a[0] * b[1] - a[1] * b[0]
+
+        div = det(xdiff, ydiff)
+        if div == 0:
+            raise Exception('lines do not intersect')
+
+        d = (det(*line1), det(*line2))
+        x = det(d, xdiff) / div
+        y = det(d, ydiff) / div
+        return (x, y)
+
+    def find_center(pts):
+        point = __class__.order_points(pts)
+        (tl, tr, br, bl) = point
+        point = __class__.line_intersection((tl,br),(bl,tr))
+        return point
+
+    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False):
+        '''
+        :param org:             image to extract plate?
+        :param thres_kirnel:    dimension of kernel use to binarize 
+                                input as n and it will be n*n size (to be sure use odd number)
+        :param min_area:        percentage of minimum area of plate float value range from 1.00 to 0.00
+        :param max_area:        percentage of maximum area of plate float value range from 1.00 to 0.00
+        :param lengPercent:     percentage of arclength float value range from 1.00 to 0.00
+                                (use to calculate epsilon)
+        :param morph:           boolean if True image will get erode with preset kernel
+                                if False nothing happen to image
+        :return: list of plate image
+        :example:
+                     plate = IP.Get_Plate2(image,min_area=0.01)
+                    you will get a list of plate image in the image
+        '''
+        platePos = []
         image = copy.deepcopy(org)
         image = __class__.binarize(image,method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
         image_area = image.shape[0]*image.shape[1]
@@ -287,11 +454,31 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         for i in range(0,len(plate)):
             plate[i] = np.array(plate[i])
             plate[i] = np.reshape(plate[i],(4,2))
+            '''My code '''
+            if center and before:
+                platePos.append(__class__.find_center(plate[i]))
+            '''End of my code'''
             plate[i] = __class__.four_point_transform(org,plate[i])
-
-        return plate
+            '''my code'''
+            if center and not before:
+                pass
+        if center:
+            return  plate,platePos
+        else:
+            return plate
 
     def Get_Word2(plate,thres_kirnel=21,boundary=20,black_tollerance=10,image_size=(60,30)):
+        '''
+        :param plate:              list of image of plate  
+        :param thres_kirnel:        dimension of kernel use to binarize 
+                                input as n and it will be n*n size (to be sure use odd number) 
+        :param boundary:            boundary of word
+                                    int value
+                                    from boundary to x-boundary and 20to y -20
+        :param black_tollerance:    tolerance of intensity consider to be letter 
+        :param image_size:          word image size
+        :return: list of word image
+        '''
         listOfWord = []
         for i in range(0,len(plate)):
             word = __class__.binarize(plate[i],method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
@@ -312,6 +499,15 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         return listOfWord
 
     def magnifly(image, percentage=100, shiftxy=[0, 0]):
+        '''
+        :param image       image to be magnify
+        :param percentage: percent to magnifly 
+                            input as percent 100 is normal 200 is two time bigger
+        :param shiftxy:     offsetof output image
+        :return: magnify image with same shape
+        :example:
+                        img = IP.magnifly(img,150,shiftxy=[-30,-50])
+        '''
         # can use with color or gray scale image
         # example code
         # img = IP.magnifly(img,150,shiftxy=[-30,-50])
@@ -336,14 +532,15 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         # base.show('hello')
         return np.array(base, dtype=np.uint8)
 
-    '''IP = Image_Processing_And_Do_something_to_make_Dataset_be_Ready()
-        img = cv2.imread('one.jpg',0)
-        img = IP.distorse(img,function='sine',axis='x',alpha=20,beta=2)
-        img = IP.distorse(img,function='sine',axis='y',alpha=20,beta=2)
-        cv2.imshow('img',img)
-        cv2.waitKey(0)'''
-
     def order_points(pts):
+        '''
+        :parameter pts: 4 point
+        :return: sorted list of 4 points in order of
+                            top-left
+                            top-right
+                            bottom-right
+                            bottom-left
+        '''
         # initialzie a list of coordinates that will be ordered
         # such that the first entry in the list is the top-left,
         # the second entry is the top-right, the third is the
@@ -366,7 +563,13 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         # return the ordered coordinates
         return rect
 
-    def four_point_transform(image, pts):
+    def four_point_transform(image, pts,matrice = False):
+        '''
+        :param image: image in which you get your 4 points
+        :param pts: 4 points 
+        :param matrice: return the tranformation matrix
+        :return: image inside 4 poinr region after removing perspective
+        '''
         # obtain a consistent order of the points and unpack them
         # individually
         rect = __class__.order_points(pts)
@@ -402,9 +605,19 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
 
         # return the warped image
+        if matrice:
+            return warped,M
         return warped
 
     def remove_perspective(image, region, shape,org_shape=None,auto_sort= True):
+        '''
+        *********** not use anymore **************
+        :param region: 
+        :param shape: 
+        :param org_shape: 
+        :param auto_sort: 
+        :return: 
+        '''
         if org_shape == None:
             org_shape = shape
 
@@ -442,9 +655,10 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         return img
 
     class Plate():
-
+        '''***************** Not being use anymore *********************'''
         #A class for plate
         def __init__(self, image, cnt, word_cnt,extract_shape):
+            '''***************** Not being use anymore *********************'''
             rect = cv2.minAreaRect(cnt)
             box = cv2.boxPoints(rect)
             box = np.int0(box)
@@ -515,6 +729,11 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             # cv2.waitKey(0)
 
     def auto_canny(image, sigma=0.33):
+        '''
+        :param image:   image to use canny detection
+        :param sigma:   
+        :return: edge image
+        '''
         # compute the median of the single channel pixel intensities
         v = np.median(image)
 
@@ -527,6 +746,13 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         return edged
 
     def get_plate(image,extract_shape,dilate=30):
+        #Decapacipate
+        '''
+        ***************** Not being use anymore *********************
+        :param extract_shape: 
+        :param dilate: 
+        :return: 
+        '''
         org = cv2.cvtColor(image,cv2.COLOR_GRAY2BGR)
         image1 = 255 - image
         image1 = __class__.morph(image1, __class__.DILATE, [dilate,dilate])
@@ -570,6 +796,13 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
        cv2.waitKey(0)'''
 
     def ztretch(image,bord=0,axis='horizontal',multiply=1):
+        '''
+        
+        :param bord:        border
+        :param axis:        stretch axis 
+        :param multiply:    
+        :return: 
+        '''
         y,x = image.shape
         bod = [0,0]
         if axis == 'horizontal':
@@ -599,6 +832,11 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         return image
 
     def Adapt_Image(image,output_shape):
+        '''
+        
+        :param output_shape: 
+        :return: 
+        '''
         #output_shape =(60,30) #
         ''' (width,height) of picture'''
         # cv2.imshow("image",image)
@@ -674,6 +912,12 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
 
 
     def zkeleton(img,multi=2,morph=15):
+        '''
+        :param img:
+        :param multi: 
+        :param morph: 
+        :return: 
+        '''
         img = 255-img
         element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
         done = False
@@ -693,6 +937,61 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         img = __class__.morph(skel,__class__.ERODE,[morph,morph])
         return img
 
+    def getHog(listOfImage):
+        '''
+        :param listOfImage: a list of image          
+        :return: a list of histogram of gradient of image
+        '''
+        def deskew(img):
+            m = cv2.moments(img)
+            if abs(m['mu02']) < 1e-2:
+                # no deskewing needed.
+                return img.copy()
+            # Calculate skew based on central momemts.
+            skew = m['mu11'] / m['mu02']
+            # Calculate affine transform to correct skewness.
+            M = np.float32([[1, skew, -0.5 ** skew], [0, 1, 0]])
+            # Apply affine transform
+            img = cv2.warpAffine(img, M, (60, 30), flags=cv2.WARP_INVERSE_MAP | cv2.INTER_LINEAR)
+            return img
+
+        def HOG_int():
+            winSize = (20, 20)
+            blockSize = (10, 10)
+            blockStride = (5, 5)
+            cellSize = (10, 10)
+            nbins = 9
+            derivAperture = 1
+            winSigma = -1.
+            histogramNormType = 0
+            L2HysThreshold = 0.2
+            gammaCorrection = 1
+            nlevels = 64
+            signedGradient = True
+            hog = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma,
+                                    histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradient)
+            return hog
+        hog = HOG_int()
+        hog_feature = list(map(lambda x: hog.compute(x.astype(np.uint8), winStride=(20, 20)), listOfImage))
+        hog_feature = list(map(lambda x: x.reshape((-1,)), hog_feature))
+        return  hog_feature
+
+    def getHis(listOfImage,rowOrColPerBar=1):
+        '''
+        :param listOfImage: a list of image
+        :param rowOrColPerBar: a number of row / column that will be group together
+                                    ****** must able to divide the row and column of image
+        :return: a list of histogram feature
+        '''
+        histogram_x = list(
+            map(lambda x: [x[:, y:y + rowOrColPerBar] for y in range(0,x.shape[1] , rowOrColPerBar)], listOfImage))
+        histogram_x = list(map(lambda x: list(map(lambda y: np.sum(y.astype(float)), x)), histogram_x))
+        histogram_y = list(
+            map(lambda x: [x[y:y + rowOrColPerBar, :] for y in range(0, x.shape[0], rowOrColPerBar)], listOfImage))
+        histogram_y = list(map(lambda x: list(map(lambda y: np.sum(y.astype(float)), x)), histogram_y))
+        all_histogram = list(map(lambda x, y: np.concatenate([x, y]).tolist(), histogram_x, histogram_y))
+        return all_histogram
+
 
     # extract plate from image
     # example
@@ -701,7 +1000,5 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
        img = ipaddr.morph(img,ipaddr.DILATE,[15,15])
        cv2.imshow('img',img)
        cv2.waitKey(0)'''
-
-
 
 

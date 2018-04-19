@@ -29,7 +29,7 @@ from module.Retinutella_theRobotEye import Retinutella
 from module.RandomFunction import *
 from module.Zkeleton import Zkele
 from module.PuenBan_K_Tua import PuenBan_K_Tua
-
+from module import PaZum
 # 5. visualization module
 import matplotlib.pyplot as plt
 
@@ -78,7 +78,7 @@ MODEL = ML_CNN
 # for example, PATH+"\\savedModel\\modelCNN"
 GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN"
 GETT_KNN_PATH = PATH+sep+'savedModel'+sep+'modelKNN'
-GETT_RF_PATH = PATH
+GETT_RF_PATH = PATH+"\\savedModel\\modelRandomForest\\Random_Forest_best_run.pkl"
 GETT_HAR_PATH = PATH
 
 CONTINUE = False
@@ -108,12 +108,22 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 *                                                  *
 *************************************************'''
 
-cam = Retinutella('cam1',0,0,cameraMode=1)
+cam = Retinutella('cam1',1,0,cameraMode=1)
 cam2 = Retinutella('cam2',0,0,cameraMode=0)
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
             "zero","one","two","three","four","five","six","seven","eight","nine",
             "soon","nung","song","sam","see","ha","hok","jed","pad","kaow"]
+
+'''*************************************************
+*                                                  *
+*                 function                         *
+*                                                  *
+*************************************************'''
+def log_prob(prob_1,prob_2,prob_3):
+    sum_of_all = list(map(lambda x,y,z: np.add(np.add(x,y),z),prob_1,prob_2,prob_3))
+    class_of_all = list(map(lambda x: np.argmax(x),sum_of_all))
+    return class_of_all
 
 '''*************************************************
 *                                                  *
@@ -167,14 +177,14 @@ testKNN = PuenBan_K_Tua()
 
 def predictKNN(img=[]):
     hog = testKNN.HOG_int()
-    
+
     test_hog_descriptors = []
     rePred = []
 
     for imgCount in range(len(img)):
     # data = np.random.sample((32*64)) *255
         data = img[imgCount].astype(np.uint8)
-        
+
         data = data.reshape(-1,(64))
         imgs = data.astype(np.uint8)
 
@@ -186,11 +196,23 @@ def predictKNN(img=[]):
             test_hog_descriptors = np.squeeze(test_hog_descriptors)
             model = joblib.load(GETT_KNN_PATH+ sep+ 'knn_model_real.pkl','r')
 
-            pred = model.predict(test_hog_descriptors.tolist())    
+            pred = model.predict(test_hog_descriptors.tolist())
             rePred.append(int(pred[0]))
         except:
             rePred.append(int(pred[0]))
     return rePred
+
+
+'''*************************************************
+*                                                  *
+*             Random Forest model                  *
+*                                                  *
+*************************************************'''
+if MODEL == ML_RF:
+    if GETT_RF_PATH != None:
+        forest = PaZum.PaZum(GETT_RF_PATH)
+    else:
+        raise SyntaxError(" If u give us no path to the model how could we restore it!!!")
 
 '''*************************************************
 *                                                  *
@@ -231,6 +253,9 @@ while(1):
         if MODEL is ML_KNN:
             pred_result = predictKNN(list_vector*255)
 
+        if MODEL is ML_RF:
+            pred_result = forest.predict(plate,'class')
+
 
 
     #show and finally destroy those windows.
@@ -243,7 +268,3 @@ while(1):
     cam.show(corg,wait=30)
     cam.destroyWindows()
 
-def log_prob(prob_1,prob_2,prob_3):
-    sum_of_all = list(map(lambda x,y,z: x+y+z,prob_1,prob_2,prob_3))
-    class_of_all = list(map(lambda x: x,sum_of_all))
-    return class_of_all

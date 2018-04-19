@@ -30,6 +30,7 @@ def Zkele(image,sauvola=21,method='norm'):
         this function find the skeleton of input image,'image' by using Sauvola thresholding with kernel
     size equal to 3 and find skeleton by using 3d skeleton method.
     '''
+
     data = IP.binarize(image,method=IP.SAUVOLA_THRESHOLDING,value=sauvola)/255
     data = 1.00-data
     if method == 'norm':

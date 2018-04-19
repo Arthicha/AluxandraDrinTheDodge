@@ -13,7 +13,7 @@ import os
 
 import numpy as np
 import cv2
-
+from scipy.spatial import cKDTree
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
 
 '''*************************************************
@@ -40,7 +40,7 @@ class Retinutella():
     CONE = 0
 
 
-    def __init__(self,name,cameraPort,cameraOreintation,cameraMode=1):
+    def __init__(self,name,cameraPort,cameraOreintation,cameraMode=1,four_points=((0,0),(300,300),(0,300),(300,0))):
 
         '''
         :param name: camera name
@@ -60,9 +60,10 @@ class Retinutella():
         self.cameraMode = cameraMode
         self.cameraOreintation = cameraOreintation
         self.cam = cv2.VideoCapture(self.cameraPort)
-
-
-    def getImage(self,fileName=None):
+        '''my code'''
+        self.four_points = np.reshape(np.array(four_points),(4,2))
+        '''end of my code'''
+    def getImage(self,fileName=None,remove_pers = False , pts = [[0,0],[300,0],[0,300],[300,300]]):
 
         '''
         :param fileName: file to save an image which captured from this object, this
@@ -89,16 +90,70 @@ class Retinutella():
         path = os.getcwd()
         if fileName != None:
             cv2.imwrite(path+fileName,img)
+        ''' my code '''
+        if remove_pers:
+            capture,matrice = IP.four_point_transform(img,self.four_points,True)
+        if remove_pers:
+            return img,capture,matrice
+        '''end of my code'''
         return img
 
-    def getListOfPlate(self,image_size=(30,60)):
-        image = self.getImage()
+    def getListOfPlate(self,image_size=(30,60),platePos=False,show=False):
+        '''have been edited'''
+        image,capture,matrice= self.getImage(remove_pers=True)
+        if platePos:
+            ''' have been edited'''
+            plate_capture,plate_pos = IP.Get_Plate2(capture,min_area=0.01,center=True,before=True)
+            '''end of edit'''
         #ret, image = cv2.threshold(image, 100, 255,0)
-        plate = IP.Get_Plate2(image,min_area=0.01)
+        plate,platePos_ = IP.Get_Plate2(image,min_area=0.01,center=True,before=True)
         plate = IP.Get_Word2(plate,image_size=image_size)
         #listOfImage = IP.get_plate(image,(64, 32))
         #print('return from get plate',listOfImage)
-        return image,plate
+        ''' my part '''
+        if show:
+            show_capture = copy.deepcopy(capture)
+            show_capture= cv2.cvtColor(show_capture,cv2.COLOR_GRAY2BGR)
+            for i in plate_pos:
+                pos = (int(i[0]),int(i[1]))
+                cv2.circle(show_capture,pos,3,[255,0,0])
+            cv2.imshow("capture",show_capture)
+            cv2.waitKey(0)
+        def calculate_position(position,HomoMatrix):
+            ''' for 2 dimen only'''
+            new_position =(position[0],position[1],1)
+            new_position = np.matmul(HomoMatrix,np.reshape(new_position,(-1,1)))
+            new_position=np.reshape(new_position,(1,-1)).tolist()
+            new_position=tuple(new_position[0][0:2])
+            return new_position
+        platePos_ = list(map(lambda x:calculate_position(x,matrice),platePos_))
+        sorted_plate_pos = platePos_
+        # print(platePos_)
+        ''' sorted plate pos in here'''
+        if platePos:
+            if platePos_ != [] and plate_pos != []:
+                tree = cKDTree(platePos_)
+                dist, index = tree.query(plate_pos)
+                print("***********")
+                print(index)
+                print(platePos_)
+                print(plate_pos)
+                print("**********")
+                for x,y in zip(index,plate_pos):
+                    sorted_plate_pos[x]=y
+                for x in range(0,len(sorted_plate_pos)):
+                    if x in index:
+                        pass
+                    else:
+                        sorted_plate_pos[x]=()
+                print(sorted_plate_pos)
+                print("----------------")
+            '''end'''
+        if platePos:
+            return image,plate,sorted_plate_pos
+            ''' end of my part'''
+        else:
+            return image,plate
 
 
     def close(self):
