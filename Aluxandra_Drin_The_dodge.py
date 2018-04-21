@@ -78,7 +78,7 @@ MODEL = ML_CNN
 # for example, PATH+"\\savedModel\\modelCNN"
 GETT_CNN_PATH = PATH+"\\savedModel\\modelCNN_skele"
 GETT_KNN_PATH = PATH+sep+'savedModel'+sep+'modelKNN'
-GETT_RF_PATH = PATH+"\\savedModel\\modelRandomForest\\Random_Forest_best_run.pkl"
+GETT_RF_PATH = PATH+"\\savedModel\\modelRandomForest\\Random_Forest_best_run.gz"
 GETT_HAR_PATH = PATH
 
 CONTINUE = False
