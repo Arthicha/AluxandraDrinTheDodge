@@ -212,7 +212,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         else:
             img = cv2.warpAffine(image, dst=None, M=matrix, dsize=(image.shape[1],image.shape[0]), flags=config[0],
                                  borderMode=config[1])
-        return img
+        return img#
 
     def blur(image, method=AVERAGING, value=5):
         '''
