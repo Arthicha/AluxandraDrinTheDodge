@@ -395,7 +395,15 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         mask = msk>tol
         return img[np.ix_(mask.any(1),mask.any(0))]
 
+    def center_of_Mass(cnt):
+        M=cv2.moments(cnt)
+        cx = int(M['m10'] / M['m00'])
+        cy = int(M['m01'] / M['m00'])
+        return (cx,cy)
+
     def line_intersection(line1, line2):
+        # print('*************')
+        # print(line1, line2)
         xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
         ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])  # Typo was here
         def det(a, b):
@@ -403,7 +411,9 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
 
         div = det(xdiff, ydiff)
         if div == 0:
-            raise Exception('lines do not intersect')
+            xdiff[1]= -1*xdiff[1]
+            div=det(xdiff,ydiff)
+            # raise Exception('lines do not intersect')
 
         d = (det(*line1), det(*line2))
         x = det(d, xdiff) / div
@@ -416,7 +426,13 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         point = __class__.line_intersection((tl,br),(bl,tr))
         return point
 
-    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False):
+    def find_orient(pts):
+        point = __class__.order_points(pts)
+        (tl, tr, br, bl) = point
+        return -1*np.arctan2([br[1]-bl[1]],[br[0]-bl[0]])
+
+
+    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False,orientation=False):
         '''
         :param org:             image to extract plate?
         :param thres_kirnel:    dimension of kernel use to binarize 
@@ -433,6 +449,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                     you will get a list of plate image in the image
         '''
         platePos = []
+        plateOrientation=[]
         image = copy.deepcopy(org)
         image = __class__.binarize(image,method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
         image_area = image.shape[0]*image.shape[1]
@@ -455,15 +472,23 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             plate[i] = np.array(plate[i])
             plate[i] = np.reshape(plate[i],(4,2))
             '''My code '''
+            if orientation:
+                plateOrientation.append(__class__.find_orient(plate[i]))
+
             if center and before:
-                platePos.append(__class__.find_center(plate[i]))
+                platePos.append(__class__.center_of_Mass(plate[i]))
             '''End of my code'''
             plate[i] = __class__.four_point_transform(org,plate[i])
             '''my code'''
             if center and not before:
                 pass
-        if center:
-            return  plate,platePos
+        if orientation and center:
+            print(plateOrientation)
+            return plate, platePos,plateOrientation
+        elif orientation:
+            return plate, plateOrientation
+        elif center:
+            return plate, platePos
         else:
             return plate
 

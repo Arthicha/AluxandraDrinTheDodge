@@ -98,19 +98,25 @@ class Retinutella():
         '''end of my code'''
         return img
 
-    def getListOfPlate(self,image_size=(30,60),platePos=False,show=False):
+    def getListOfPlate(self,image_size=(30,60),platePos=False,plateOrientation = False,show=False):
         '''have been edited'''
         image,capture,matrice= self.getImage(remove_pers=True)
-        if platePos:
+        if platePos and plateOrientation:
+            plate_capture, plate_pos,plate_orientation = IP.Get_Plate2(capture, min_area=0.01, center=True, before=True,orientation=True)
+        elif platePos:
             ''' have been edited'''
             plate_capture,plate_pos = IP.Get_Plate2(capture,min_area=0.01,center=True,before=True)
             '''end of edit'''
+
+
         #ret, image = cv2.threshold(image, 100, 255,0)
         plate,platePos_ = IP.Get_Plate2(image,min_area=0.01,center=True,before=True)
         plate = IP.Get_Word2(plate,image_size=image_size)
         #listOfImage = IP.get_plate(image,(64, 32))
         #print('return from get plate',listOfImage)
         ''' my part '''
+
+
         if show:
             show_capture = copy.deepcopy(capture)
             show_capture= cv2.cvtColor(show_capture,cv2.COLOR_GRAY2BGR)
@@ -118,7 +124,7 @@ class Retinutella():
                 pos = (int(i[0]),int(i[1]))
                 cv2.circle(show_capture,pos,3,[255,0,0])
             cv2.imshow("capture",show_capture)
-            cv2.waitKey(0)
+            cv2.waitKey(100)
         def calculate_position(position,HomoMatrix):
             ''' for 2 dimen only'''
             new_position =(position[0],position[1],1)
@@ -127,7 +133,8 @@ class Retinutella():
             new_position=tuple(new_position[0][0:2])
             return new_position
         platePos_ = list(map(lambda x:calculate_position(x,matrice),platePos_))
-        sorted_plate_pos = platePos_
+        sorted_plate_pos = [x for x in platePos_]
+        sorted_plate_orientation = [x for x in platePos_]
         # print(platePos_)
         ''' sorted plate pos in here'''
         if platePos:
@@ -135,23 +142,36 @@ class Retinutella():
                 tree = cKDTree(platePos_)
                 dist, index = tree.query(plate_pos)
                 print("***********")
-                print(index)
-                print(platePos_)
+                # print(index)
+                # print(platePos_)
                 print(plate_pos)
+                print(plate_orientation)
                 print("**********")
-                for x,y in zip(index,plate_pos):
-                    sorted_plate_pos[x]=y
+                if platePos and plateOrientation:
+                    for x,y,z in zip(index,plate_pos,plate_orientation):
+                        sorted_plate_pos[x]=y
+                        sorted_plate_orientation[x]=z
+
+                else:
+                    for x,y in zip(index,plate_pos):
+                        sorted_plate_pos[x]=y
+
                 for x in range(0,len(sorted_plate_pos)):
                     if x in index:
                         pass
                     else:
                         sorted_plate_pos[x]=()
-                print(sorted_plate_pos)
-                print("----------------")
+                        sorted_plate_orientation[x]= None
+                # print(sorted_plate_pos)
+                # print("----------------")
             '''end'''
-        if platePos:
-            return image,plate,sorted_plate_pos
+        if platePos and plateOrientation:
+            print('suck')
+            print(sorted_plate_pos)
+            return image, plate, sorted_plate_pos,sorted_plate_orientation
+        elif platePos:
             ''' end of my part'''
+            return image,plate,sorted_plate_pos
         else:
             return image,plate
 
