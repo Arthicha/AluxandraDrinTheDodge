@@ -166,8 +166,6 @@ class Retinutella():
                 # print("----------------")
             '''end'''
         if platePos and plateOrientation:
-            print('suck')
-            print(sorted_plate_pos)
             return image, plate, sorted_plate_pos,sorted_plate_orientation
         elif platePos:
             ''' end of my part'''
