@@ -23,6 +23,41 @@ example: you can find the example program at the bottom section of this file.
 
 class MANipulator():
 
+    def __init__(self):
+        self.d1 = 500.0
+        self.a1 = 85.0
+        self.a2 = 300.0
+        self.a3 = 30.0
+        self.d4 = 448.0
+        self.d6 = 112.0
+        self.DH_param = np.array([[0,self.d1,self.a1,math.pi/2],
+                            [0,0,self.a2,0],
+                            [math.pi/2,0,self.a3,math.pi/2], # fixed
+                            [0,self.d4,0,-math.pi/2],
+                            [0,0,0,math.pi/2],
+                            [0,self.d6,0,0]],dtype=np.float32)
+        self.jointLimit = [[-2*math.pi,2*math.pi],
+                    [0,math.pi],
+                    [-math.pi,math.pi],
+                    [-3*math.pi/4,3*math.pi/4],
+                    [-math.pi/2,math.pi/2],
+                    [-math.pi/2,math.pi/2]]
+
+        self.ofset = [0,0,0,0,0,0]
+
+        self.q = [0,0,0,0,0,0,0]
+        self.RE_F = np.array([[0,0,1],
+                    [0,1,0],
+                    [1,0,0]])
+        self.RE_L = np.array([[1,0,0],
+                        [0,0,-1],
+                        [0,1,0]])
+        self.RE_R = np.array([[0,1,0],
+                        [0,0,1],
+                        [1,0,0]])
+        self.RE_B = np.array([[0,-1,0],
+                        [1,0,0],
+                        [0,0,-1]])
 
 
     def RotTranz(self,DH,q):
