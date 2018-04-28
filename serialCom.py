@@ -32,9 +32,9 @@ if __name__ == '__main__':
     step = 20
     R_e = MAN.RE_F
 
-    if False :
+    if True :
         while(1):
-            for x,y,z in zip([100,75,200,600],[50,100,0,0],[80,200,200,530]):
+            for x,y,z in zip([0,100,75,75,600,600],[0,50,100,100,0,0],[0,80,200,200,530,530]):
 
                 dd = MAN.d6*R_e[:,2]
 
@@ -55,9 +55,9 @@ if __name__ == '__main__':
                     
                     ser.write(q=set_q, jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=0)
 
-                    time.sleep(1)
-                    print(ser.readLine())
                     
+                    print(ser.readLine())
+                    # time.sleep(1)
 
     else :
 

@@ -37,14 +37,12 @@ class serial_commu():
     def write(self,q,jointLimit,ofset,valve):
         string = [int(degrees(sum(qi))) for qi in zip(q,[-jL[0] for jL in jointLimit],ofset)]+[valve]
         self.ser.write(self.makeDataWord(string=string).encode('ascii'))
+        time.sleep(0.1)
 
     def read(self,length=1):
         word = ''
-        while self.ser.in_waiting and len(word) <= length+2:
-            if len(word)< length:
-                word+=str(self.ser.read().decode('ascii'))
-            else:
-                self.ser.read()
+        while self.ser.in_waiting and len(word) < length:
+            word+=str(self.ser.read().decode('ascii'))
         return word
 
     def readLine(self,length=26):
