@@ -3,15 +3,6 @@ import time
 from math import degrees
 
 class serial_commu():
-    
-    gripperOpen = 'OS'
-    gripperClose = 'CS'
-    gripperUp = 'HS'
-    gripperMid = 'IS'
-    gripperDown = 'JS'
-    gripperReturn = 'MS'
-    possitionX = 'AX'
-    possitionY = 'Y'
 
 
     def __init__(self,port=3,baud=9600,t=0.01):
@@ -53,22 +44,10 @@ class serial_commu():
 
     def readAll(self):
         return str(self.ser.read_all().decode('ascii'))
-
-    def onlyPos(self,string):
-        string = string.replace(self.gripperDown,'')
-        string = string.replace(self.gripperUp,'')
-        string = string.replace(self.gripperMid,'')
-        string = string.replace(self.gripperClose,'')
-        string = string.replace(self.gripperOpen,'')
-        string = string.replace(self.gripperUp,'')
-        return string
-
-    def onlyOperation(self,string):
-        string = string.replace(self.possitionX,'')
-        string = string.replace(self.possitionY,'')
-        for i in range(0,10):
-            string = string.replace(str(i),'')
-        return string
+    
+    def clearSerialData(self):
+        self.ser.read_all()
+        return 0
 
     def makeDataWord(self,string):
         key = 'g'

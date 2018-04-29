@@ -1,71 +1,106 @@
-import math
 import sys
 import time
+from math import degrees
 
 import cv2
 import numpy as np
 import serial
+from matlab import int16 as matlabInt16
 
 from module.MANipulatorKinematics import MANipulator
 from module.serialCommu import serial_commu
+from module.prePackage import addSubPosition
+from module.MATLAPUTOPPU import callMatFunc
+
+# a = matlabInt16([[0],[0],[0],[0],[0],[0]])
+# box,laser = callMatFunc('collision_check',a,1)[0]
+# print((box,laser))
 
 if __name__ == '__main__':
+    
+    platePositionX = 600
+    platePositionY = [300,100,-100,-300]
+    platePositionZ = [700,500,300]
+    ofsetLenght = 20
+    plateHeight = 50
+
+    checkLaser = False
+
+    workspace = [-400,600,-500,500,0,1000]
+
     ser = serial_commu(port=3)
-
-
-    
-    # mode
-    MOD_WORKSPACE = 0
-    MOD_INVKIN = 1
-    MOD_JACOBIAN = 2
-
-    # mode of operation
-    MODE = MOD_INVKIN
-    # define DH parameter
-
     MAN = MANipulator()
-    
-    x = 600
-    y = 0
-    z = 530
-    key = -1
-    step = 20
     R_e = MAN.RE_F
+    allQ = []
 
-    if True :
-        while(1):
-            for x,y,z in zip([0,100,75,75,600,600],[0,50,100,100,0,0],[0,80,200,200,530,530]):
+    if True:
+        # data = zip(zip([0,100,75,75,75,600],[0,50,100,100,100,0],[0,80,200,200,200,530]),['F','F','F','L','R','F'],[0,0,0,0,0,0],[0,0,0,0,0,0])
+        data = zip(zip([75,75,75],[100,100,100],[200,200,200]),[0,5,10],[0,0,0],['F','L','R'])
+        '''arg datalist = [[3D-position, predict_output, degreee of pai, no. of wall],...]'''
 
-                dd = MAN.d6*R_e[:,2]
 
-                dx = x-dd[0]
-                dy = y-dd[1]
-                dz = z-dd[2]
+        data = addSubPosition(dataList=data,platePositionX=platePositionX,platePositionY=platePositionY 
+                            ,platePositionZ= platePositionZ, ofsetlenght=ofsetLenght, plateHeight=plateHeight)
+        
+        for position,wall,valve,ang in data:
+            x,y,z = position
+            # wall 'F'front,'L'left,'R'right,'B'buttom
+            if wall == 'F':
+                R_e = MAN.RE_F
+            elif wall == 'L':
+                R_e = MAN.RE_R
+            elif wall == 'R':
+                R_e = MAN.RE_L
+            elif wall == 'B':
+                R_e = MAN.RE_B
 
-                try:
-                    ans = MAN.inverse_kinamatic2(dx,dy,dz,MAN.DH_param,R_e)
-                    #ans=MAN.inverse_angle(dx,dy,dz,R_e,DH_param,BIAS=[0.05,0.05],Target=[x,y,z])
-                except:
-                    sys.exit('inverse fail')
-                print((x,y,z))
-                
-                ans = MAN.setJointLimits(ans,MAN.jointLimit)
-                
-                for set_q in ans:
-                    
-                    ser.write(q=set_q, jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=0)
+            dd = MAN.d6*R_e[:,2]
+            dx = x-dd[0]
+            dy = y-dd[1]
+            dz = z-dd[2]
 
-                    
-                    print(ser.readLine())
-                    # time.sleep(1)
+            ans = MAN.inverse_kinamatic2(dx,dy,dz,MAN.DH_param,R_e)
+            ans = MAN.setJointLimits(ans,MAN.jointLimit)
+            print((x,y,z))
+            H_a = []
+            for set_q in ans:
+                allQ.append(set_q[:-1]+[ang])
+            
 
+        for set_q in allQ:
+            # boxBreak,laserBreak = wanFunction(set_q)
+            # if boxBreak == 1:
+            #     sys.exit('box will be break')
+            # if checkLaser and laserBreak == 1:
+            #     sys.exit('breakdown sensor')
+            ser.write(q=set_q, jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=valve)
+            # time.sleep(1)
+            print(ser.readLine(26))
+            H,Hi = MAN.forward_kin(MAN.DH_param,set_q)
+            H_a.append(Hi[:,:4,3])
+            MAN.plot(H_a,matplotLibs=False,plotTarget=[x,y,z])
+            
+            while ser.readLine(2) == 'ok':
+                # ser.clearSerialData()
+                pass
+            
     else :
+        # mode
+        MOD_WORKSPACE = 0
+        MOD_INVKIN = 1
+        MOD_JACOBIAN = 2
 
+        # mode of operation
+        MODE = MOD_INVKIN
         if MODE is MOD_WORKSPACE:
             MAN.plotWorkSpace([0,1,1,0,0,0],MAN.DH_param,MAN.jointLimit)
         elif MODE is MOD_INVKIN:
             
-            
+            x = 600
+            y = 0
+            z = 530
+            key = -1
+            step = 20
             while(1):
                 #BIAS = [0.07,0.07]
                 # define position
@@ -99,11 +134,6 @@ if __name__ == '__main__':
                 elif key == 108:
                     R_e = MAN.RE_L
                     print('\tKEYBOARDINPUT:', 'l')
-
-
-                #x = randint(0,500)
-                #y = randint(0,500)
-                #z = randint(0,1000)
 
                 dd = MAN.d6*R_e[:,2]
 

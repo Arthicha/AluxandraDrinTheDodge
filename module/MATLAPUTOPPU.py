@@ -23,6 +23,8 @@ __description__ = 'Store call matlab and call simulink function'
 *                                                  *
 *************************************************'''
 
+import os
+
 import matlab.engine
 
 '''*************************************************
@@ -31,12 +33,16 @@ import matlab.engine
 *                                                  *
 *************************************************'''
 
-def callMatFunc(funcname,argumentDict,outputs):
+def callMatFunc(funcname,argumentDict,outputs,path =os.getcwd()+os.sep+'matlab'):
+    eng = matlab.engine.start_matlab()
+    eng.cd(path)
+    # eng.foo()
     getRes = getattr(eng,str(funcname))(argumentDict,nargout=outputs)
     return getRes
 
-def callSimulink(simulinkName,blockName):
+def callSimulink(simulinkName,blockName,path =os.getcwd()+os.sep+'matlab'):
     eng = matlab.engine.start_matlab()
+    eng.cd(path)
     Sim = eng.sim(simulinkName,'SimulationMode','normal')
     getSim = Sim.get(blockName)
     return getSim
@@ -46,4 +52,7 @@ def callSimulink(simulinkName,blockName):
 # A = matlab.int8([1,2,3,4,5])
 # y = {'arg1': A , 'arg2': A}
 # r = callMatFunc('yourfunc',y,1)
-# print(r)
+
+# a = matlab.int16([[0],[0],[0],[0],[0],[0]])
+# box,laser = callMatFunc('collision_check',a,1)[0]
+# print((box,laser))
