@@ -121,10 +121,22 @@ def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size
     joblib.dump(regX,'X_'+camera_name+'.gz',True)
     joblib.dump(regY, 'Y_' + camera_name+'.gz', True)
 
-cam = cv2.VideoCapture(1)
+def m_click (event,x,y,k,l):
+    if (event == cv2.EVENT_LBUTTONUP):
+        print(x,y)
+
+
+
+cam = cv2.VideoCapture(2)
+# ret,im = cam.read()
+im =cv2.imread('testimBr.jpg')
+cv2.imshow('image1',im)
+cv2.setMouseCallback('image1',m_click)
 while(1):
-    ret,im = cam.read()
-    cv2.imshow('image',im)
+    # ret,im = cam.read()
+    im =cv2.imread('testimBr.jpg')
+    cv2.imshow('image1',im)
+    cv2.setMouseCallback('image1', m_click)
     k=cv2.waitKey(100)
     if k == ord('r'):
         im = cv2.imread('testim.jpg',cv2.IMREAD_COLOR)
@@ -132,6 +144,6 @@ while(1):
     elif k== ord('e'):
         break
     elif k== ord('s'):
-        cv2.imwrite('testim.jpg',im)
+        cv2.imwrite('testimBr.jpg',im)
     else:
         pass
