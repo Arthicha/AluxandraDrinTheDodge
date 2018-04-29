@@ -78,7 +78,6 @@ def get_motion_model():
 
 
 def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
-    a = 0
     # calc potential field
     pmap, minx, miny = calc_potential_field(gx, gy, ox, oy, reso, rr)
 
@@ -119,11 +118,9 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         d = np.hypot(gx - xp, gy - yp)
         rx.append(xp)
         ry.append(yp)
-        listx.append(ix)
-        listy.append(iy)
 #        print(ix, iy)
-        if len(listx) == len(listy):
-            some = len(listx)
+        if len(rx) == len(ry):
+            some = len(rx)
         if show_animation:
             plt.plot(ix, iy, ".r")              #ix iy = position red dot
             plt.pause(0.01)
@@ -131,7 +128,7 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     #print(j)
     print("Goal!!")
 
-    return rx, ry, some, listx, listy
+    return rx, ry, some
 
 
 def draw_heatmap(data):
@@ -139,20 +136,17 @@ def draw_heatmap(data):
     plt.pcolor(data, vmax=100.0, cmap=plt.cm.Blues)
 
 
-def main():
+def point(start, goal):
     print("potential_field_planning start")
 
-    sx = 80.0  # start x position [m]
-    sy = 30.0  # start y positon [m]
-    sz = 20.0
-    gx = 40.0  # goal x position [m]
-    gy = 100.0  # goal y position [m]
-    gz= 80.0
+    sx = start[0]  # start x position [m]
+    sy = start[1]  # start y positon [m]
+    sz = start[2]       #start z position
+    gx = goal[0]  # goal x position [m]
+    gy = goal[1]  # goal y position [m]
+    gz= goal[2]
     grid_size = 1.0  # potential grid size [m]
     robot_radius = 1.0  # robot radius [m]
-
-    #suan = (gz-sz)/j
-    #print(suan)
 
     ox = [50.0]  # obstacle x position list [m]
     oy = [80.0]  # obstacle y position list [m]
@@ -162,30 +156,35 @@ def main():
         plt.axis("equal")
 
     # path generation
-    rx, ry ,some, listx, listy  = potential_field_planning(
+    rx, ry ,some = potential_field_planning(
         sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
-    print('point qua', some)
+
+
+ #   print(type(rx), len(rx), type(ry), len(ry))
+ #   print('point', some)
     section = (gz-sz)/(some-1)
 
-#    print(section)
-#    print(len(listx), listx)
-#    print(len(listy), listy)
-    listz = np.arange(sz, gz+(section/2), section)
-#    print(len(listz), listz)
+    rz = np.arange(sz, gz+(section/2), section)
 
-    position = []
     sent = []
-    for a, b, c in zip(listx, listy, listz):
+    for a, b, c in zip(rx, ry, rz):
         position = [a, b, c]
         sent.append(position)
 #        print(position)
-#    print(sent)
+#    print(len(sent), sent)
 
 
     if show_animation:
         plt.show()
 
     return sent
+
+
+def main():
+    start = [80.0, 30.0, 20.0]
+    goal = [40.0, 100.0, 80.0]
+    sent = point(start, goal)
+    print(len(sent), sent)
 
 
 
