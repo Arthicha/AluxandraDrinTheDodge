@@ -63,7 +63,7 @@ class Retinutella():
         '''my code'''
         self.four_points = np.reshape(np.array(four_points),(4,2))
         '''end of my code'''
-    def getImage(self,fileName=None,remove_pers = False , pts = [[0,0],[300,0],[0,300],[300,300]]):
+    def getImage(self,fileName=None,remove_pers = False ):
 
         '''
         :param fileName: file to save an image which captured from this object, this
