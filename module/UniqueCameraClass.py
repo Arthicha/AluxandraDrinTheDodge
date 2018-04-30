@@ -175,9 +175,86 @@ class Camera_right(Camera_left):
         self.z = offset_z
 
 
+class Camera_Bottom_right(Camera_left):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0))):
+        '''
+        :param name: camera name
+        :param cameraPort: camera usb port
+        :param cameraOreintation: angle of rotation of camera (degree)
+        :param cameraMode: camera mode 0 for BGR and 1 for Grayscale
+        :param four_points: four point to extract image
+        :param offset_z: distance of z against a wall
+        :return: None
+        example
+                CAM1 =  Camera_left(0,90,cameraMode=1)
+            this line of code create an object  Camera_left name 'L'
+        It connect to the camera usb port 0. The image capturing from this camera
+        is rotated 90 degree and converted to gray scale.
+        '''
+        current_path = os.getcwd()
+        model_path = current_path.split(os.sep)
+        model_path = model_path[:]
+        model_path = os.sep.join(model_path)
+        model_path = model_path+os.sep+'savedModel'+os.sep+'modelcamera'+os.sep
+        super().__init__(cameraPort,cameraOreintation,cameraMode=cameraMode,four_points=four_points)
+        self.name ='Br'
+        self.model_x = joblib.load(model_path+'X_'+self.name+'.gz')
+        self.model_y = joblib.load(model_path+'Y_'+self.name+'.gz')
+        self.z = offset_z
 
+class Camera_Bottom_left(Camera_left):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0))):
+        '''
+        :param name: camera name
+        :param cameraPort: camera usb port
+        :param cameraOreintation: angle of rotation of camera (degree)
+        :param cameraMode: camera mode 0 for BGR and 1 for Grayscale
+        :param four_points: four point to extract image
+        :param offset_z: distance of z against a wall
+        :return: None
+        example
+                CAM1 =  Camera_left(0,90,cameraMode=1)
+            this line of code create an object  Camera_left name 'L'
+        It connect to the camera usb port 0. The image capturing from this camera
+        is rotated 90 degree and converted to gray scale.
+        '''
+        current_path = os.getcwd()
+        model_path = current_path.split(os.sep)
+        model_path = model_path[:]
+        model_path = os.sep.join(model_path)
+        model_path = model_path+os.sep+'savedModel'+os.sep+'modelcamera'+os.sep
+        super().__init__(cameraPort,cameraOreintation,cameraMode=cameraMode,four_points=four_points)
+        self.name ='Bl'
+        self.model_x = joblib.load(model_path+'X_'+self.name+'.gz')
+        self.model_y = joblib.load(model_path+'Y_'+self.name+'.gz')
+        self.z = offset_z
 
-
+class Camera_Bottom_middle(Camera_left):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0))):
+        '''
+        :param name: camera name
+        :param cameraPort: camera usb port
+        :param cameraOreintation: angle of rotation of camera (degree)
+        :param cameraMode: camera mode 0 for BGR and 1 for Grayscale
+        :param four_points: four point to extract image
+        :param offset_z: distance of z against a wall
+        :return: None
+        example
+                CAM1 =  Camera_left(0,90,cameraMode=1)
+            this line of code create an object  Camera_left name 'L'
+        It connect to the camera usb port 0. The image capturing from this camera
+        is rotated 90 degree and converted to gray scale.
+        '''
+        current_path = os.getcwd()
+        model_path = current_path.split(os.sep)
+        model_path = model_path[:]
+        model_path = os.sep.join(model_path)
+        model_path = model_path+os.sep+'savedModel'+os.sep+'modelcamera'+os.sep
+        super().__init__(cameraPort,cameraOreintation,cameraMode=cameraMode,four_points=four_points)
+        self.name ='Bm'
+        self.model_x = joblib.load(model_path+'X_'+self.name+'.gz')
+        self.model_y = joblib.load(model_path+'Y_'+self.name+'.gz')
+        self.z = offset_z
 
 
 def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size = 21,number_of_points = (12,17),difference_distance_per_point = [-120,-120],shift_x=2040,shift_y=1320,camera_name='left'):
