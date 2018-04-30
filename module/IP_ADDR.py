@@ -1017,7 +1017,25 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         all_histogram = list(map(lambda x, y: np.concatenate([x, y]).tolist(), histogram_x, histogram_y))
         return all_histogram
 
+    def get_XY_feature(point):
+        X3 = np.power(point[0], 3)
+        XY2 = (point[0]) * (np.power(point[1], 2))
+        X5 = np.power(point[0], 5)
+        X3Y2 = (np.power(point[0], 3)) * (np.power(point[1], 2))
+        XY4 = point[0] * (np.power(point[1], 4))
+        X2 = (np.power(point[0], 2))
+        Y2 = (np.power(point[1], 2))
+        XY = (point[0]) * (point[1])
 
+        # #Y DATAS
+        YX2 = (point[1]) * (np.power(point[0], 2))
+        Y3 = np.power(point[1], 3)
+        YX4 = (point[1]) * (np.power(point[0], 4))
+        X2Y3 = (np.power(point[0], 2)) * (np.power(point[1], 3))
+        Y5 = np.power(point[1], 5)
+        feature_x = np.array([X3, XY2, X5, X3Y2, XY4, X2, Y2, XY])
+        feature_y = np.array([YX2, Y3, YX4, X2Y3, Y5, X2, Y2, XY])
+        return feature_x,feature_y
     # extract plate from image
     # example
     '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr

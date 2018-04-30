@@ -15,7 +15,7 @@ import numpy as np
 import cv2
 from scipy.spatial import cKDTree
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
-
+from sklearn.externals import  joblib
 '''*************************************************
 *                                                  *
 *               class Retinutella                  *
@@ -63,7 +63,7 @@ class Retinutella():
         '''my code'''
         self.four_points = np.reshape(np.array(four_points),(4,2))
         '''end of my code'''
-    def getImage(self,fileName=None,remove_pers = False , pts = [[0,0],[300,0],[0,300],[300,300]]):
+    def getImage(self,fileName=None,remove_pers = False ):
 
         '''
         :param fileName: file to save an image which captured from this object, this
@@ -125,6 +125,7 @@ class Retinutella():
                 cv2.circle(show_capture,pos,3,[255,0,0])
             cv2.imshow("capture",show_capture)
             cv2.waitKey(100)
+
         def calculate_position(position,HomoMatrix):
             ''' for 2 dimen only'''
             new_position =(position[0],position[1],1)
@@ -132,6 +133,7 @@ class Retinutella():
             new_position=np.reshape(new_position,(1,-1)).tolist()
             new_position=tuple(new_position[0][0:2])
             return new_position
+
         platePos_ = list(map(lambda x:calculate_position(x,matrice),platePos_))
         sorted_plate_pos = [x for x in platePos_]
         sorted_plate_orientation = [x for x in platePos_]
