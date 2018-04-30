@@ -113,9 +113,9 @@ class Camera_left(Retinutella):
                 print("***********")
                 # print(index)
                 # print(platePos_)
-                print(plate_pos)
-                print(plate_orientation)
-                print("**********")
+                # print(plate_pos)
+                # print(plate_orientation)
+                # print("**********")
                 if platePos and plateOrientation:
                     for x,y,z in zip(index,plate_pos,plate_orientation):
                         sorted_plate_pos[x]=y

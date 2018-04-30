@@ -63,7 +63,7 @@ class Retinutella():
         '''my code'''
         self.four_points = np.reshape(np.array(four_points),(4,2))
         '''end of my code'''
-    def getImage(self,fileName=None,remove_pers = False ):
+    def getImage(self,fileName=None,remove_pers = False ,show = True):
 
         '''
         :param fileName: file to save an image which captured from this object, this
@@ -87,6 +87,15 @@ class Retinutella():
             rows,cols = img.shape
         M = cv2.getRotationMatrix2D((cols/2,rows/2),self.cameraOreintation,1)
         img = cv2.warpAffine(img,M,(cols,rows))
+        if show is True:
+            def m_click(event, x, y, k, l):
+                if (event == cv2.EVENT_LBUTTONUP):
+                    print(x, y)
+
+            cv2.imshow('image',img)
+            cv2.setMouseCallback('image',m_click)
+            cv2.waitKey(100)
+
         path = os.getcwd()
         if fileName != None:
             cv2.imwrite(path+fileName,img)
