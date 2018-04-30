@@ -149,6 +149,9 @@ while(1):
     k=cv2.waitKey(100)
     if k == ord('r'):
         im = cv2.imread('testimBr.jpg',cv2.IMREAD_COLOR)
+        '''shift x y 
+            input real world coordinate of bottom left square
+        '''
         Regression_HaHA(im,camera_name='Br',number_of_points=(15,10),kernel_size=[5,5],binarization_thresh_kernel_size=15,difference_distance_per_point=[-30,+30],shift_x= -695,shift_y=1000-455)
     elif k== ord('e'):
         break
