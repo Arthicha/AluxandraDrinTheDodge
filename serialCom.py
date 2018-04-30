@@ -5,16 +5,17 @@ from math import degrees
 import cv2
 import numpy as np
 import serial
-from matlab import int16 as matlabInt16
 
 from module.MANipulatorKinematics import MANipulator
 from module.serialCommu import serial_commu
-from module.prePackage import addSubPosition
-from module.MATLAPUTOPPU import callMatFunc
+from module.prePackage import prePackage
 
-# a = matlabInt16([[0],[0],[0],[0],[0],[0]])
-# box,laser = callMatFunc('collision_check',a,1)[0]
+
+# matlab = MATLAPUTOPPU()
+# a = [[0],[0],[0],[0],[0],[0]]
+# box,laser = matlab.callMatFunc('collision_check',a,1)[0]
 # print((box,laser))
+
 
 if __name__ == '__main__':
     
@@ -31,17 +32,22 @@ if __name__ == '__main__':
     ser = serial_commu(port=3)
     MAN = MANipulator()
     R_e = MAN.RE_F
-    allQ = []
+    package = prePackage(checkLaser=checkLaser)
 
+    ser.clearSerialData()
     if True:
         # data = zip(zip([0,100,75,75,75,600],[0,50,100,100,100,0],[0,80,200,200,200,530]),['F','F','F','L','R','F'],[0,0,0,0,0,0],[0,0,0,0,0,0])
-        data = zip(zip([75,75,75],[100,100,100],[200,200,200]),[0,5,10],[0,0,0],['F','L','R'])
+        # data = zip(zip([75,100,150],[100,125,200],[200,250,300]),[0,5,10],[0,0,0],['F','L','R'])
+        data = zip(zip([100,150],[125,100],[250,200]),[5,10],[0,0],['L','R'])
         '''arg datalist = [[3D-position, predict_output, degreee of pai, no. of wall],...]'''
 
+        path = package.make10PathLine(data, ofsetlenght=ofsetLenght)
+        data= package.sortBestPosition(path,initial_position=[300,300,300],final_position=[300,300,300])
 
-        data = addSubPosition(dataList=data,platePositionX=platePositionX,platePositionY=platePositionY 
-                            ,platePositionZ= platePositionZ, ofsetlenght=ofsetLenght, plateHeight=plateHeight)
         
+        # data = package.addSubPosition(dataList=data,platePositionX=platePositionX,platePositionY=platePositionY 
+        #                     ,platePositionZ= platePositionZ, ofsetlenght=ofsetLenght, plateHeight=plateHeight)
+        # print(data)
         for position,wall,valve,ang in data:
             x,y,z = position
             # wall 'F'front,'L'left,'R'right,'B'buttom
@@ -59,30 +65,41 @@ if __name__ == '__main__':
             dy = y-dd[1]
             dz = z-dd[2]
 
-            ans = MAN.inverse_kinamatic2(dx,dy,dz,MAN.DH_param,R_e)
-            ans = MAN.setJointLimits(ans,MAN.jointLimit)
+            try :
+                ans = MAN.inverse_kinamatic2(dx,dy,dz,MAN.DH_param,R_e)
+                ans = MAN.setJointLimits(ans,MAN.jointLimit)
+            except :
+                ser.write(q=[0,0,0,0,0,0], jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=0)
+                sys.exit('IK calculate fail')
             print((x,y,z))
             H_a = []
-            for set_q in ans:
-                allQ.append(set_q[:-1]+[ang])
-            
 
-        for set_q in allQ:
-            # boxBreak,laserBreak = wanFunction(set_q)
-            # if boxBreak == 1:
-            #     sys.exit('box will be break')
-            # if checkLaser and laserBreak == 1:
-            #     sys.exit('breakdown sensor')
-            ser.write(q=set_q, jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=valve)
-            # time.sleep(1)
-            print(ser.readLine(26))
-            H,Hi = MAN.forward_kin(MAN.DH_param,set_q)
-            H_a.append(Hi[:,:4,3])
-            MAN.plot(H_a,matplotLibs=False,plotTarget=[x,y,z])
-            
-            while ser.readLine(2) == 'ok':
-                # ser.clearSerialData()
-                pass
+            for set_q in ans:
+                boxHit,laserHit = package.boxbreak(set_q[:-1]+[ang])
+
+                if boxHit ==1:
+                    ser.write(q=[0,0,0,0,0,0], jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=0)
+                    sys.exit('BOX HIT!!!')
+                
+                if laserHit == 1 :
+                    if  checkLaser:
+                        ser.write(q=[0,0,0,0,0,0], jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=0)
+                        sys.exit('ALERT LASER!!!')
+                    else :
+                        print('ALERT LASER!!!')
+                
+
+                ser.write(q=set_q[:-1]+[ang], jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=valve)
+                # time.sleep(1)
+                print(ser.readLine(26))
+                H,Hi = MAN.forward_kin(MAN.DH_param,set_q[:-1]+[ang])
+                H_a.append(Hi[:,:4,3])
+                MAN.plot(H_a,matplotLibs=False,plotTarget=[x,y,z])
+                
+                while ser.readLine(2) == 'ok':
+                    # ser.clearSerialData()
+                    pass
+                
             
     else :
         # mode

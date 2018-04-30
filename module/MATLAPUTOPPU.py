@@ -16,7 +16,6 @@ __description__ = 'Store call matlab and call simulink function'
     
 '''
 
-
 '''*************************************************
 *                                                  *
 *                 import module                    *
@@ -24,7 +23,6 @@ __description__ = 'Store call matlab and call simulink function'
 *************************************************'''
 
 import os
-
 import matlab.engine
 
 '''*************************************************
@@ -32,20 +30,30 @@ import matlab.engine
 *                 random function                  *
 *                                                  *
 *************************************************'''
+class MATLAPUTOPPU:
+    def __init__(self,path =os.getcwd()+os.sep+'module'+os.sep+'matlab'):
+        self.eng = matlab.engine.start_matlab()
+        self.eng.cd(path)
 
-def callMatFunc(funcname,argumentDict,outputs,path =os.getcwd()+os.sep+'matlab'):
-    eng = matlab.engine.start_matlab()
-    eng.cd(path)
-    # eng.foo()
-    getRes = getattr(eng,str(funcname))(argumentDict,nargout=outputs)
-    return getRes
+    def callMatFunc(self,funcname,argumentDict,outputs):
+        if str(type(argumentDict)) in ["<class 'mlarray.int16'>","<class 'dict'>"]:
+            argument = argumentDict
+        elif str(type(argumentDict)) in ["<class 'list'>","<class 'tuple'>"]:
+            argument = matlab.int16(argumentDict)
+        else :
+            argument = argumentDict
 
-def callSimulink(simulinkName,blockName,path =os.getcwd()+os.sep+'matlab'):
-    eng = matlab.engine.start_matlab()
-    eng.cd(path)
-    Sim = eng.sim(simulinkName,'SimulationMode','normal')
-    getSim = Sim.get(blockName)
-    return getSim
+        getRes = getattr(self.eng,str(funcname))(argument,nargout=outputs)
+        return getRes
+
+    def callSimulink(self,simulinkName,blockName):
+
+        Sim = self.eng.sim(simulinkName,'SimulationMode','normal')
+        getSim = Sim.get(blockName)
+        return getSim
+
+    def stopMatlab(self):
+        self.eng.qut()
 
 # send array to matlab function and return
 # eng = matlab.engine.start_matlab()

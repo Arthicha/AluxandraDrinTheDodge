@@ -136,20 +136,20 @@ def draw_heatmap(data):
     plt.pcolor(data, vmax=100.0, cmap=plt.cm.Blues)
 
 
-def point(start, goal):
+def point(start, goal,laserPosition=[50.0, 80.0]):
     print("potential_field_planning start")
 
-    sx = start[0]  # start x position [m]
-    sy = start[1]  # start y positon [m]
+    sx = start[0]  # start x position [cm]
+    sy = start[1]  # start y positon [cm]
     sz = start[2]       #start z position
-    gx = goal[0]  # goal x position [m]
-    gy = goal[1]  # goal y position [m]
+    gx = goal[0]  # goal x position [cm]
+    gy = goal[1]  # goal y position [cm]
     gz= goal[2]
-    grid_size = 1.0  # potential grid size [m]
-    robot_radius = 1.0  # robot radius [m]
+    grid_size = 1.0  # potential grid size [cm]
+    robot_radius = 1.0  # robot radius [cm]
 
-    ox = [50.0]  # obstacle x position list [m]
-    oy = [80.0]  # obstacle y position list [m]
+    ox = [laserPosition[0]]  # obstacle x position list [cm]
+    oy = [laserPosition[1]]  # obstacle y position list [cm]
 
     if show_animation:
         plt.grid(True)
@@ -159,12 +159,14 @@ def point(start, goal):
     rx, ry ,some = potential_field_planning(
         sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
 
-
  #   print(type(rx), len(rx), type(ry), len(ry))
  #   print('point', some)
     section = (gz-sz)/(some-1)
 
-    rz = np.arange(sz, gz+(section/2), section)
+    if section != 0:
+        rz = np.arange(sz, gz+(section/2), section)
+    else :
+        rz = [sz]*len(rx)
 
     sent = []
     for a, b, c in zip(rx, ry, rz):
@@ -185,7 +187,6 @@ def main():
     goal = [40.0, 100.0, 80.0]
     sent = point(start, goal)
     print(len(sent), sent)
-
 
 
 if __name__ == '__main__':
