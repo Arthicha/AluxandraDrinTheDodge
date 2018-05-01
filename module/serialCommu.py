@@ -1,11 +1,13 @@
 import serial
 import time
-from math import degrees
+from math import degrees, radians
 
 class serial_commu():
 
 
-    def __init__(self,port=3,baud=9600,t=0.01):
+    def __init__(self,port=3,baud=9600,t=0.01,sendSerial=True):
+        self.sendSerial = sendSerial
+
         self.ser = serial.Serial()
         self.ser.baudrate = baud
         self.ser.timeout = t
@@ -25,9 +27,12 @@ class serial_commu():
         #     self.ser.read()
 
 
-    def write(self,q,jointLimit,ofset,valve):
-        string = [int(degrees(sum(qi))) for qi in zip(q,[-jL[0] for jL in jointLimit],ofset)]+[valve]
-        self.ser.write(self.makeDataWord(string=string).encode('ascii'))
+    def write(self,q,jointLimit,ofset,valve,gainQ):
+        new_q = [q[0]*gainQ[0],q[1]*gainQ[1],q[2]*gainQ[2],q[3]*gainQ[3],q[4]*gainQ[4],q[5]*gainQ[5]]
+        string = [int(degrees(sum(qi))) for qi in zip(new_q,[0 for jL in jointLimit],[radians(ofs) for ofs in ofset])]+[valve]
+        print(self.makeDataWord(string=string))
+        if self.sendSerial:
+            self.ser.write(self.makeDataWord(string=string).encode('ascii'))
         time.sleep(0.1)
 
     def read(self,length=1):
