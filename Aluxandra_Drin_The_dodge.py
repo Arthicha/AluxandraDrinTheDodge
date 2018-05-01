@@ -23,7 +23,7 @@ import math
 import random
 
 # 4. our own module
-from module.Tenzor import TenzorCNN,TenzorNN,TenzorAE
+# from module.Tenzor import TenzorCNN,TenzorNN,TenzorAE
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
 from module.Retinutella_theRobotEye import Retinutella
 from module.RandomFunction import *
@@ -35,6 +35,7 @@ import matplotlib.pyplot as plt
 
 # 6. image processing module
 import cv2
+from module.UniqueCameraClass import *
 
 '''*************************************************
 *                                                  *
@@ -108,8 +109,10 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 *                                                  *
 *************************************************'''
 
-cam = Retinutella('cam1',1,0,cameraMode=1)
+# cam = Retinutella('cam1',1,0,cameraMode=1)
 cam2 = Retinutella('cam2',0,0,cameraMode=0)
+
+cam = Camera_Bottom_right(1,-90,cameraMode=1,four_points=((96,0),(355,15),(81,476),(623,429)))
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
             "zero","one","two","three","four","five","six","seven","eight","nine",
@@ -141,31 +144,31 @@ if MODEL not in range(0,3):
 *                                                  *
 *************************************************'''
 
-# create input section
-with tf.name_scope('input_placeholder'):
-    x = tf.placeholder(tf.float32, shape=[None, IMAGE_SIZE[0]*IMAGE_SIZE[1]],name='x_data')
-    y_ = tf.placeholder(tf.float32, shape=[None, N_CLASS],name='y_data')
-    x_image = tf.reshape(x, [-1, IMAGE_SIZE[0],IMAGE_SIZE[1], 1])
+# # create input section
+# with tf.name_scope('input_placeholder'):
+#     x = tf.placeholder(tf.float32, shape=[None, IMAGE_SIZE[0]*IMAGE_SIZE[1]],name='x_data')
+#     y_ = tf.placeholder(tf.float32, shape=[None, N_CLASS],name='y_data')
+#     x_image = tf.reshape(x, [-1, IMAGE_SIZE[0],IMAGE_SIZE[1], 1])
 
-# create model of convolutional neural network
-with tf.name_scope('CNN_model'):
-    CNN = TenzorCNN()
-    y_pred,activity = CNN.CNN2(x_image,CNN_HIDDEN_LAYER,KERNEL_SIZE,POOL_SIZE,STRIDE_SIZE,IMAGE_SIZE)
+# # create model of convolutional neural network
+# with tf.name_scope('CNN_model'):
+#     CNN = TenzorCNN()
+#     y_pred,activity = CNN.CNN2(x_image,CNN_HIDDEN_LAYER,KERNEL_SIZE,POOL_SIZE,STRIDE_SIZE,IMAGE_SIZE)
 
 # output and evaluation of the model
-with tf.name_scope('evaluation'):
-    pred_prob = tf.argmax(y_pred, 1)
-    correct_prediction = tf.equal(pred_prob, tf.argmax(y_, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+# with tf.name_scope('evaluation'):
+#     pred_prob = tf.argmax(y_pred, 1)
+#     correct_prediction = tf.equal(pred_prob, tf.argmax(y_, 1))
+#     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-if GETT_CNN_PATH != None:
-        saver = tf.train.Saver()
+# if GETT_CNN_PATH != None:
+#         saver = tf.train.Saver()
 
-sess = tf.Session()
-sess.run(tf.global_variables_initializer())
-if GETT_CNN_PATH != None:
-    saver.restore(sess, GETT_CNN_PATH+'\\modelCNN.ckpt')
-    print("Get model from path: %s" % GETT_CNN_PATH+'\\modelCNN.ckpt')
+# sess = tf.Session()
+# sess.run(tf.global_variables_initializer())
+# if GETT_CNN_PATH != None:
+#     saver.restore(sess, GETT_CNN_PATH+'\\modelCNN.ckpt')
+#     print("Get model from path: %s" % GETT_CNN_PATH+'\\modelCNN.ckpt')
 
 '''*************************************************
 *                                                  *
@@ -242,24 +245,24 @@ while(1):
         #plate[p] = 255 - plate[p]
         plate[p] = Zkele(plate[p],method='3d')
 
-    if plate != []:
-        # preparing input, convert image to vector
-        list_vector = np.resize(np.array(plate),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
-        # convert 8 bit image to be in range of 0.00-1.00, dtype = float
-        list_vector = list_vector/255
-        pred_result1 = sess.run(y_pred,feed_dict={x: list_vector})
-        pred_result2 = predictKNN(list_vector*255)
-        pred_result3 = forest.predict(plate,'prob')
-        pred_result=log_prob(pred_result1,pred_result2,pred_result3)
+    # if plate != []:
+    #     # preparing input, convert image to vector
+    #     list_vector = np.resize(np.array(plate),(len(plate),IMAGE_SIZE[0]*IMAGE_SIZE[1]))
+    #     # convert 8 bit image to be in range of 0.00-1.00, dtype = float
+    #     list_vector = list_vector/255
+    #     pred_result1 = sess.run(y_pred,feed_dict={x: list_vector})
+    #     pred_result2 = predictKNN(list_vector*255)
+    #     pred_result3 = forest.predict(plate,'prob')
+    #     pred_result=log_prob(pred_result1,pred_result2,pred_result3)
 
 
-    #show and finally destroy those windows.
-    for p in range(0,len(plate)):
-        plate[p] = cv2.resize(plate[p],(IMAGE_SIZE[1]*5,IMAGE_SIZE[0]*5))
-        cam.show(plate[p],frame='plate_'+str(NUM2WORD[pred_result[p]]))
-        cv2.moveWindow('plate_'+str(NUM2WORD[pred_result[p]]), 700,300);
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(corg, str(NUM2WORD[pred_result[p]]), (50, 400), font, 5, (0, 0, 255), 5, cv2.LINE_AA)
-    cam.show(corg,wait=30)
-    cam.destroyWindows()
+    # #show and finally destroy those windows.
+    # for p in range(0,len(plate)):
+    #     plate[p] = cv2.resize(plate[p],(IMAGE_SIZE[1]*5,IMAGE_SIZE[0]*5))
+    #     cam.show(plate[p],frame='plate_'+str(NUM2WORD[pred_result[p]]))
+    #     cv2.moveWindow('plate_'+str(NUM2WORD[pred_result[p]]), 700,300);
+    #     font = cv2.FONT_HERSHEY_SIMPLEX
+    #     cv2.putText(corg, str(NUM2WORD[pred_result[p]]), (50, 400), font, 5, (0, 0, 255), 5, cv2.LINE_AA)
+    # cam.show(corg,wait=30)
+    # cam.destroyWindows()
 
