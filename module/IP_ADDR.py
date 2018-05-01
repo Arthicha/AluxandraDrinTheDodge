@@ -455,7 +455,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         image_area = image.shape[0]*image.shape[1]
         if morph:
             image = __class__.morph(image,mode=__class__.ERODE,value=[5,5])
-
+        plate_hierachy= []
         img, contours, hierarchy = cv2.findContours(image, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
         plate = []
         for i in range(0,len(contours)):
@@ -466,6 +466,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             area = cv2.contourArea(cnt)
             if (area>min_area*image_area) and (area < image_area*max_area)and(len(approx) == 4) and(hi[2]!=-1)and(hi[1]==-1):
                 plate.append(approx)
+                plate_hierachy.append(hi)
                 cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
 
         for i in range(0,len(plate)):
@@ -474,16 +475,36 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             '''My code '''
             if orientation:
                 plateOrientation.append(__class__.find_orient(plate[i]))
-
+            # print('**********************')
+            # print(image.shape)
+            # print(plate[i])
+            # Full =True
             if center and before:
+                # if True in np.greater(image.shape[0]-5,plate[i][:,0]) or True in np.greater(image.shape[1]-5,plate[i][:,1]):
+                #     Full=False
+                # else:
                 platePos.append(__class__.center_of_Mass(plate[i]))
             '''End of my code'''
-            plate[i] = __class__.four_point_transform(org,plate[i])
+            plate[i],M = __class__.four_point_transform(org,plate[i],matrice=True)
+            # word,offset = __class__.Get_Word2([plate[i]],Resize=False)
+            # im,cont,hier = cv2.findContours(__class__.morph(word[0],__class__.DILATE,[15,15]), mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
             '''my code'''
-            if center and not before:
-                pass
+            # if center and before:
+            #     if Full is False:
+            #         print(len(cont))
+            #         print(cont)
+            #         if len(cont) == 1:
+            #             def calculate_position(position, HomoMatrix):
+            #                 ''' for 2 dimen only'''
+            #                 new_position = (position[0], position[1], 1)
+            #                 new_position = np.matmul(HomoMatrix, np.reshape(new_position, (-1, 1)))
+            #                 new_position = np.reshape(new_position, (1, -1)).tolist()
+            #                 new_position = tuple(new_position[0][0:2])
+            #                 return new_position
+            #             print(np.array(__class__.center_of_Mass(cont[0]))+offset/2)
+            #             platePos.append(calculate_position(__class__.center_of_Mass(cont[0])+(offset/2),M))
+
         if orientation and center:
-            print(plateOrientation)
             return plate, platePos,plateOrientation
         elif orientation:
             return plate, plateOrientation
@@ -492,7 +513,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         else:
             return plate
 
-    def Get_Word2(plate,thres_kirnel=21,boundary=20,black_tollerance=10,image_size=(60,30)):
+    def Get_Word2(plate,thres_kirnel=21,boundary=20,black_tollerance=10,image_size=(60,30),Resize= True):
         '''
         :param plate:              list of image of plate  
         :param thres_kirnel:        dimension of kernel use to binarize 
@@ -519,9 +540,13 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             word = __class__.crop_image(plate[i],word,tol=black_tollerance)
 
             if word != []:
-                word = cv2.resize(word,(image_size[1],image_size[0]))
+                if Resize:
+                    word = cv2.resize(word,(image_size[1],image_size[0]))
                 listOfWord.append(word)
-        return listOfWord
+        if Resize:
+            return listOfWord
+        else:
+            return listOfWord,bou
 
     def magnifly(image, percentage=100, shiftxy=[0, 0]):
         '''
@@ -1033,8 +1058,12 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         YX4 = (point[1]) * (np.power(point[0], 4))
         X2Y3 = (np.power(point[0], 2)) * (np.power(point[1], 3))
         Y5 = np.power(point[1], 5)
-        feature_x = np.array([X3, XY2, X5, X3Y2, XY4, X2, Y2, XY])
-        feature_y = np.array([YX2, Y3, YX4, X2Y3, Y5, X2, Y2, XY])
+
+        X = point[0]
+        Y = point[1]
+
+        feature_x = np.array([X,Y, XY2,  X2, Y2, XY])#np.array([X,Y,YX2,X3, XY2, X5, X3Y2, XY4, X2, Y2, XY])
+        feature_y = np.array([X,Y,YX2, X2, Y2, XY])#np.array([X,Y,XY2,YX2, Y3, YX4, X2Y3, Y5, X2, Y2, XY])
         return feature_x,feature_y
     # extract plate from image
     # example
