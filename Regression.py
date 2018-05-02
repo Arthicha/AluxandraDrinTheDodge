@@ -136,23 +136,23 @@ def m_click (event,x,y,k,l):
 
 
 #(96,0),(355,15),(81,476),(623,429)
-cam = Retinutella('cam1',1,-90,cameraMode=1,four_points=((82,15),(292,18),(358,456),(82,478)))
+# cam = Retinutella('cam1',1,-90,cameraMode=1,four_points=((82,15),(292,18),(358,456),(82,478)))
 # cam.getImage()
-# im = cv2.imread('testimBr.jpg',cv2.IMREAD_COLOR)
+im = cv2.imread('suck.jpg',cv2.IMREAD_COLOR)
 # ret,im = cam.read()
 # cv2.setMouseCallback('image1',m_click)
 while(1):
     # ret,im = cam.read()
-    capture,im,matri =cam.getImage(remove_pers=True)
+    # capture,im,matri =cam.getImage(remove_pers=True)
     cv2.imshow('image1',im)
     cv2.setMouseCallback('image1', m_click)
     k=cv2.waitKey(10)
     if k == ord('r'):
-        # im = cv2.imread('testimBr.jpg',cv2.IMREAD_COLOR)
+        im = cv2.imread('suck.jpg',cv2.IMREAD_GRAYSCALE)
         '''shift x y 
             input real world coordinate of bottom left square
         '''
-        Regression_HaHA(im,camera_name='Brr',number_of_points=(15,10),kernel_size=[5,5],binarization_thresh_kernel_size=15,difference_distance_per_point=[-30,+30],shift_x= -700,shift_y=1000-455)
+        Regression_HaHA(im,camera_name='Bl_bottom',number_of_points=(15,10),kernel_size=[7,7],binarization_thresh_kernel_size=19,difference_distance_per_point=[-30,+30],shift_x= 500-32.5,shift_y=700-455)
     elif k== ord('e'):
         break
     elif k== ord('s'):
@@ -161,12 +161,13 @@ while(1):
     else:
         pass
 while 1:
-    capture, im, matri = cam.getImage(remove_pers=True)
+    # capture, im, matri = cam.getImage(remove_pers=True)
+    im = cv2.imread('suck.jpg', cv2.IMREAD_GRAYSCALE)
     cv2.imshow('image1', im)
     print('test_model')
     cv2.imshow('image1', im)
-    model_X=joblib.load('X_Br.gz')
-    model_Y=joblib.load('Y_Br.gz')
+    model_X=joblib.load('X_Bl_bottom.gz')
+    model_Y=joblib.load('Y_Bl_bottom.gz')
     cv2.waitKey(0)
     j=int(input('X value'))
     k=int(input('Y value'))

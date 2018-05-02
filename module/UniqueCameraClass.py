@@ -252,8 +252,17 @@ class Camera_Bottom_right(Camera_left):
             rows, cols, _ = img.shape
         else:
             rows, cols = img.shape
-        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), self.cameraOreintation, 1)
-        img = cv2.warpAffine(img, M, (cols, rows))
+        maxima = max(img.shape)
+        # print(maxima)
+        blank_image = np.ones((cols, cols), np.uint8) * 255
+        blank_image[int((maxima - rows) / 2):int(maxima - (maxima - rows) / 2),
+        int((maxima - cols) / 2):int(maxima - (maxima - cols) / 2)] = img
+        new_image_rows, new_image_cols = blank_image.shape
+        # blank_image[:,:]
+        M = cv2.getRotationMatrix2D((maxima / 2, maxima / 2), 90, 1)
+        img = cv2.warpAffine(blank_image, M, (cols, cols), borderValue=255)
+        # M = cv2.getRotationMatrix2D((cols / 2, rows / 2), self.cameraOreintation, 1)
+        # img = cv2.warpAffine(img, M, (cols, rows))
         if show is True:
             def m_click(event, x, y, k, l):
                 if (event == cv2.EVENT_LBUTTONUP):
