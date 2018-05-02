@@ -36,14 +36,13 @@ class MANipulator():
                             [0,self.d4,0,-math.pi/2],
                             [0,0,0,math.pi/2],
                             [0,self.d6,0,0]],dtype=np.float32)
-        self.jointLimit = [[-2*math.pi,2*math.pi],
+        self.jointLimit = [[0,math.pi],
                     [0,math.pi],
-                    [-math.pi,math.pi],
-                    [-3*math.pi/4,3*math.pi/4],
-                    [-math.pi/2,math.pi/2],
-                    [-math.pi/2,math.pi/2]]
+                    [-1/2*math.pi,1/2*math.pi],
+                    [-2*math.pi,2*math.pi],
+                    [-2*math.pi,2*math.pi],
+                    [-2*math.pi,2*math.pi]]
 
-        self.ofset = [0,0,0,0,0,0]
         self.platePosition = [[1000,200,700],[1000,400,700],[1000,600,700],[1000,800,700],
                             [1000,200,500],[1000,400,500],[1000,600,500],[1000,800,500],
                             [1000,400,300],[1000,600,300]]

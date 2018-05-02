@@ -8,7 +8,7 @@ q = [q0 ;q1 ;q2 ;q3 ;q4 ;q5 ;q6 ];
 type = [1 ;1 ;1 ;1 ; 1; 1];
 DH_table = [0 d1 a1 pi/2;0 0 a2 0;pi/2 0 a3 pi/2;0 d4 0 -pi/2;0 0 0 pi/2;0 d6 0 0];
 [H, H_e, R_e, p_e] = forwardKinematics(q, DH_table, type);
-Hb0 = [0 -1 0 500 ;1 0 0 300; 0 0 1 0; 0 0 0 1];
+Hb0 = [1 0 0 500 ;0 1 0 300; 0 0 1 0; 0 0 0 1];
 
 H = subs(H, d1, 500);
 H = subs(H, a1, 85);
