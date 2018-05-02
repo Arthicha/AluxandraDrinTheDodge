@@ -26,7 +26,7 @@ def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size
 
     imgC = Image_naja
     imgBW = imgC
-    imgBW = cv2.cvtColor(imgC, cv2.COLOR_BGR2GRAY)
+    # imgBW = cv2.cvtColor(imgC, cv2.COLOR_BGR2GRAY)
     img = IP.binarize(imgBW,IP.SAUVOLA_THRESHOLDING,binarization_thresh_kernel_size)
     # ret, img = cv2.threshold(imgBW, 100, 255, cv2.THRESH_BINARY)
     cv2.imshow('gray',img)
@@ -135,24 +135,24 @@ def m_click (event,x,y,k,l):
         print(x,y)
 
 
-
-# cam = Retinutella('cam1',1,-90,cameraMode=1,four_points=((96,0),(355,15),(81,476),(623,429)))
+#(96,0),(355,15),(81,476),(623,429)
+cam = Retinutella('cam1',1,-90,cameraMode=1,four_points=((82,15),(292,18),(358,456),(82,478)))
 # cam.getImage()
-im = cv2.imread('testimBr.jpg',cv2.IMREAD_COLOR)
+# im = cv2.imread('testimBr.jpg',cv2.IMREAD_COLOR)
 # ret,im = cam.read()
-cv2.setMouseCallback('image1',m_click)
+# cv2.setMouseCallback('image1',m_click)
 while(1):
     # ret,im = cam.read()
-    # capture,im,matri =cam.getImage(remove_pers=True)
+    capture,im,matri =cam.getImage(remove_pers=True)
     cv2.imshow('image1',im)
     cv2.setMouseCallback('image1', m_click)
-    k=cv2.waitKey(100)
+    k=cv2.waitKey(10)
     if k == ord('r'):
-        im = cv2.imread('testimBr.jpg',cv2.IMREAD_COLOR)
+        # im = cv2.imread('testimBr.jpg',cv2.IMREAD_COLOR)
         '''shift x y 
             input real world coordinate of bottom left square
         '''
-        Regression_HaHA(im,camera_name='Br',number_of_points=(15,10),kernel_size=[5,5],binarization_thresh_kernel_size=15,difference_distance_per_point=[-30,+30],shift_x= -695,shift_y=1000-455)
+        Regression_HaHA(im,camera_name='Brr',number_of_points=(15,10),kernel_size=[5,5],binarization_thresh_kernel_size=15,difference_distance_per_point=[-30,+30],shift_x= -700,shift_y=1000-455)
     elif k== ord('e'):
         break
     elif k== ord('s'):
@@ -161,6 +161,8 @@ while(1):
     else:
         pass
 while 1:
+    capture, im, matri = cam.getImage(remove_pers=True)
+    cv2.imshow('image1', im)
     print('test_model')
     cv2.imshow('image1', im)
     model_X=joblib.load('X_Br.gz')
