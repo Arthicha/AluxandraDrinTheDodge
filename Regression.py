@@ -152,7 +152,7 @@ while(1):
         '''shift x y 
             input real world coordinate of bottom left square
         '''
-        Regression_HaHA(im,camera_name='Bl_bottom',number_of_points=(15,10),kernel_size=[7,7],binarization_thresh_kernel_size=19,difference_distance_per_point=[-30,+30],shift_x= 500-32.5,shift_y=700-455)
+        Regression_HaHA(im,camera_name='Bl_bottom',number_of_points=(15,10),kernel_size=[7,7],binarization_thresh_kernel_size=19,difference_distance_per_point=[+30,+30],shift_x= -500+32.5,shift_y=700-457.5)
     elif k== ord('e'):
         break
     elif k== ord('s'):
