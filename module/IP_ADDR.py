@@ -426,13 +426,23 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         point = __class__.line_intersection((tl,br),(bl,tr))
         return point
 
-    def find_orient(pts):
+    def find_orient(pts,model_x=None,model_y = None):
         point = __class__.order_points(pts)
-        (tl, tr, br, bl) = point
-        return -1*np.arctan2([br[1]-bl[1]],[br[0]-bl[0]])
+        if model_x is None or model_y is None:
+            (tl, tr, br, bl) = point
+            return -1*np.arctan2([br[1]-bl[1]],[br[0]-bl[0]])
+        else:
+            (tl, tr, br, bl) = point
+            feature_x,feature_y = __class__.get_XY_feature(br)
+            br = [0, 0]
+            br[0]=model_x.predict([feature_x])[0]
+            br[1]=model_y.predict([feature_y])[0][0]
+            br = (0, 0)
+            bl[0] = model_x.predict([feature_x])[0]
+            bl[1] = model_y.predict([feature_y])[0][0]
+            return -1 * np.arctan2([br[1] - bl[1]], [br[0] - bl[0]])
 
-
-    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False,orientation=False):
+    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False,orientation=False,model_x=None,model_y=None):
         '''
         :param org:             image to extract plate?
         :param thres_kirnel:    dimension of kernel use to binarize 
@@ -474,7 +484,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             plate[i] = np.reshape(plate[i],(4,2))
             '''My code '''
             if orientation:
-                plateOrientation.append(__class__.find_orient(plate[i]))
+                plateOrientation.append(__class__.find_orient(plate[i],model_x,model_y))
             # print('**********************')
             # print(image.shape)
             # print(plate[i])
