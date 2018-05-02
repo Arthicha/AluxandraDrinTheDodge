@@ -83,7 +83,7 @@ class Camera_left(Retinutella):
                 elif 'R' in self.name:
                     return [new_x[0],self.z-500,new_y[0][0]]
                 elif 'B' in self.name:
-                    return [new_y[0][0],new_x[0],self.z]
+                    return [new_x[0],new_y[0][0],self.z]
             else:
                 return ()
 
@@ -324,19 +324,31 @@ class Camera_Bottom_right(Camera_left):
             new_position = tuple(new_position[0][0:2])
             return new_position
 
-        def regress_to_real_world( points,model_x,model_y):
-            if points != ():
-                feature_x, feature_y = IP.get_XY_feature(points)
-                new_x = model_x.predict([feature_x])
-                new_y = model_y.predict([feature_y])
-                if 'L' in self.name:
-                    return [new_x[0], 500 - self.z, new_y[0][0]]
-                elif 'R' in self.name:
-                    return [new_x[0], self.z - 500, new_y[0][0]]
-                elif 'B' in self.name:
-                    return [new_y[0][0], new_x[0], self.z]
+        def regress_to_real_world( points,model_x,model_y,side=False):
+            if side is False:
+                if points != ():
+                    feature_x, feature_y = IP.get_XY_feature(points)
+                    new_x = model_x.predict([feature_x])
+                    new_y = model_y.predict([feature_y])
+                    if 'L' in self.name:
+                        return [new_x[0], 500 - self.z, new_y[0][0]]
+                    elif 'R' in self.name:
+                        return [new_x[0], self.z - 500, new_y[0][0]]
+                    elif 'B' in self.name:
+                        return [new_x[0],new_y[0][0],self.z]
+                else:
+                    return ()
             else:
-                return ()
+                if points != ():
+                    feature_x, feature_y = IP.get_XY_feature(points)
+                    new_x = model_x.predict([feature_x])
+                    new_y = model_y.predict([feature_y])
+                    if 'l' in self.name:
+                        return [new_x[0], new_y[0][0], self.z]
+                    if 'r' in self.name:
+                        return [new_x[0], new_y[0][0], self.z]
+                else:
+                    return ()
 
         def orientation_to_mat(self, orientation):
             if orientation is None:
@@ -425,7 +437,7 @@ class Camera_Bottom_right(Camera_left):
                         # print(sorted_plate_pos)
                         # print("----------------")
         sorted_plate_pos2 = list(
-            map(lambda x: regress_to_real_world(x, self.model_x_side, self.model_y_side), sorted_plate_pos2))
+            map(lambda x: regress_to_real_world(x, self.model_x_side, self.model_y_side,side=True), sorted_plate_pos2))
         sorted_plate_orientation2 = list(map(lambda x: orientation_to_mat(self, x), sorted_plate_orientation2))
 
         for i in range(0,len(sorted_plate_pos2)):
