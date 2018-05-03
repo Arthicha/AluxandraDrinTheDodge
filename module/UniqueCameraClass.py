@@ -92,11 +92,14 @@ class Camera_left(Retinutella):
                 return None
             else:
                 if 'L' in self.name:
-                    return np.array([[np.cos(-orientation[0]),np.sin(-orientation[0]),0],[0,0,1],[np.sin(-orientation[0]),np.cos(-orientation[0]),0]])
+                    return np.array([[0, 0, -1],[np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                              [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
                 elif 'R' in self.name:
-                    return np.array([[-np.cos(orientation[0]),-np.sin(orientation[0]),0],[0,0,-1],[np.sin(orientation[0]),-np.cos(orientation[0]),0]])
+                    return np.array([[0, 0, 1], [np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                              [-np.sin(orientation[0]), np.cos(orientation[0]), 0]])
                 elif 'B' in self.name:
-                    return np.array([[-np.cos(orientation[0]),-np.sin(orientation[0]),0],[0,0,-1],[np.sin(orientation[0]),-np.cos(orientation[0]),0]])
+                    return np.array([[np.cos(orientation[0]), np.sin(orientation[0]), 0], [np.sin(orientation[0]), -np.cos(orientation[0]), 0],
+                              [0,0,-1]])
 
         platePos_ = list(map(lambda x:calculate_position(x,matrice),platePos_))
         sorted_plate_pos = [x for x in platePos_]
@@ -344,7 +347,7 @@ class Camera_Bottom_right(Camera_left):
                     new_x = model_x.predict([feature_x])
                     new_y = model_y.predict([feature_y])
                     if 'l' in self.name:
-                        return [-500 + self.z, new_x[0], new_y[0][0]]
+                        return [-500 + self.z, new_x[0],new_y[0][0] ]
                     if 'r' in self.name:
                         return [500-self.z, new_x[0], new_y[0][0]]
                 else:
@@ -355,14 +358,14 @@ class Camera_Bottom_right(Camera_left):
                 return None
             else:
                 if 'L' in self.name:
-                    return np.array([[np.cos(-orientation[0]), np.sin(-orientation[0]), 0], [0, 0, 1],
-                                     [np.sin(-orientation[0]), np.cos(-orientation[0]), 0]])
+                    return np.array([[0, 0, -1],[np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                              [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
                 elif 'R' in self.name:
-                    return np.array([[-np.cos(orientation[0]), -np.sin(orientation[0]), 0], [0, 0, -1],
-                                     [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
+                    return np.array([[0, 0, 1], [np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                              [-np.sin(orientation[0]), np.cos(orientation[0]), 0]])
                 elif 'B' in self.name:
-                    return np.array([[-np.cos(orientation[0]), -np.sin(orientation[0]), 0], [0, 0, -1],
-                                     [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
+                    return np.array([[np.cos(orientation[0]), np.sin(orientation[0]), 0], [np.sin(orientation[0]), -np.cos(orientation[0]), 0],
+                              [0,0,-1]])
 
         platePos_dum = list(map(lambda x: calculate_position(x, matrice), platePos_))
         sorted_plate_pos = [x for x in platePos_dum]
