@@ -79,9 +79,9 @@ class Camera_left(Retinutella):
                 new_x = self.model_x.predict([feature_x])
                 new_y = self.model_y.predict([feature_y])
                 if 'L' in self.name:
-                    return [new_x[0],500-self.z,new_y[0][0]]
+                    return [-500 + self.z, new_x[0], new_y[0][0]]
                 elif 'R' in self.name:
-                    return [new_x[0],self.z-500,new_y[0][0]]
+                    return [500 - self.z, new_x[0], new_y[0][0]]
                 elif 'B' in self.name:
                     return [new_x[0],new_y[0][0],self.z]
             else:
@@ -331,9 +331,9 @@ class Camera_Bottom_right(Camera_left):
                     new_x = model_x.predict([feature_x])
                     new_y = model_y.predict([feature_y])
                     if 'L' in self.name:
-                        return [new_x[0], 500 - self.z, new_y[0][0]]
+                        return [-500 + self.z, new_x[0], new_y[0][0]]
                     elif 'R' in self.name:
-                        return [new_x[0], self.z - 500, new_y[0][0]]
+                        return [500-self.z, new_x[0], new_y[0][0]]
                     elif 'B' in self.name:
                         return [new_x[0],new_y[0][0],self.z]
                 else:
@@ -344,9 +344,9 @@ class Camera_Bottom_right(Camera_left):
                     new_x = model_x.predict([feature_x])
                     new_y = model_y.predict([feature_y])
                     if 'l' in self.name:
-                        return [new_x[0], new_y[0][0], self.z]
+                        return [-500 + self.z, new_x[0], new_y[0][0]]
                     if 'r' in self.name:
-                        return [new_x[0], new_y[0][0], self.z]
+                        return [500-self.z, new_x[0], new_y[0][0]]
                 else:
                     return ()
 
