@@ -347,25 +347,36 @@ class Camera_Bottom_right(Camera_left):
                     new_x = model_x.predict([feature_x])
                     new_y = model_y.predict([feature_y])
                     if 'l' in self.name:
-                        return [-500 + self.z, new_x[0],new_y[0][0] ]
+                        return [-500 + self.z, new_y[0][0],new_x[0] ]
                     if 'r' in self.name:
-                        return [500-self.z, new_x[0], new_y[0][0]]
+                        return [500-self.z,new_y[0][0] , new_x[0]]
                 else:
                     return ()
 
-        def orientation_to_mat(self, orientation):
-            if orientation is None:
-                return None
+        def orientation_to_mat(self, orientation,side=False):
+            if side is False:
+                if orientation is None:
+                    return None
+                else:
+                    if 'L' in self.name:
+                        return np.array([[0, 0, -1],[np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                                  [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
+                    elif 'R' in self.name:
+                        return np.array([[0, 0, 1], [np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                                  [-np.sin(orientation[0]), np.cos(orientation[0]), 0]])
+                    elif 'B' in self.name:
+                        return np.array([[np.cos(orientation[0]), np.sin(orientation[0]), 0], [np.sin(orientation[0]), -np.cos(orientation[0]), 0],
+                                  [0,0,-1]])
             else:
-                if 'L' in self.name:
-                    return np.array([[0, 0, -1],[np.cos(orientation[0]), np.sin(orientation[0]), 0],
-                              [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
-                elif 'R' in self.name:
-                    return np.array([[0, 0, 1], [np.cos(orientation[0]), np.sin(orientation[0]), 0],
-                              [-np.sin(orientation[0]), np.cos(orientation[0]), 0]])
-                elif 'B' in self.name:
-                    return np.array([[np.cos(orientation[0]), np.sin(orientation[0]), 0], [np.sin(orientation[0]), -np.cos(orientation[0]), 0],
-                              [0,0,-1]])
+                if orientation is None:
+                    return None
+                else:
+                    if 'l' in self.name:
+                        return np.array([[0, 0, -1],[np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                                  [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
+                    elif 'r' in self.name:
+                        return np.array([[0, 0, 1], [np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                                  [-np.sin(orientation[0]), np.cos(orientation[0]), 0]])
 
         platePos_dum = list(map(lambda x: calculate_position(x, matrice), platePos_))
         sorted_plate_pos = [x for x in platePos_dum]
@@ -441,7 +452,7 @@ class Camera_Bottom_right(Camera_left):
                         # print("----------------")
         sorted_plate_pos2 = list(
             map(lambda x: regress_to_real_world(x, self.model_x_side, self.model_y_side,side=True), sorted_plate_pos2))
-        sorted_plate_orientation2 = list(map(lambda x: orientation_to_mat(self, x), sorted_plate_orientation2))
+        sorted_plate_orientation2 = list(map(lambda x: orientation_to_mat(self, x,side=True), sorted_plate_orientation2))
 
         for i in range(0,len(sorted_plate_pos2)):
             if sorted_plate_pos[i] == ():
