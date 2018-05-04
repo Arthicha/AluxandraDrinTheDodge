@@ -21,7 +21,7 @@ example: you can find the example program at the bottom section of this file.
 '''
 
 
-class MANipulator():
+class MANipulator():   
 
     def __init__(self):
         self.d1 = 500.0
@@ -43,23 +43,21 @@ class MANipulator():
                     [-2*math.pi,2*math.pi],
                     [-2*math.pi,2*math.pi]]
 
-        self.platePosition = [[1000,200,700],[1000,400,700],[1000,600,700],[1000,800,700],
-                            [1000,200,500],[1000,400,500],[1000,600,500],[1000,800,500],
-                            [1000,400,300],[1000,600,300]]
 
         self.q = [0,0,0,0,0,0,0]
-        self.RE_F = np.array([[0,0,1],
-                    [0,1,0],
+        self.RE_F = np.array([[0,1,0],
+                    [0,0,1],
                     [1,0,0]])
-        self.RE_L = np.array([[1,0,0],
-                        [0,0,-1],
-                        [0,1,0]])
-        self.RE_R = np.array([[0,1,0],
-                        [0,0,1],
+        self.RE_L = np.array([[0,0,-1],
+                        [0,1,0],
+                        [1,0,0]])
+        self.RE_R = np.array([[0,0,1],
+                        [0,1,0],
                         [1,0,0]])
         self.RE_B = np.array([[0,-1,0],
                         [1,0,0],
                         [0,0,-1]])
+
 
 
     def RotTranz(self,DH,q):
@@ -112,8 +110,8 @@ class MANipulator():
                 ax.plot([0,plotTarget[0]],[0,0],[0,0],'r--')
                 ax.plot([plotTarget[0],plotTarget[0]],[0,plotTarget[1]],[0,0],'g--')
                 ax.plot([plotTarget[0],plotTarget[0]],[plotTarget[1],plotTarget[1]],[0,plotTarget[2]],'b--')
-        ax.set_xlim3d(-250-85, 1000-250-85)
-        ax.set_ylim3d(-500,500)
+        ax.set_xlim3d(-500,500)
+        ax.set_ylim3d(-250-85, 1000-250-85)
         ax.set_zlim3d(0,1000)
         ax.set_xlabel('x_0-direction')
         ax.set_ylabel('y_0-direction')
@@ -131,8 +129,8 @@ class MANipulator():
     def plotWorkSpace(self,ena_q,DH_param,q_lim,step=10):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.set_xlim3d(-250-85, 1000-250-85)
-        ax.set_ylim3d(-500,500)
+        ax.set_xlim3d(-500,500)
+        ax.set_ylim3d(-250-85, 1000-250-85)
         ax.set_zlim3d(0,1000)
         ax.set_xlabel('x_0-direction')
         ax.set_ylabel('y_0-direction')
@@ -217,7 +215,6 @@ class MANipulator():
         q1 = atan2(dy,dx)
 
 
-
         x = sqrt(pow(dx,2)+pow(dy,2)) - a1
         x_sq = pow(dx,2)+pow(dy,2)+pow(a1,2)-2*a1*sqrt(pow(dx,2)+pow(dy,2))
         y = dz - d1
@@ -264,18 +261,9 @@ class MANipulator():
                     q4 += math.pi
                 q5 = -q5
 
-            #q5 = acos(Rz[2])
-
-            #q4 = asin(Rz[1]/sin(q5))
-            #q5 = atan2(s5,c5)
-
-            #q4 = asin(Rz[1]/sin(q5))
-            #q4 = asin(Rz[1]/cos(q5))
-            #if sin(q5) == 0:
-                #q4 = 0
-            #else:
-                #q4 = asin(Rz[1]/sin(q5))
-            q.append([q1,q2,q3,q4,q5,0])
+            Rx = R[:, 0]
+            q6 = atan((sin(q4)*Rx[0]-cos(q4)*Rx[1])*sin(q5)/Rx[2])
+            q.append([q1,q2,q3,q4,q5,q6])
 
         return q
 
