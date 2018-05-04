@@ -1083,4 +1083,18 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
        cv2.imshow('img',img)
        cv2.waitKey(0)'''
 
+    '''filter plate for boss'''
+
+    def filter_plate(plate_img, plate_position, plate_Orientation):
+        new_plate_img = []
+        new_plate_position = []
+        new_plate_orientation = []
+        for x, y, z in zip(plate_img, plate_position, plate_Orientation):
+            if y == ():
+                pass
+            else:
+                new_plate_img.append(x)
+                new_plate_position.append(y)
+                new_plate_orientation.append(z)
+        return new_plate_img, new_plate_position, new_plate_orientation
 
