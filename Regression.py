@@ -138,40 +138,43 @@ def m_click (event,x,y,k,l):
 #(96,0),(355,15),(81,476),(623,429)
 # cam = Retinutella('cam1',1,-90,cameraMode=1,four_points=((82,15),(292,18),(358,456),(82,478)))
 # cam.getImage()
-im = cv2.imread('suck.jpg',cv2.IMREAD_COLOR)
+cam = cv2.VideoCapture(1)
+ret,im = cam.read()
+# im = cv2.imread('suck.jpg',cv2.IMREAD_COLOR)
 # ret,im = cam.read()
 # cv2.setMouseCallback('image1',m_click)
 while(1):
     # ret,im = cam.read()
     # capture,im,matri =cam.getImage(remove_pers=True)
+    ret, im = cam.read()
     cv2.imshow('image1',im)
     cv2.setMouseCallback('image1', m_click)
     k=cv2.waitKey(10)
-    if k == ord('r'):
-        im = cv2.imread('suck.jpg',cv2.IMREAD_GRAYSCALE)
-        '''shift x y 
-            input real world coordinate of bottom left square
-        '''
-        Regression_HaHA(im,camera_name='Bl_bottom',number_of_points=(15,10),kernel_size=[7,7],binarization_thresh_kernel_size=19,difference_distance_per_point=[+30,+30],shift_x= -500+32.5,shift_y=700-457.5)
-    elif k== ord('e'):
+    # if k == ord('r'):
+    #     im = cv2.imread('suck.jpg',cv2.IMREAD_GRAYSCALE)
+    #     '''shift x y
+    #         input real world coordinate of bottom left square
+    #     '''
+    #     Regression_HaHA(im,camera_name='Bl_bottom',number_of_points=(15,10),kernel_size=[7,7],binarization_thresh_kernel_size=19,difference_distance_per_point=[+30,+30],shift_x= -500+32.5,shift_y=700-457.5)
+    if k== ord('e'):
         break
     elif k== ord('s'):
+        cv2.imwrite('BottomLeftLeftSide.jpg',im)
         pass
-        # cv2.imwrite('testimBr.jpg',im)
     else:
         pass
-while 1:
-    # capture, im, matri = cam.getImage(remove_pers=True)
-    im = cv2.imread('suck.jpg', cv2.IMREAD_GRAYSCALE)
-    cv2.imshow('image1', im)
-    print('test_model')
-    cv2.imshow('image1', im)
-    model_X=joblib.load('X_Bl_bottom.gz')
-    model_Y=joblib.load('Y_Bl_bottom.gz')
-    cv2.waitKey(0)
-    j=int(input('X value'))
-    k=int(input('Y value'))
-    print(type(j),type(k))
-    feature_x,feature_y = IP.get_XY_feature([j,k])
-    print(model_X.predict([feature_x]))
-    print(model_Y.predict([feature_y]))
+# while 1:
+#     # capture, im, matri = cam.getImage(remove_pers=True)
+#     im = cv2.imread('suck.jpg', cv2.IMREAD_GRAYSCALE)
+#     cv2.imshow('image1', im)
+#     print('test_model')
+#     cv2.imshow('image1', im)
+#     model_X=joblib.load('X_Bl_bottom.gz')
+#     model_Y=joblib.load('Y_Bl_bottom.gz')
+#     cv2.waitKey(0)
+#     j=int(input('X value'))
+#     k=int(input('Y value'))
+#     print(type(j),type(k))
+#     feature_x,feature_y = IP.get_XY_feature([j,k])
+#     print(model_X.predict([feature_x]))
+#     print(model_Y.predict([feature_y]))

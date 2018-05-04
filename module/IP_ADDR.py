@@ -1102,29 +1102,30 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         new_position = []
         new_image = []
         new_orientation = []
-        tree = cKDTree(all_position)
-        already_duplicate_index=[]
-        for i in range(0,len(all_position)):
-            if i not in already_duplicate_index:
-                result = tree.query_ball_point(all_position[i],r)
-                if len(result)<=1:
-                    new_position.append(all_image[i])
-                    new_image.append(all_position[i])
-                    new_orientation.append(all_orientation[i])
-                elif len(result)>1:
-                    new_x = []
-                    new_y = []
-                    new_z = []
-                    for s in result:
-                        buffer=all_position[s]
-                        new_x.append(buffer[0])
-                        new_y.append(buffer[1])
-                        new_z.append(buffer[2])
-                        already_duplicate_index.append(s)
-                    new_x = np.mean(new_x)
-                    new_y = np.mean(new_y)
-                    new_z = np.mean(new_z)
-                    new_position.append(all_image[i])
-                    new_image.append([new_x,new_y,new_z])
-                    new_orientation.append(all_orientation[i])
-        return new_image,new_position,new_orientation
+        if all_position != []:
+            tree = cKDTree(all_position)
+            already_duplicate_index=[]
+            for i in range(0,len(all_position)):
+                if i not in already_duplicate_index:
+                    result = tree.query_ball_point(all_position[i],r)
+                    if len(result)<=1:
+                        new_position.append(all_image[i])
+                        new_image.append(all_position[i])
+                        new_orientation.append(all_orientation[i])
+                    elif len(result)>1:
+                        new_x = []
+                        new_y = []
+                        new_z = []
+                        for s in result:
+                            buffer=all_position[s]
+                            new_x.append(buffer[0])
+                            new_y.append(buffer[1])
+                            new_z.append(buffer[2])
+                            already_duplicate_index.append(s)
+                        new_x = np.mean(new_x)
+                        new_y = np.mean(new_y)
+                        new_z = np.mean(new_z)
+                        new_position.append(all_image[i])
+                        new_image.append([new_x,new_y,new_z])
+                        new_orientation.append(all_orientation[i])
+            return new_image,new_position,new_orientation

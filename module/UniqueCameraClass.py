@@ -359,14 +359,17 @@ class Camera_Bottom_right(Camera_left):
                     return None
                 else:
                     if 'L' in self.name:
-                        return np.array([[0, 0, -1],[np.cos(orientation[0]), np.sin(orientation[0]), 0],
-                                  [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
+                        return np.array([[0, 0, -1],
+                                         [np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                                        [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
                     elif 'R' in self.name:
-                        return np.array([[0, 0, 1], [np.cos(orientation[0]), np.sin(orientation[0]), 0],
-                                  [-np.sin(orientation[0]), np.cos(orientation[0]), 0]])
+                        return np.array([[0, 0, 1],
+                                         [np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                                        [-np.sin(orientation[0]), np.cos(orientation[0]), 0]])
                     elif 'B' in self.name:
-                        return np.array([[np.cos(orientation[0]), np.sin(orientation[0]), 0], [np.sin(orientation[0]), -np.cos(orientation[0]), 0],
-                                  [0,0,-1]])
+                        return np.array([[np.cos(orientation[0]), np.sin(orientation[0]), 0],
+                                         [np.sin(orientation[0]), -np.cos(orientation[0]), 0],
+                                        [0,0,-1]])
             else:
                 if orientation is None:
                     return None
