@@ -1,4 +1,4 @@
-#import library
+# import library
 import numpy as np
 import cv2
 import random
@@ -9,9 +9,28 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.externals import joblib
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
 from module.Retinutella_theRobotEye import Retinutella
+
 # Measures are in milimeters
 
-def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size = 21,number_of_points = (12,17),difference_distance_per_point = [-120,-120],shift_x=2040,shift_y=1320,camera_name='left'):
+LOAD_IMAGE_NAME = 'BL_Bside.jpg'
+SAVE_IMAGE_NAME = 'Bl_b.png'
+FROM_FILE = True
+TEST_MODEL = True
+MODEL_FILE_NAME = 'Bl_bottom'
+
+'''Regression Parameter'''
+SAVED_MODEL_NAME = 'Bl_bottom'
+KERNEL_SIZE = (4,4)
+NUMBER_OF_POINTS = (15,9)
+DIFFERENCE_DISTANCE_PER_POINT = [30,30]
+SHIFT_X = -500+32.5
+SHIFT_Y = 700-450
+
+'''********************************************************'''
+
+
+def Regression_HaHA(Image_naja, kernel_size=(4, 4), binarization_thresh_kernel_size=21, number_of_points=(12, 17),
+                    difference_distance_per_point=[-120, -120], shift_x=2040, shift_y=1320, camera_name='left'):
     '''
     :param Image_naja: Image contain the point aka chessboard or whatever 
     :param kernel_size: kernel_size use to erode 
@@ -27,19 +46,19 @@ def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size
     imgC = Image_naja
     imgBW = imgC
     # imgBW = cv2.cvtColor(imgC, cv2.COLOR_BGR2GRAY)
-    img = IP.binarize(imgBW,IP.SAUVOLA_THRESHOLDING,binarization_thresh_kernel_size)
-    # ret, img = cv2.threshold(imgBW, 100, 255, cv2.THRESH_BINARY)
-    cv2.imshow('gray',img)
+    # img = IP.binarize(imgBW, IP.SAUVOLA_THRESHOLDING, binarization_thresh_kernel_size)
+    ret, img = cv2.threshold(imgBW, 60, 255, cv2.THRESH_BINARY)
+    cv2.imshow('gray', img)
     cv2.waitKey(0)
     img = cv2.bitwise_not(img)
     kernel = np.ones(kernel_size, np.uint8)
     img = cv2.erode(img, kernel, iterations=1)
-    img = np.array(img , dtype = np.uint8)
+    img = np.array(img, dtype=np.uint8)
     cv2.imshow('gray', img)
     cv2.waitKey(0)
     im2, contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     # draw contours and find centers
-    for i in range(len(contours)-number_of_points[0]*number_of_points[1], len(contours)):
+    for i in range(len(contours) - number_of_points[0] * number_of_points[1], len(contours)):
         color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         cnt = contours[i]
         M = cv2.moments(cnt)
@@ -49,9 +68,9 @@ def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size
         conWorldMatY = np.append(conWorldMatY, [cy])
         mc = (cx, cy)
         cv2.circle(imgC, mc, 3, color, -1, 8, 0)
-    conWorldMatX = np.reshape(conWorldMatX,(-1,number_of_points[1]))
-    conWorldMatX = np.sort(conWorldMatX,axis=1)
-    conWorldMatX = np.reshape(conWorldMatX,-1)
+    conWorldMatX = np.reshape(conWorldMatX, (-1, number_of_points[1]))
+    conWorldMatX = np.sort(conWorldMatX, axis=1)
+    conWorldMatX = np.reshape(conWorldMatX, -1)
     print('-------------')
     print('center X:')
     print(conWorldMatX)
@@ -79,8 +98,8 @@ def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size
     # Y MATRIX
     RealWorldMatY = np.zeros(shape=number_of_points)
     RealWorldRolY = np.zeros(shape=(1, number_of_points[1]))
-    for l in range(0,number_of_points[0]):
-        RealWorldRolY[:1] = (shift_y) + (difference_distance_per_point[1]* l)
+    for l in range(0, number_of_points[0]):
+        RealWorldRolY[:1] = (shift_y) + (difference_distance_per_point[1] * l)
         RealWorldMatY[l] = RealWorldRolY
         RealWorldRolY.fill(0)
     RealWorldMatY = RealWorldMatY.flatten()
@@ -91,8 +110,8 @@ def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size
     print('Real world Y :')
     print(RealWorldMatY)
     print('***************')
-    DisX = np.zeros(shape=(number_of_points[0]*number_of_points[1], 6))
-    DisY = np.zeros(shape=(number_of_points[0]*number_of_points[1], 6))
+    DisX = np.zeros(shape=(number_of_points[0] * number_of_points[1], 6))
+    DisY = np.zeros(shape=(number_of_points[0] * number_of_points[1], 6))
     for k in range(len(conWorldMatX)):
         # X_DATA
         X3 = np.power(conWorldMatX[k], 3)
@@ -115,10 +134,9 @@ def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size
         X = conWorldMatX[k]
         Y = conWorldMatY[k]
 
-
-        dummyX = np.array([X,Y, XY2,  X2, Y2, XY])#X3,X5, X3Y2, XY4,
+        dummyX = np.array([X, Y, XY2, X2, Y2, XY])  # X3,X5, X3Y2, XY4,
         DisX[k] = dummyX
-        dummyY = np.array([X,Y,YX2, X2, Y2, XY])# Y3, YX4, X2Y3, Y5,
+        dummyY = np.array([X, Y, YX2, X2, Y2, XY])  # Y3, YX4, X2Y3, Y5,
         DisY[k] = dummyY
 
     regX = linear_model.LinearRegression()
@@ -127,54 +145,70 @@ def Regression_HaHA(Image_naja,kernel_size=(4,4),binarization_thresh_kernel_size
     regY.fit(DisY, RealWorldMatY)
     print("X_SCORE =" + str(regX.score(DisX, RealWorldMatX)))
     print("Y_SCORE =" + str(regY.score(DisY, RealWorldMatY)))
-    joblib.dump(regX,'X_'+camera_name+'.gz',True)
-    joblib.dump(regY, 'Y_' + camera_name+'.gz', True)
+    joblib.dump(regX, 'X_' + camera_name + '.gz', True)
+    joblib.dump(regY, 'Y_' + camera_name + '.gz', True)
 
-def m_click (event,x,y,k,l):
+
+def m_click(event, x, y, k, l):
     if (event == cv2.EVENT_LBUTTONUP):
-        print(x,y)
+        print(x, y)
 
 
-#(96,0),(355,15),(81,476),(623,429)
-# cam = Retinutella('cam1',1,-90,cameraMode=1,four_points=((82,15),(292,18),(358,456),(82,478)))
+# (96,0),(355,15),(81,476),(623,429)
+if FROM_FILE:
+    pass
+else:
+    cam = Retinutella('cam1',1,-90,cameraMode=1,four_points=((82,15),(292,18),(358,456),(82,478)))
 # cam.getImage()
-cam = cv2.VideoCapture(1)
-ret,im = cam.read()
-# im = cv2.imread('suck.jpg',cv2.IMREAD_COLOR)
+# cam = cv2.VideoCapture(1)
 # ret,im = cam.read()
+if FROM_FILE:
+    im = cv2.imread(LOAD_IMAGE_NAME, cv2.IMREAD_COLOR)
+# else:
+#     ret,im = cam.read()
 # cv2.setMouseCallback('image1',m_click)
-while(1):
+while (1):
     # ret,im = cam.read()
-    # capture,im,matri =cam.getImage(remove_pers=True)
-    ret, im = cam.read()
-    cv2.imshow('image1',im)
+    if not FROM_FILE:
+        capture,im,matri =cam.getImage(remove_pers=True)
+    else:
+        im = cv2.imread(LOAD_IMAGE_NAME, cv2.IMREAD_GRAYSCALE)
+    # ret, im = cam.read()
+    cv2.imshow('image1', im)
     cv2.setMouseCallback('image1', m_click)
-    k=cv2.waitKey(10)
-    # if k == ord('r'):
-    #     im = cv2.imread('suck.jpg',cv2.IMREAD_GRAYSCALE)
-    #     '''shift x y
-    #         input real world coordinate of bottom left square
-    #     '''
-    #     Regression_HaHA(im,camera_name='Bl_bottom',number_of_points=(15,10),kernel_size=[7,7],binarization_thresh_kernel_size=19,difference_distance_per_point=[+30,+30],shift_x= -500+32.5,shift_y=700-457.5)
-    if k== ord('e'):
+    k = cv2.waitKey(10)
+    if k == ord('r'):
+        if FROM_FILE:
+            im = cv2.imread(LOAD_IMAGE_NAME, cv2.IMREAD_GRAYSCALE)
+        '''shift x y
+            input real world coordinate of bottom left square
+        '''
+        Regression_HaHA(im, camera_name=SAVED_MODEL_NAME, number_of_points=NUMBER_OF_POINTS, kernel_size=KERNEL_SIZE,
+                        binarization_thresh_kernel_size=19, difference_distance_per_point=DIFFERENCE_DISTANCE_PER_POINT, shift_x=SHIFT_X,
+                        shift_y=SHIFT_Y)
+    if k == ord('e'):
         break
-    elif k== ord('s'):
-        cv2.imwrite('BottomLeftLeftSide.jpg',im)
+    elif k == ord('s'):
+        cv2.imwrite(SAVE_IMAGE_NAME,im)
         pass
     else:
         pass
-# while 1:
-#     # capture, im, matri = cam.getImage(remove_pers=True)
-#     im = cv2.imread('suck.jpg', cv2.IMREAD_GRAYSCALE)
-#     cv2.imshow('image1', im)
-#     print('test_model')
-#     cv2.imshow('image1', im)
-#     model_X=joblib.load('X_Bl_bottom.gz')
-#     model_Y=joblib.load('Y_Bl_bottom.gz')
-#     cv2.waitKey(0)
-#     j=int(input('X value'))
-#     k=int(input('Y value'))
-#     print(type(j),type(k))
-#     feature_x,feature_y = IP.get_XY_feature([j,k])
-#     print(model_X.predict([feature_x]))
-#     print(model_Y.predict([feature_y]))
+if TEST_MODEL:
+    while 1:
+        #
+        if FROM_FILE:
+            im = cv2.imread(LOAD_IMAGE_NAME, cv2.IMREAD_GRAYSCALE)
+        else:
+            capture, im, matri = cam.getImage(remove_pers=True)
+        cv2.imshow('image1', im)
+        print('test_model')
+        cv2.imshow('image1', im)
+        model_X = joblib.load('X_'+MODEL_FILE_NAME+'.gz')
+        model_Y = joblib.load('Y_'+MODEL_FILE_NAME+'.gz')
+        cv2.waitKey(0)
+        j = int(input('X value'))
+        k = int(input('Y value'))
+        print(type(j), type(k))
+        feature_x, feature_y = IP.get_XY_feature([j, k])
+        print(model_X.predict([feature_x]))
+        print(model_Y.predict([feature_y]))
