@@ -48,16 +48,16 @@ class MANipulator():
         self.q = [0,0,0,0,0,0,0]
         self.RE_F = np.array([[0,1,0],
                     [0,0,1],
-                    [1,0,0]])
+                    [1,0,0]],dtype= np.float)
         self.RE_L = np.array([[0,0,-1],
                         [0,1,0],
-                        [1,0,0]])
+                        [1,0,0]],dtype= np.float)
         self.RE_R = np.array([[0,0,1],
                         [0,1,0],
-                        [1,0,0]])
+                        [1,0,0]],dtype= np.float)
         self.RE_B = np.array([[0,-1,0],
                         [1,0,0],
-                        [0,0,-1]])
+                        [0,0,-1]],dtype= np.float)
 
 
 

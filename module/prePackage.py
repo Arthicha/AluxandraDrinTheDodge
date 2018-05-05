@@ -1,5 +1,6 @@
 
 from math import pow, sqrt
+import numpy as np
 
 from module.MATLAPUTOPPU import MATLAPUTOPPU
 from module.MotionPlanningZ import point
@@ -7,7 +8,7 @@ from module.MANipulatorKinematics import MANipulator
 
 
 class prePackage:
-    def __init__(self,pathPlaning =True,runMatLab=True, ofsetlenght=20, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300]):
+    def __init__(self,pathPlaning =True,runMatLab=True, ofsetlenght=20, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],stepRotation = 5):
         
         self.runMatlab = runMatLab
         if self.runMatlab:
@@ -25,11 +26,12 @@ class prePackage:
                         [platePositionX[1],Y,platePositionZ[2] ],[platePositionX[2],Y,platePositionZ[2] ] ]
         self.ofsetPlatePosition = [[x,y-ofsetlenght,z] for x,y,z in self.platePosition]
         self.MAN = MANipulator()
+        self.stepRotation = stepRotation
 
-
-    def sortBestPosition(self,dataList,initial_position = [200,0,400], final_position = [200,0,400]):
+    def sortBestPosition(self,dataList,initial_position , final_position ):
         output = [] # list start final
         realOutput = []
+        priorityOutput = []
         excepted = []
         keep = {}
         # find first and last position of list and keep in dict
@@ -37,7 +39,7 @@ class prePackage:
             
             keep[(tuple(datas[0][0]),tuple(datas[-1][0]))] = datas
         
-        # sort data
+        # sort nearest data
         keys = list(keep.keys())
         while(len(output) < len(keys) ):    
             nearest = 10e+10
@@ -46,7 +48,7 @@ class prePackage:
                 if datas not in output :
                     
                     if output==[]:
-                        sumdistance = sqrt(sum([pow(initial_position[0]-datas[0][0],2), pow(initial_position[1] -datas[0][1],2), pow(initial_position[2]-datas[0][2],2) ]))
+                        sumdistance = sqrt(sum([pow(initial_position[0][0]-datas[0][0],2), pow(initial_position[0][1] -datas[0][1],2), pow(initial_position[0][2]-datas[0][2],2) ]))
                     else:
                         sumdistance = sqrt(sum([pow(output[-1][1][0]-datas[0][0],2), pow(output[-1][1][1] -datas[0][1],2), pow(output[-1][1][2]-datas[0][2],2) ]))
                     
@@ -59,14 +61,15 @@ class prePackage:
                 output.append(select)
             else:
                 break    
+        
+        keep[(tuple(initial_position[0]),output[0][0])] = [[data, 'F', 0, self.MAN.RE_F ] for data in self.sendToPoint(initial_position[0],output[0][0])]
+        keep[(output[-1][-1],tuple(final_position[0]))] = [[data, 'F', 0, self.MAN.RE_F ] for data in self.sendToPoint(output[-1][-1],final_position[0])]
+
+        output.insert(0,(tuple(initial_position[0]),output[0][0]) )
+        output.insert(len(output),(output[-1][-1],tuple(final_position[0])) )
+
 
         # add all sub position in path
-        keep[(tuple(initial_position),output[0][0])] = [[data, 'F', 0, self.MAN.RE_F ] for data in self.sendToPoint(initial_position,output[0][0])]
-        keep[(output[-1][-1],tuple(final_position))] = [[data, 'F', 0, self.MAN.RE_F ] for data in self.sendToPoint(output[-1][-1],final_position)]
-
-        output.insert(0,(tuple(initial_position),output[0][0]) )
-        output.insert(len(output),(output[-1][-1],tuple(final_position)) )
-        
         count = 0
         for index in range(1,len(output)-2):
             
@@ -74,14 +77,29 @@ class prePackage:
             start = output[index+count-1][1]
             end = output[index+count][0]
             output.insert(index+count,(start,end))
-
+            
             keep[(start,end)] = [[data, keep[output[index]][0][1], keep[output[index]][0][2], keep[output[index]][0][3] ] for data in self.sendToPoint(start,end)] 
          # connect all path and keep in 1 list 
+        
         for index in output: 
             for data in keep[index]:
-                realOutput.append(data)
+                if len(realOutput) == 0:
+                    realOutput.append(data)
+                elif str(data) != str(realOutput[-1]) : 
+                    realOutput.append(data)
 
-        return realOutput
+        # add rotation sub path in all loop
+        for indexCountRealOutput in range(len(realOutput)-1):
+
+            if str(realOutput[indexCountRealOutput][3]) == str(realOutput[indexCountRealOutput+1][3]):
+                priorityOutput.append(realOutput[indexCountRealOutput])
+            else:
+                subRotation = self.getSubRotation(start= realOutput[indexCountRealOutput][3], stop=realOutput[indexCountRealOutput+1][3],step= self.stepRotation)
+                for splitSubRotation in subRotation:
+                    priorityOutput.append([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], 
+                                    realOutput[indexCountRealOutput][2], splitSubRotation ])
+
+        return priorityOutput
 
 
     def make10PathLine(self,dataList ):
@@ -163,3 +181,25 @@ class prePackage:
         a = [[int(listQ[0])],[int(listQ[1])],[int(listQ[2])],[int(listQ[3])],[int(listQ[4])],[int(listQ[5])]]
         box,laser = self.matlab.callMatFunc('collision_check',a,1)[0]
         return (box,laser)
+
+    def getSubRotation(self, start, stop, step):
+        output = []
+        subRotation = []
+
+        for row in range(0,3):
+            for col in range(0,3):
+                section = (stop[row][col]-start[row][col])/(step-1)
+                if abs(float(section)) != 0.0:
+                    subRotation.append(np.arange(start[row][col], stop[row][col]+(section/2), section))
+
+                else:
+                    subRotation.append(np.array([start[row][col]] * step))
+
+        for listIndex in range(step):
+            key = []
+            for row in range(0,3):
+                for col in range(0,3):
+                    key.append(subRotation[3*row+col][listIndex])
+            output.append(np.array(key).reshape(3,3))
+
+        return output

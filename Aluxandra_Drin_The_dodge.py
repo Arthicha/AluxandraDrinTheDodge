@@ -72,6 +72,7 @@ sep = os.path.sep
 *               configuration variable             *
 *                                                  *
 *************************************************'''
+MAN = MANipulator()
 
 # protocal serial setting
 PORT = 3
@@ -81,17 +82,18 @@ RECIEVE_SERIAL = SEND_SERIAL
 # main serial setting
 RUN_MATLAB = False
 CHECK_LASER = False
-PATH_PLANING = False    
-HALF_IK = True
+PATH_PLANING = True 
+HALF_IK = False
 
 # initial constant 
-INITIAL_POSITION = [400,0,600]
+INITIAL_POSITION = [[400,0,600],'R',MAN.RE_R]
 PLATE_POSITION_X = [-300,-100,100,300]
 PLATE_POSITION_Y = 600
-PLATE_POSITION_Z = [700,500,300]
+PLATE_POSITION_Z = [700,500,300]  
 OFSET_LENGHT = 30 
 PLATE_HEIGHT = 0
 WORKSPACE = [-500,500,-400,600,0,1000]
+STEP_ROTATION = 5
 
 #ofset set Q
 OFSET_Q = [230,10,170,135,135,135]
@@ -99,17 +101,17 @@ GAIN_Q = [-1,1,1,1,1,1]
 
 # test condition
 TEST_MODE = True
-MODE_POSITION = False
-MODE_FIX_DATA = True
+MODE_POSITION = True
+MODE_FIX_DATA = False
 
 
-MAN = MANipulator()
+
 
 # test data
 if TEST_MODE:
     if MODE_POSITION:
-        data = [ [[200,400,100],'B',0,MAN.RE_B], [[-400,200,800],'L',1,MAN.RE_F] ]
-        data = [[[200,733,618],'F',0,MAN.RE_F] ] 
+        data = [ [[200,400,100],'B',0,MAN.RE_B], [[-400,200,800],'L',1,MAN.RE_L] ]
+        # data = [[[200,733,618],'F',0,MAN.RE_F] ] 
         # daat = [[0,],'F',0,MAN.RE_F]
     else:
        data= [90/180*pi,160/180*pi,-140/180*pi,0/180*pi,0/180*pi,0/180*pi]
@@ -118,8 +120,6 @@ if TEST_MODE:
 # data = [95/180*pi,115/180*pi,-120/180*pi,135/180*pi,135/180*pi,135/180*pi]  # up rising
 # data = [1/2*pi,0*pi,-110/180*pi,0*pi,0*pi,0*pi]                             # hua pak           
 # data = [1/2*pi,-35/180*pi,-110/180*pi,0*pi,0*pi,0*pi]                       # drin the dodge
-
-
 
 CAMERA_ALL_OFFSET_Z = 25
 
@@ -218,7 +218,7 @@ send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MAT
                 pathPlaning = PATH_PLANING, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL ,
                 half_IK= HALF_IK, platePositionX= PLATE_POSITION_X, platePositionY = PLATE_POSITION_Y ,
                 platePositionZ = PLATE_POSITION_Z, ofsetLenght = OFSET_LENGHT, plateHeight = PLATE_HEIGHT, 
-                workspace = WORKSPACE, ofsetQ = OFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA)
+                workspace = WORKSPACE, ofsetQ = OFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION)
 
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
