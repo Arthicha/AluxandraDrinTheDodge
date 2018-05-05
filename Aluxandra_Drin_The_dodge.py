@@ -75,8 +75,8 @@ sep = os.path.sep
 MAN = MANipulator()
 
 # protocal serial setting
-PORT = 3
-SEND_SERIAL = False
+PORT = 4
+SEND_SERIAL = True
 RECIEVE_SERIAL = SEND_SERIAL
 
 # main serial setting
@@ -90,10 +90,11 @@ INITIAL_POSITION = [[400,0,600],'R',MAN.RE_R]
 PLATE_POSITION_X = [-300,-100,100,300]
 PLATE_POSITION_Y = 600
 PLATE_POSITION_Z = [700,500,300]  
-OFSET_LENGHT = 30 
-PLATE_HEIGHT = 0
+OFSET_LENGHT = 30  # before to position
+OFSET_LENGHT_2 = 60 # after to position
+PLATE_HEIGHT = 25
 WORKSPACE = [-500,500,-400,600,0,1000]
-STEP_ROTATION = 5
+STEP_ROTATION = 8
 
 #ofset set Q
 OFSET_Q = [230,10,170,135,135,135]
@@ -217,7 +218,7 @@ listCam = [cam5,cam5,cam5,cam5,cam5]
 send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL,
                 pathPlaning = PATH_PLANING, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL ,
                 half_IK= HALF_IK, platePositionX= PLATE_POSITION_X, platePositionY = PLATE_POSITION_Y ,
-                platePositionZ = PLATE_POSITION_Z, ofsetLenght = OFSET_LENGHT, plateHeight = PLATE_HEIGHT, 
+                platePositionZ = PLATE_POSITION_Z, ofsetLenght = OFSET_LENGHT, plateHeight = PLATE_HEIGHT, ofsetLenght2= OFSET_LENGHT_2,
                 workspace = WORKSPACE, ofsetQ = OFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION)
 
 

@@ -8,7 +8,7 @@ from module.MANipulatorKinematics import MANipulator
 
 
 class prePackage:
-    def __init__(self,pathPlaning =True,runMatLab=True, ofsetlenght=20, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],stepRotation = 5):
+    def __init__(self,pathPlaning =True,runMatLab=True, ofsetlenght=20,ofsetlenght2 = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],stepRotation = 5):
         
         self.runMatlab = runMatLab
         if self.runMatlab:
@@ -16,6 +16,7 @@ class prePackage:
         self.pathPlaning = pathPlaning
 
         self.ofsetlenght = ofsetlenght
+        self.ofsetlenght2 = ofsetlenght2
         
         Y = platePositionY-int(plateHeight/2)
 
@@ -25,6 +26,7 @@ class prePackage:
                         [platePositionX[2],Y,platePositionZ[1] ],[platePositionX[3],Y,platePositionZ[1] ],
                         [platePositionX[1],Y,platePositionZ[2] ],[platePositionX[2],Y,platePositionZ[2] ] ]
         self.ofsetPlatePosition = [[x,y-ofsetlenght,z] for x,y,z in self.platePosition]
+        self.nextOfsetPlatePosition = [[x,y-ofsetlenght2,z] for x,y,z in self.platePosition]
         self.MAN = MANipulator()
         self.stepRotation = stepRotation
 
@@ -123,40 +125,46 @@ class prePackage:
         for keyList in sortList: # count pai position
             if keyList in toDict.keys(): #if detect position-number language -> True
 
+                # ofset position
                 position,wall,orentation = toDict[keyList]
                 ofsetPosition = [int(val) for val in position]
+                nextOfsetPosition = [int(val) for val in position]
                 if wall == 'F':
                     ofsetPosition[1] = int(ofsetPosition[1])-self.ofsetlenght
+                    nextOfsetPosition[1] = int(ofsetPosition[1])-(self.ofsetlenght2)
                 if wall == 'L':
                     ofsetPosition[0] = int(ofsetPosition[0])+self.ofsetlenght
+                    nextOfsetPosition[0] = int(ofsetPosition[0])+(self.ofsetlenght2)
                 if wall == 'R':
                     ofsetPosition[0] = int(ofsetPosition[0])-self.ofsetlenght
+                    nextOfsetPosition[0] = int(ofsetPosition[0])-(self.ofsetlenght2)
                 if wall == 'B':
                     ofsetPosition[2] = int(ofsetPosition[2])+self.ofsetlenght   
+                    nextOfsetPosition[2] = int(ofsetPosition[2])+(self.ofsetlenght2)   
 
                 key = []
-                # get pai
+                # ofset before get pai to get pai 
 
                 for deltaPosition in self.sendToPoint(ofsetPosition,position):
                     key.append([deltaPosition,wall,0,orentation] )
                 # open valve
                 key.append([deltaPosition,wall,1,orentation] )
 
-                # ofset after get pai 
-                for deltaPosition in self.sendToPoint(position,ofsetPosition):
+                # get pai to ofset after get pai 
+                for deltaPosition in self.sendToPoint(position,nextOfsetPosition):
                     key.append([deltaPosition,wall,1,orentation] )
 
-                # ofset before put pai 
+                # ofset from get pai to ofset before put pai
                 for deltaPosition in self.sendToPoint(ofsetPosition,self.ofsetPlatePosition[tagCount]):
                     key.append([deltaPosition,wall,1,self.MAN.RE_F] )
             
-                # put pai 
+                # ofset before put pai to put pai
                 for deltaPosition in self.sendToPoint(self.ofsetPlatePosition[tagCount],self.platePosition[tagCount]):
                     key.append([deltaPosition,'F',1,self.MAN.RE_F] )
                 # off valve
                 key.append([deltaPosition,'F',0,self.MAN.RE_F] )
 
-                # ofset after put pai
+                # putpai to ofset after put pai
                 for deltaPosition in self.sendToPoint(self.platePosition[tagCount],self.ofsetPlatePosition[tagCount]):
                     key.append([deltaPosition,'F',0,self.MAN.RE_F] )
                 output.append(key)
