@@ -230,7 +230,7 @@ while(1):
     # after pass through this section, we get list of word (image) in the variable
     # 'plate'.
     corg = cam.getImage()
-    org,plate = cam.getListOfPlate(image_size=IMAGE_SIZE)
+    org,plate,sorted_plate_pos, sorted_plate_orientation = cam.getListOfPlate(image_size=IMAGE_SIZE,platePos=True, plateOrientation=True, show=True,LOAD_IMAGE =True,FILENAME='picture\\testpic\TestBottomRightSide.jpg')
 
 
     # prediction section

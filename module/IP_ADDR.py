@@ -474,7 +474,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             epsilon = lengPercent*cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,epsilon,True)
             area = cv2.contourArea(cnt)
-            if (area>min_area*image_area) and (area < image_area*max_area)and(len(approx) == 4) and(hi[2]!=-1)and(hi[1]==-1):
+            if (area>min_area*image_area) and (area < image_area*max_area)and(len(approx) == 4) and(hi[2]!=-1):
                 plate.append(approx)
                 plate_hierachy.append(hi)
                 cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
@@ -1109,8 +1109,8 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                 if i not in already_duplicate_index:
                     result = tree.query_ball_point(all_position[i],r)
                     if len(result)<=1:
-                        new_position.append(all_image[i])
-                        new_image.append(all_position[i])
+                        new_position.append(all_position[i])
+                        new_image.append(all_image[i])
                         new_orientation.append(all_orientation[i])
                     elif len(result)>1:
                         new_x = []
@@ -1125,7 +1125,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                         new_x = np.mean(new_x)
                         new_y = np.mean(new_y)
                         new_z = np.mean(new_z)
-                        new_position.append(all_image[i])
-                        new_image.append([new_x,new_y,new_z])
+                        new_position.append([new_x,new_y,new_z])
+                        new_image.append(all_image[i])
                         new_orientation.append(all_orientation[i])
             return new_image,new_position,new_orientation

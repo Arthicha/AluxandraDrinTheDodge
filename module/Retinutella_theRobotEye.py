@@ -63,7 +63,7 @@ class Retinutella():
         '''my code'''
         self.four_points = np.reshape(np.array(four_points),(4,2))
         '''end of my code'''
-    def getImage(self,fileName=None,remove_pers = False ,show = True):
+    def getImage(self,fileName=None,remove_pers = False ,show = True,LOAD_IMAGE=False,FILE_NAME_or_PATH = 'picture\\testpic\TestBottomRightSide.jpg'):
 
         '''
         :param fileName: file to save an image which captured from this object, this
@@ -75,11 +75,17 @@ class Retinutella():
         that had been set in object constructor. In addition, the program will save that
         image as 'imageCapture1.jpg'.
         '''
+        if LOAD_IMAGE:
+            img = cv2.imread(FILE_NAME_or_PATH,cv2.IMREAD_GRAYSCALE)
+        else:
+            ret, img = self.cam.read(self.cameraMode)
 
-
-        ret, img = self.cam.read(self.cameraMode)
         if self.cameraMode == self.ROD:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            if LOAD_IMAGE:
+                pass
+            else:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
 
         if self.cameraMode is self.CONE:
             rows,cols,_ = img.shape
@@ -92,7 +98,7 @@ class Retinutella():
         int((maxima - cols) / 2):int(maxima - (maxima - cols) / 2)] = img
         new_image_rows, new_image_cols = blank_image.shape
         # blank_image[:,:]
-        M = cv2.getRotationMatrix2D((maxima / 2, maxima / 2), 90, 1)
+        M = cv2.getRotationMatrix2D((maxima / 2, maxima / 2),self.cameraOreintation, 1)
         img = cv2.warpAffine(blank_image, M, (cols, cols), borderValue=255)
         # M = cv2.getRotationMatrix2D((cols/2,rows/2),self.cameraOreintation,1)
         # img = cv2.warpAffine(img,M,(cols,rows))

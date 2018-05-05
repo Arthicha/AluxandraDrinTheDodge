@@ -39,18 +39,27 @@ class Camera_left(Retinutella):
         self.model_y = joblib.load(model_path+'Y_'+self.name+'.gz')
         self.z = offset_z
 
-    def getListOfPlate(self,image_size=(30,60),platePos=False,plateOrientation = False,show=False):
+    def getListOfPlate(self,image_size=(30,60),platePos=False,plateOrientation = False,show=False,LOAD_IMAGE =False,FILENAME='picture\\testpic\TestBottomRightSide.jpg'):
+        ''' '''
+        '''ConFig parameter of bottom_middle left and right side'''
+
+        MINIMUM_AREA_ORIGINAL_PIC = 0.01
+        LENGPERCENT_ORIGINAL_PIC = 0.01
+        MINIMUM_AREA_OTHER_PIC = 0.01
+        LENGPERCENT_OTHER_PIC = 0.01
+        ''' ****************************************    '''
+
         '''have been edited'''
-        image,capture,matrice= self.getImage(remove_pers=True)
+        image,capture,matrice= self.getImage(remove_pers=True,LOAD_IMAGE =LOAD_IMAGE,FILE_NAME_or_PATH=FILENAME)
         if platePos and plateOrientation:
-            plate_capture, plate_pos,plate_orientation = IP.Get_Plate2(capture, min_area=0.01, center=True, before=True,orientation=True,model_x=self.model_x,model_y=self.model_y)
+            plate_capture, plate_pos,plate_orientation = IP.Get_Plate2(capture, min_area=MINIMUM_AREA_OTHER_PIC,lengPercent=LENGPERCENT_OTHER_PIC, center=True, before=True,orientation=True,model_x=self.model_x,model_y=self.model_y)
         elif platePos:
             ''' have been edited'''
-            plate_capture,plate_pos = IP.Get_Plate2(capture,min_area=0.01,center=True,before=True)
+            plate_capture,plate_pos = IP.Get_Plate2(capture,min_area=MINIMUM_AREA_OTHER_PIC,lengPercent=LENGPERCENT_OTHER_PIC,center=True,before=True)
             '''end of edit'''
 
         #ret, image = cv2.threshold(image, 100, 255,0)
-        plate,platePos_ = IP.Get_Plate2(image,min_area=0.01,center=True,before=True)
+        plate,platePos_ = IP.Get_Plate2(image,min_area=MINIMUM_AREA_ORIGINAL_PIC,lengPercent=LENGPERCENT_ORIGINAL_PIC,center=True,before=True)
         plate = IP.Get_Word2(plate,image_size=image_size)
         #listOfImage = IP.get_plate(image,(64, 32))
         #print('return from get plate',listOfImage)
@@ -139,6 +148,9 @@ class Camera_left(Retinutella):
         # print("----------------")
         sorted_plate_pos = list(map(lambda x:regress_to_real_world(self,x) ,sorted_plate_pos))
         sorted_plate_orientation = list(map(lambda x:orientation_to_mat(self,x),sorted_plate_orientation))
+
+        plate, sorted_plate_pos, sorted_plate_orientation = IP.filter_plate(plate, sorted_plate_pos,
+                                                                            sorted_plate_orientation)
         '''end'''
         if platePos and plateOrientation:
             return image, plate, sorted_plate_pos,sorted_plate_orientation
@@ -234,7 +246,7 @@ class Camera_Bottom_right(Camera_left):
         self.model_y_bottom = joblib.load(model_path + 'Y_' + self.name + '_bottom.gz')
         self.z = offset_z
 
-    def getImage(self, fileName=None, remove_pers=False, show=True):
+    def getImage(self, fileName=None, remove_pers=False, show=True,LOAD_IMAGE=False,FILE_NAME_or_PATH = 'picture\\testpic\TestBottomRightSide.jpg'):
 
         '''
         :param fileName: file to save an image which captured from this object, this
@@ -246,10 +258,16 @@ class Camera_Bottom_right(Camera_left):
         that had been set in object constructor. In addition, the program will save that
         image as 'imageCapture1.jpg'.
         '''
+        if LOAD_IMAGE:
+            img = cv2.imread(FILE_NAME_or_PATH,cv2.IMREAD_GRAYSCALE)
+        else:
+            ret, img = self.cam.read(self.cameraMode)
 
-        ret, img = self.cam.read(self.cameraMode)
         if self.cameraMode == self.ROD:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            if LOAD_IMAGE:
+                pass
+            else:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         if self.cameraMode is self.CONE:
             rows, cols, _ = img.shape
@@ -262,7 +280,7 @@ class Camera_Bottom_right(Camera_left):
         int((maxima - cols) / 2):int(maxima - (maxima - cols) / 2)] = img
         new_image_rows, new_image_cols = blank_image.shape
         # blank_image[:,:]
-        M = cv2.getRotationMatrix2D((maxima / 2, maxima / 2), 90, 1)
+        M = cv2.getRotationMatrix2D((maxima / 2, maxima / 2), self.cameraOreintation, 1)
         img = cv2.warpAffine(blank_image, M, (cols, cols), borderValue=255)
         # M = cv2.getRotationMatrix2D((cols / 2, rows / 2), self.cameraOreintation, 1)
         # img = cv2.warpAffine(img, M, (cols, rows))
@@ -287,13 +305,22 @@ class Camera_Bottom_right(Camera_left):
         return img
 
 
-    def getListOfPlate(self, image_size=(30, 60), platePos=False, plateOrientation=False, show=False):
+    def getListOfPlate(self, image_size=(30, 60), platePos=False, plateOrientation=False, show=False,LOAD_IMAGE =False,FILENAME='picture\\testpic\TestBottomRightSide.jpg' ):
         '''have been edited'''
-        image, capture, matrice,capture2,matrice2 = self.getImage(remove_pers=True)
+        '''ConFig parameter of bottom_left and bottom_right side'''
+
+        MINIMUM_AREA_ORIGINAL_PIC = 0.01
+        LENGPERCENT_ORIGINAL_PIC = 0.01
+        MINIMUM_AREA_OTHER_PIC = 0.01
+        LENGPERCENT_OTHER_PIC = 0.01
+        ''' ****************************************    '''
+
+        image, capture, matrice , capture2 , matrice2 = self.getImage(remove_pers=True,LOAD_IMAGE=LOAD_IMAGE,FILE_NAME_or_PATH= FILENAME)
+
         if platePos and plateOrientation:
-            plate_capture, plate_pos, plate_orientation = IP.Get_Plate2(capture, min_area=0.01, center=True,
+            plate_capture, plate_pos, plate_orientation = IP.Get_Plate2(capture, min_area=0.01,lengPercent=0.15, center=True,
                                                                         before=True, orientation=True,model_x=self.model_x_bottom,model_y=self.model_y_bottom)
-            plate_capture2, plate_pos2, plate_orientation2 = IP.Get_Plate2(capture, min_area=0.01, center=True,
+            plate_capture2, plate_pos2, plate_orientation2 = IP.Get_Plate2(capture2, min_area=0.01, center=True,
                                                                         before=True, orientation=True,model_x=self.model_x_side,model_y=self.model_y_side)
         elif platePos:
             ''' have been edited'''
@@ -430,11 +457,11 @@ class Camera_Bottom_right(Camera_left):
             if platePos_dum != [] and plate_pos2 != []:
                 tree = cKDTree(platePos_dum)
                 dist, index = tree.query(plate_pos2)
-                print("***********")
-                # print(index)
-                # print(platePos_)
-                # print(plate_pos)
-                # print(plate_orientation)
+                # print("***********")
+                # # print(index)
+                # # print(platePos_)
+                # print(plate_pos2)
+                # print(plate_orientation2)
                 # print("**********")
                 if platePos and plateOrientation:
                     for x, y, z in zip(index, plate_pos2, plate_orientation2):
@@ -453,16 +480,19 @@ class Camera_Bottom_right(Camera_left):
                         sorted_plate_orientation2[x] = None
                         # print(sorted_plate_pos)
                         # print("----------------")
-        sorted_plate_pos2 = list(
-            map(lambda x: regress_to_real_world(x, self.model_x_side, self.model_y_side,side=True), sorted_plate_pos2))
-        sorted_plate_orientation2 = list(map(lambda x: orientation_to_mat(self, x,side=True), sorted_plate_orientation2))
+                sorted_plate_pos2 = list(
+                    map(lambda x: regress_to_real_world(x, self.model_x_side, self.model_y_side,side=True), sorted_plate_pos2))
+                sorted_plate_orientation2 = list(map(lambda x: orientation_to_mat(self, x,side=True), sorted_plate_orientation2))
 
-        for i in range(0,len(sorted_plate_pos2)):
-            if sorted_plate_pos[i] == ():
-                sorted_plate_pos[i] = sorted_plate_pos2[i]
-                sorted_plate_orientation[i] = sorted_plate_orientation2[i]
+                for i in range(0,len(sorted_plate_pos2)):
+                    if sorted_plate_pos[i] == ():
+                        sorted_plate_pos[i] = sorted_plate_pos2[i]
+                        sorted_plate_orientation[i] = sorted_plate_orientation2[i]
+        plate, sorted_plate_pos, sorted_plate_orientation =IP.filter_plate(plate, sorted_plate_pos, sorted_plate_orientation)
         '''end'''
-
+        # plate, sorted_plate_pos, sorted_plate_orientation = IP.find_same_point_and_average_it(plate,
+        #                                                                                           sorted_plate_pos,
+        #                                                                                           sorted_plate_orientation,                                                                  75)
         if platePos and plateOrientation:
             return image, plate, sorted_plate_pos, sorted_plate_orientation
         elif platePos:
