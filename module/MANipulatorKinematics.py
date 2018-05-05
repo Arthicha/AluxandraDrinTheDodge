@@ -48,16 +48,16 @@ class MANipulator():
         self.q = [0,0,0,0,0,0,0]
         self.RE_F = np.array([[0,1,0],
                     [0,0,1],
-                    [1,0,0]])
+                    [1,0,0]],dtype= np.float)
         self.RE_L = np.array([[0,0,-1],
                         [0,1,0],
-                        [1,0,0]])
+                        [1,0,0]],dtype= np.float)
         self.RE_R = np.array([[0,0,1],
-                        [0,1,0],
-                        [1,0,0]])
-        self.RE_B = np.array([[0,-1,0],
                         [1,0,0],
-                        [0,0,-1]])
+                        [0,1,0]],dtype= np.float)
+        self.RE_B = np.array([[0,-1,0],
+                        [-1,0,0],
+                        [0,0,-1]],dtype= np.float)
 
 
 
@@ -103,8 +103,10 @@ class MANipulator():
             listPos = orientation[i]
             init = [0,0,0]
             link_color = ['k-','m-','b-','c-']
+            j = 0
             for pos in listPos:
-                ax.plot([init[0],pos[0]],[init[1],pos[1]],[init[2],pos[2]],link_color[i],linewidth=3.0)
+                j += 1
+                ax.plot([init[0],pos[0]],[init[1],pos[1]],[init[2],pos[2]],link_color[j%4],linewidth=3.0)
                 init = [pos[0],pos[1],pos[2]]
             if plotTarget != None:
 

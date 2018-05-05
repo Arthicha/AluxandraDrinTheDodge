@@ -16,13 +16,16 @@ class sendSerial:
                  pathPlaning = True, initial_position = [200,200,200], recieveSerial= True ,half_IK=False,
                  platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300],
                  ofsetLenght = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], ofsetQ = [205,35,150,0,0,0],
-                gainQ = [-1,1,1,1,1,1],modeFixData = False):
+                gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,ofsetLenght2 = 40, servoPlaning = True):
     
         self.platePositionX = platePositionX
         self.platePositionY = platePositionY
         self.platePositionZ = platePositionZ
         self.ofsetLenght = ofsetLenght
+        self.ofsetLenght2 = ofsetLenght2
         self.plateHeight = plateHeight
+
+        self.stepRotation = stepRotation
 
         self.checkLaser = checkLaser
 
@@ -36,6 +39,7 @@ class sendSerial:
         self.sendSerial = sendSerial
 
         self.pathPlaning = pathPlaning
+        self.servoPlaning = servoPlaning
 
         self.recieveSerial = recieveSerial
 
@@ -48,11 +52,13 @@ class sendSerial:
         '''-----------------------------------------------------------------------------'''
 
         self.ser = serial_commu(port=port, sendSerial=self.sendSerial)
+        input('press reset board')
         self.MAN = MANipulator()
         # self.R_e = MAN.RE_R
         self.package = prePackage(pathPlaning=self.pathPlaning, runMatLab=self.runMatLab, ofsetlenght=self.ofsetLenght,
                                     plateHeight=self.plateHeight ,platePositionX=self.platePositionX,
-                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ)
+                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ,
+                                    stepRotation= self.stepRotation,ofsetlenght2=self.ofsetLenght2, servoPlaning = self.servoPlaning)
 
         self.ser.clearSerialData()
 
@@ -67,7 +73,6 @@ class sendSerial:
             data= self.package.sortBestPosition(dataList= data,initial_position=self.initial_position  ,final_position=self.final_position )
             # data = position wall valve orentation
 
-        # print(data)
         # data = position wall valve orentation
         for position,wall,valve,orentation in data:
             print('get position : '+str(position))
@@ -143,10 +148,13 @@ class sendSerial:
         # print(self.ser.readLine(26))
         
         if self.recieveSerial:
-            while self.ser.read() != 'A' :
-                # ser.clearSerialData()
-                pass
-
+            serRead = self.ser.read() 
+            while serRead != 'A' :
+                serRead = self.ser.read() 
+                # print(serRead)
+                time.sleep(0.1)
+                # pass
+        input('press any key')
         return 0
 
 
