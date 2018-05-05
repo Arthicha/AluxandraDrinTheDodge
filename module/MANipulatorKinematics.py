@@ -36,12 +36,13 @@ class MANipulator():
                             [0,self.d4,0,-math.pi/2],
                             [0,0,0,math.pi/2],
                             [0,self.d6,0,0]],dtype=np.float32)
-        self.jointLimit = [[0,math.pi],
-                    [0,math.pi],
-                    [-1/2*math.pi,1/2*math.pi],
-                    [-2*math.pi,2*math.pi],
-                    [-2*math.pi,2*math.pi],
-                    [-2*math.pi,2*math.pi]]
+        self.jointLimit = [[-1/4*math.pi,5/4*math.pi],
+                    [1/12*math.pi,math.pi],
+                    [-11/12*math.pi,0*math.pi],
+                    [-3/4*math.pi,3/4*math.pi],
+                    [-3/4*math.pi,3/4*math.pi],
+                    [-3/4*math.pi,3/4*math.pi]]
+
 
 
         self.q = [0,0,0,0,0,0,0]
