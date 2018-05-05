@@ -8,12 +8,13 @@ from module.MANipulatorKinematics import MANipulator
 
 
 class prePackage:
-    def __init__(self,pathPlaning =True,runMatLab=True, ofsetlenght=20,ofsetlenght2 = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],stepRotation = 5):
+    def __init__(self,pathPlaning =True,servoPlaning = True,runMatLab=True, ofsetlenght=20,ofsetlenght2 = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],stepRotation = 5):
         
         self.runMatlab = runMatLab
         if self.runMatlab:
             self.matlab = MATLAPUTOPPU()
         self.pathPlaning = pathPlaning
+        self.servoPlaning = servoPlaning
 
         self.ofsetlenght = ofsetlenght
         self.ofsetlenght2 = ofsetlenght2
@@ -64,8 +65,9 @@ class prePackage:
             else:
                 break    
         
-        keep[(tuple(initial_position[0]),output[0][0])] = [[data, 'F', 0, self.MAN.RE_F ] for data in self.sendToPoint(initial_position[0],output[0][0])]
-        keep[(output[-1][-1],tuple(final_position[0]))] = [[data, 'F', 0, self.MAN.RE_F ] for data in self.sendToPoint(output[-1][-1],final_position[0])]
+        # add home and final position
+        keep[(tuple(initial_position[0]),output[0][0])] = [[data, 'F', 0, keep[output[0]][0][3] ] for data in self.sendToPoint(initial_position[0],output[0][0])]
+        keep[(output[-1][-1],tuple(final_position[0]))] = [[data, 'F', 0, keep[output[-1]][0][3] ] for data in self.sendToPoint(output[-1][-1],final_position[0])]
 
         output.insert(0,(tuple(initial_position[0]),output[0][0]) )
         output.insert(len(output),(output[-1][-1],tuple(final_position[0])) )
@@ -95,11 +97,14 @@ class prePackage:
 
             if str(realOutput[indexCountRealOutput][3]) == str(realOutput[indexCountRealOutput+1][3]):
                 priorityOutput.append(realOutput[indexCountRealOutput])
-            else:
-                subRotation = self.getSubRotation(start= realOutput[indexCountRealOutput][3], stop=realOutput[indexCountRealOutput+1][3],step= self.stepRotation)
-                for splitSubRotation in subRotation:
-                    priorityOutput.append([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], 
-                                    realOutput[indexCountRealOutput][2], splitSubRotation ])
+            else :
+                if self.servoPlaning:
+                    subRotation = self.getSubRotation(start= realOutput[indexCountRealOutput][3], stop=realOutput[indexCountRealOutput+1][3],step= self.stepRotation)
+                    for splitSubRotation in subRotation:
+                        priorityOutput.append([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], 
+                                        realOutput[indexCountRealOutput][2], splitSubRotation ])
+                else:
+                    priorityOutput.append(realOutput[indexCountRealOutput])
 
         return priorityOutput
 
