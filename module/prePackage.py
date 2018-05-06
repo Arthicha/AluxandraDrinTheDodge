@@ -8,7 +8,7 @@ from module.MANipulatorKinematics import MANipulator
 
 
 class prePackage:
-    def __init__(self,pathPlaning =True,servoPlaning = True,runMatLab=True, ofsetlenght=20,ofsetlenght2 = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],stepRotation = 5):
+    def __init__(self,pathPlaning =True,servoPlaning = True,runMatLab=True,extraOfset =60, ofsetlenght=20,ofsetlenght2 = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],stepRotation = 5):
         
         self.runMatlab = runMatLab
         if self.runMatlab:
@@ -26,7 +26,7 @@ class prePackage:
                         [platePositionX[0],Y,platePositionZ[1] ],[platePositionX[1],Y,platePositionZ[1] ],
                         [platePositionX[2],Y,platePositionZ[1] ],[platePositionX[3],Y,platePositionZ[1] ],
                         [platePositionX[1],Y,platePositionZ[2] ],[platePositionX[2],Y,platePositionZ[2] ] ]
-        self.ofsetPlatePosition = [[x,y-ofsetlenght,z] for x,y,z in self.platePosition]
+        self.ofsetPlatePosition = [[x,y-ofsetlenght-extraOfset,z] for x,y,z in self.platePosition]
         self.nextOfsetPlatePosition = [[x,y-ofsetlenght2,z] for x,y,z in self.platePosition]
         self.MAN = MANipulator()
         self.stepRotation = stepRotation
@@ -107,7 +107,7 @@ class prePackage:
 
 
     def make10PathLine(self,dataList ):
-        '''param datalist = [[3D-position, wall name, predict_output, orentation ],...]'''
+        '''param datalist = [[3D-position, wall name, predict_output, oreintation  ],...]'''
 
         sortList = []   # 0 son zero 1 nung one ... 29 yeesibkaw twenty-nine 
         for i in range(10): 
@@ -120,15 +120,15 @@ class prePackage:
         
         # list -> dict
         toDict = {}
-        for  position,wall,pred,orentation in dataList:
+        for  position,wall,pred,oreintation in dataList:
 
-            toDict[pred] = [position,wall,orentation]
+            toDict[pred] = [position,wall,oreintation]
         # sorted toDict and add all required position
         for keyList in sortList: # count pai position
             if keyList in toDict.keys(): #if detect position-number language -> True
 
                 # ofset position
-                position,wall,orentation = toDict[keyList]
+                position,wall,oreintation = toDict[keyList]
                 ofsetPosition = [int(val) for val in position]
                 nextOfsetPosition = [int(val) for val in position]
                 if wall == 'F':
@@ -148,17 +148,17 @@ class prePackage:
                 # ofset before get pai to get pai 
 
                 for deltaPosition in self.sendToPoint(ofsetPosition,position):
-                    key.append([deltaPosition,wall,0,orentation] )
+                    key.append([deltaPosition,wall,0,oreintation] )
                 # open valve
-                key.append([deltaPosition,wall,1,orentation] )
+                key.append([deltaPosition,wall,1,oreintation] )
    
                 # get pai to ofset after get pai 
                 for deltaPosition in self.sendToPoint(position,nextOfsetPosition):
-                    key.append([deltaPosition,wall,1,orentation] )
+                    key.append([deltaPosition,wall,1,oreintation] )
 
                 # ofset from get pai to ofset before put pai
                 for deltaPosition in self.sendToPoint(nextOfsetPosition,self.ofsetPlatePosition[tagCount]):
-                    key.append([deltaPosition,wall,1,self.MAN.RE_F] )
+                    key.append([deltaPosition,wall,1,oreintation] )
             
                 # ofset before put pai to put pai
                 for deltaPosition in self.sendToPoint(self.ofsetPlatePosition[tagCount],self.platePosition[tagCount]):

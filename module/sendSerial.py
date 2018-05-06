@@ -14,7 +14,7 @@ class sendSerial:
 
     def __init__(self,port=4,checkLaser = False, runMatlab= True, sendSerial= True,
                  pathPlaning = True, initial_position = [200,200,200], recieveSerial= True ,half_IK=False,
-                 platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300],
+                 platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], extraOfset = 60,
                  ofsetLenght = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], ofsetQ = [205,35,150,0,0,0],
                 gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,ofsetLenght2 = 40, servoPlaning = True):
     
@@ -23,6 +23,7 @@ class sendSerial:
         self.platePositionZ = platePositionZ
         self.ofsetLenght = ofsetLenght
         self.ofsetLenght2 = ofsetLenght2
+        self.extraOfset = extraOfset
         self.plateHeight = plateHeight
 
         self.stepRotation = stepRotation
@@ -57,7 +58,7 @@ class sendSerial:
         # self.R_e = MAN.RE_R
         self.package = prePackage(pathPlaning=self.pathPlaning, runMatLab=self.runMatLab, ofsetlenght=self.ofsetLenght,
                                     plateHeight=self.plateHeight ,platePositionX=self.platePositionX,
-                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ,
+                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ, extraOfset =self.extraOfset, 
                                     stepRotation= self.stepRotation,ofsetlenght2=self.ofsetLenght2, servoPlaning = self.servoPlaning)
 
         self.ser.clearSerialData()

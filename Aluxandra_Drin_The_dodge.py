@@ -93,6 +93,7 @@ PLATE_POSITION_Y = 600
 PLATE_POSITION_Z = [700,500,300]  
 OFSET_LENGHT = 60  # before to position
 OFSET_LENGHT_2 = 120 # after to position
+EXTRA_OFSET = 180 # ofset out from put pai
 PLATE_HEIGHT = 50
 WORKSPACE = [-500,500,-400,600,0,1000]
 STEP_ROTATION = 4
@@ -219,7 +220,7 @@ listCam = [ cam4, cam5]
 
 
 send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL,
-                pathPlaning = PATH_PLANING, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL ,
+                pathPlaning = PATH_PLANING, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL , extraOfset= EXTRA_OFSET, 
                 half_IK= HALF_IK, platePositionX= PLATE_POSITION_X, platePositionY = PLATE_POSITION_Y , servoPlaning= SERVO_PLANING, 
                 platePositionZ = PLATE_POSITION_Z, ofsetLenght = OFSET_LENGHT, plateHeight = PLATE_HEIGHT, ofsetLenght2= OFSET_LENGHT_2,
                 workspace = WORKSPACE, ofsetQ = OFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION)
