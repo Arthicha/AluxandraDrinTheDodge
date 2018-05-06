@@ -9,22 +9,42 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.externals import joblib
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
 from module.Retinutella_theRobotEye import Retinutella
-
+from module.UniqueCameraClass import *
 # Measures are in milimeters
 
 LOAD_IMAGE_NAME = 'BL_Bside.jpg'
 SAVE_IMAGE_NAME = 'Bl_b.png'
-FROM_FILE = True
+FROM_FILE = False
 TEST_MODEL = True
-MODEL_FILE_NAME = 'Bl_bottom'
-
+MODEL_FILE_NAME = 'Bm'
+CAM_ORIENT = -180
+CAM_FOUR_POINT = ((479,289),(635,495),(14,506),(168,294))
 '''Regression Parameter'''
-SAVED_MODEL_NAME = 'Bl_bottom'
-KERNEL_SIZE = (4,4)
-NUMBER_OF_POINTS = (15,9)
+SAVED_MODEL_NAME = 'Bm'
+KERNEL_SIZE = (4,5)
+NUMBER_OF_POINTS = (15,14)
 DIFFERENCE_DISTANCE_PER_POINT = [30,30]
-SHIFT_X = -500+32.5
-SHIFT_Y = 700-450
+SHIFT_X = -500+312.5
+SHIFT_Y = 700-462.5
+
+
+'''Cam config for run with cam'''
+CAMERA_ALL_OFFSET_Z =25
+
+CAM_BOTTOM_RIGHT_PORT = 4
+CAM_BOTTOM_RIGHT_MODE = 1
+CAM_BOTTOM_RIGHT_ORIENTATION = -90
+CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM = np.array([[70,639],[105,221],[301,228],[360,639]])
+CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT = np.array([[275, 238], [320, 1], [542, 564], [356, 638]])
+
+CAM_BOTTOM_LEFT_PORT = 5
+CAM_BOTTOM_LEFT_MODE = 1
+CAM_BOTTOM_LEFT_ORIENTATION = 90
+CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM = np.array([[335,193],[538,182],[587,638],[294,639]])
+CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT = np.array([[380, 223], [335, 9], [150, 523], [305, 638]])
+
+cam = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
+                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT)
 
 '''********************************************************'''
 
@@ -47,7 +67,7 @@ def Regression_HaHA(Image_naja, kernel_size=(4, 4), binarization_thresh_kernel_s
     imgBW = imgC
     # imgBW = cv2.cvtColor(imgC, cv2.COLOR_BGR2GRAY)
     # img = IP.binarize(imgBW, IP.SAUVOLA_THRESHOLDING, binarization_thresh_kernel_size)
-    ret, img = cv2.threshold(imgBW, 60, 255, cv2.THRESH_BINARY)
+    ret, img = cv2.threshold(imgBW, 155, 255, cv2.THRESH_BINARY)
     cv2.imshow('gray', img)
     cv2.waitKey(0)
     img = cv2.bitwise_not(img)
@@ -158,7 +178,7 @@ def m_click(event, x, y, k, l):
 if FROM_FILE:
     pass
 else:
-    cam = Retinutella('cam1',1,-90,cameraMode=1,four_points=((82,15),(292,18),(358,456),(82,478)))
+    cam = Retinutella('cam1',1,CAM_ORIENT,cameraMode=1,four_points=CAM_FOUR_POINT)
 # cam.getImage()
 # cam = cv2.VideoCapture(1)
 # ret,im = cam.read()

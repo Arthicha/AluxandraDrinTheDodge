@@ -42,6 +42,13 @@ CAM_RIGHT_MODE = 1
 CAM_RIGHT_ORIENTATION = 0
 CAM_RIGHT_FOUR_POINTS = np.array([[93,81],[116,450],[523,560],[559,81]])
 
+
+
+CAM_BOTTOM_MIDDLE_PORT = 3
+CAM_BOTTOM_MIDDLE_MODE = 1
+CAM_BOTTOM_MIDDLE_ORIENTATION = -90
+CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[0, 0], [300, 300], [0, 300], [300, 0]])
+
 CAM_BOTTOM_RIGHT_PORT = 4
 CAM_BOTTOM_RIGHT_MODE = 1
 CAM_BOTTOM_RIGHT_ORIENTATION = -90
@@ -72,101 +79,101 @@ def calculate_position(position, HomoMatrix):
 
 
 while 1:
-    org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
-                                                                                plateOrientation=True, show=True,
-                                                                                LOAD_IMAGE=True,
-                                                                                FILENAME='picture\\testpic\TestBottomRightSide.jpg')
-    cv2.imshow('org',org)
-    for p in range(0,len(plate)):
-        plate[p] = Zkele(plate[p],method='3d')
-        print(sorted_plate_pos[p])
-        print(sorted_plate_orientation[p])
-        cv2.imshow('plate',plate[p])
-        cv2.waitKey(200)
-
-    cam4.close()
-    cv2.waitKey(0)
-    cam4 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
-                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
-    org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
-                                                                                 plateOrientation=True, show=True,
-                                                                                 LOAD_IMAGE=True,
-                                                                                 FILENAME='picture\\testpic\TestBottomLeftallSide.jpg')
-    cv2.imshow('org', org)
-    for p in range(0, len(plate)):
-        plate[p] = Zkele(plate[p], method='3d')
-        print(sorted_plate_pos[p])
-        print(sorted_plate_orientation[p])
-        cv2.imshow('plate', plate[p])
-        cv2.waitKey(200)
-
-    cam4.close()
-    cv2.waitKey(0)
-    cam4 = Camera_right(CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAMERA_ALL_OFFSET_Z, CAM_RIGHT_FOUR_POINTS)
-
-    org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
-                                                                                 plateOrientation=True, show=True,
-                                                                                 LOAD_IMAGE=True,
-                                                                                 FILENAME='picture\\testpic\TestRightSide.jpg')
-
-    cv2.waitKey(0)
-    cv2.imshow('org', org)
-    for p in range(0, len(plate)):
-        plate[p] = Zkele(plate[p], method='3d')
-        print(sorted_plate_pos[p])
-        print(sorted_plate_orientation[p])
-        cv2.imshow('plate', plate[p])
-        cv2.waitKey(200)
-    cv2.waitKey(0)
-    cam4.close()
-    cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
-                               CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM,
-                               CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT)
-    IP.filter_plate()
-    # img = cv2.imread(IMG_PATH)
-    # print(img.shape)
-    # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
+    #                                                                             plateOrientation=True, show=True,
+    #                                                                             LOAD_IMAGE=True,
+    #                                                                             FILENAME='picture\\testpic\TestBottomRightSide.jpg')
+    # cv2.imshow('org',org)
+    # for p in range(0,len(plate)):
+    #     plate[p] = Zkele(plate[p],method='3d')
+    #     print(sorted_plate_pos[p])
+    #     print(sorted_plate_orientation[p])
+    #     cv2.imshow('plate',plate[p])
+    #     cv2.waitKey(200)
     #
-    # cv2.imshow('image', img)
-    # cv2.setMouseCallback('image', m_click)
+    # cam4.close()
     # cv2.waitKey(0)
-    # rows, cols = img.shape
-    # maxima = max(img.shape)
-    # print(maxima)
-    # blank_image = np.ones((cols, cols), np.uint8) * 255
-    # blank_image[int((maxima - rows) / 2):int(maxima - (maxima - rows) / 2),
-    # int((maxima - cols) / 2):int(maxima - (maxima - cols) / 2)] = img
-    # cv2.imshow('image', blank_image)
-    # cv2.setMouseCallback('image', m_click)
-    # cv2.waitKey(0)
-    # new_image_rows, new_image_cols = blank_image.shape
-    # # blank_image[:,:]
-    # M = cv2.getRotationMatrix2D((maxima / 2, maxima / 2), ROTATION, 1)
-    # img = cv2.warpAffine(blank_image, M, (cols, cols), borderValue=255)
-    # print(img.shape)
-    # cv2.imshow('image', img)
-    # cv2.setMouseCallback('image', m_click)
-    # cv2.waitKey(0)
-    # path = os.getcwd()
-    # ''' my code '''
-    # # 335 193
-    # # 538 182
-    # # 587 638
-    # # 294 639
-    # # [[335,193],[538,182],[587,638],[294,639]]
-    # # point1 = calculate_position([104,193],M)
-    # # point2=calculate_position([80,479],M)
-    # # print(point1)
-    # # print(point2)
-    # # [point1,point2,(81,420),(639,420)
-    # # Right Side
-    # # 93  81
-    # # 116 450
-    # # 523 560
-    # # 559 81
-    # capture, matrice = IP.four_point_transform(img, FOUR_POINTS, True)
+    # cam4 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
+    #                        CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
+    # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
+    #                                                                              plateOrientation=True, show=True,
+    #                                                                              LOAD_IMAGE=True,
+    #                                                                              FILENAME='picture\\testpic\TestBottomLeftallSide.jpg')
+    # cv2.imshow('org', org)
+    # for p in range(0, len(plate)):
+    #     plate[p] = Zkele(plate[p], method='3d')
+    #     print(sorted_plate_pos[p])
+    #     print(sorted_plate_orientation[p])
+    #     cv2.imshow('plate', plate[p])
+    #     cv2.waitKey(200)
     #
-    # cv2.imshow('image', capture)
-    # k = cv2.waitKey(0)
-    # if k == ord('s'):
-    #     cv2.imwrite(SAVE_IMG_NAME, capture)
+    # cam4.close()
+    # cv2.waitKey(0)
+    # cam4 = Camera_right(CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAMERA_ALL_OFFSET_Z, CAM_RIGHT_FOUR_POINTS)
+    #
+    # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
+    #                                                                              plateOrientation=True, show=True,
+    #                                                                              LOAD_IMAGE=True,
+    #                                                                              FILENAME='picture\\testpic\TestRightSide.jpg')
+    #
+    # cv2.waitKey(0)
+    # cv2.imshow('org', org)
+    # for p in range(0, len(plate)):
+    #     plate[p] = Zkele(plate[p], method='3d')
+    #     print(sorted_plate_pos[p])
+    #     print(sorted_plate_orientation[p])
+    #     cv2.imshow('plate', plate[p])
+    #     cv2.waitKey(200)
+    # cv2.waitKey(0)
+    # cam4.close()
+    # cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
+    #                            CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM,
+    #                            CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT)
+    # IP.filter_plate()
+    img = cv2.imread(IMG_PATH)
+    print(img.shape)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    cv2.imshow('image', img)
+    cv2.setMouseCallback('image', m_click)
+    cv2.waitKey(0)
+    rows, cols = img.shape
+    maxima = max(img.shape)
+    print(maxima)
+    blank_image = np.ones((cols, cols), np.uint8) * 255
+    blank_image[int((maxima - rows) / 2):int(maxima - (maxima - rows) / 2),
+    int((maxima - cols) / 2):int(maxima - (maxima - cols) / 2)] = img
+    cv2.imshow('image', blank_image)
+    cv2.setMouseCallback('image', m_click)
+    cv2.waitKey(0)
+    new_image_rows, new_image_cols = blank_image.shape
+    # blank_image[:,:]
+    M = cv2.getRotationMatrix2D((maxima / 2, maxima / 2), ROTATION, 1)
+    img = cv2.warpAffine(blank_image, M, (cols, cols), borderValue=255)
+    print(img.shape)
+    cv2.imshow('image', img)
+    cv2.setMouseCallback('image', m_click)
+    cv2.waitKey(0)
+    path = os.getcwd()
+    ''' my code '''
+    # 335 193
+    # 538 182
+    # 587 638
+    # 294 639
+    # [[335,193],[538,182],[587,638],[294,639]]
+    # point1 = calculate_position([104,193],M)
+    # point2=calculate_position([80,479],M)
+    # print(point1)
+    # print(point2)
+    # [point1,point2,(81,420),(639,420)
+    # Right Side
+    # 93  81
+    # 116 450
+    # 523 560
+    # 559 81
+    capture, matrice = IP.four_point_transform(img, FOUR_POINTS, True)
+
+    cv2.imshow('image', capture)
+    k = cv2.waitKey(0)
+    if k == ord('s'):
+        cv2.imwrite(SAVE_IMG_NAME, capture)
