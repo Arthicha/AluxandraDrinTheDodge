@@ -12,8 +12,8 @@ from module.prePackage import prePackage
 
 class sendSerial:
 
-    def __init__(self,port=4,checkLaser = False, runMatlab= True, sendSerial= True,
-                 pathPlaning = True, initial_position = [200,200,200], recieveSerial= True ,half_IK=False, manualStep = False, 
+    def __init__(self,port=4,checkLaser = False, runMatlab= True, sendSerial= True, enLightPos = [[0,500,800],[-250,500,750],[250,500,750]],
+                 pathPlaning = 3, initial_position = [200,200,200], recieveSerial= True ,half_IK=False, manualStep = False, 
                  platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], extraOfset = 60,
                  ofsetLenght = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], ofsetQ = [205,35,150,0,0,0],
                 gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,ofsetLenght2 = 40, servoPlaning = True):
@@ -60,7 +60,8 @@ class sendSerial:
         self.package = prePackage(pathPlaning=self.pathPlaning, runMatLab=self.runMatLab, ofsetlenght=self.ofsetLenght,
                                     plateHeight=self.plateHeight ,platePositionX=self.platePositionX,
                                     platePositionY =self.platePositionY, platePositionZ=self.platePositionZ, extraOfset =self.extraOfset, 
-                                    stepRotation= self.stepRotation,ofsetlenght2=self.ofsetLenght2, servoPlaning = self.servoPlaning)
+                                    stepRotation= self.stepRotation,ofsetlenght2=self.ofsetLenght2, servoPlaning = self.servoPlaning,
+                                    enLightPos= enLightPos)
 
         self.ser.clearSerialData()
 

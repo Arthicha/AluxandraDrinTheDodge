@@ -8,7 +8,9 @@ from module.MANipulatorKinematics import MANipulator
 
 
 class prePackage:
-    def __init__(self,pathPlaning =True,servoPlaning = True,runMatLab=True,extraOfset =60, ofsetlenght=20,ofsetlenght2 = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],stepRotation = 5):
+    def __init__(self,pathPlaning =3,servoPlaning = True,runMatLab=True,extraOfset =60, ofsetlenght=20,
+    ofsetlenght2 = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],
+    stepRotation = 5, enLightPos=[[0,500,800],[-250,500,750],[250,500,750]]):
         
         self.runMatlab = runMatLab
         if self.runMatlab:
@@ -30,6 +32,10 @@ class prePackage:
         self.nextOfsetPlatePosition = [[x,y-ofsetlenght2,z] for x,y,z in self.platePosition]
         self.MAN = MANipulator()
         self.stepRotation = stepRotation
+
+        self.MID_POS = enLightPos[0]
+        self.LEF_POS = enLightPos[1]
+        self.RIG_POS = enLightPos[2]
 
     def sortBestPosition(self,dataList,initial_position , final_position ):
         output = [] # list start final
@@ -69,7 +75,7 @@ class prePackage:
         # add home and final position
 
         keep[(tuple(initial_position[0]),output[0][0])] = [[initial_position[0], keep[output[0]][0][1], 0 , R]  for R in self.getSubRotation(start=initial_position[2],stop = keep[output[0]][0][3] , step = self.stepRotation ) ] + [[data, keep[output[0]][0][1], 0, keep[output[0]][0][3] ] for data in self.sendToPoint(initial_position[0],output[0][0])]
-        keep[(output[-1][-1],tuple(final_position[0]))] = [[data, keep[output[-1]][0][1], 0, keep[output[-1]][0][3] ] for data in self.sendToPoint(output[-1][-1],final_position[0])] + [[final_position[0], final_position[1] , 0 , R]  for R in self.getSubRotation(start= keep[output[-1]][0][3],stop = final_position[2] , step = self.stepRotation ) ]
+        keep[(output[-1][-1],tuple(final_position[0]))] = [[data, keep[output[-1]][0][1], 0, keep[output[-1]][0][3] ] for data in self.sendToPoint(output[-1][-1],final_position[0],'ofset')] + [[final_position[0], final_position[1] , 0 , R]  for R in self.getSubRotation(start= keep[output[-1]][0][3],stop = final_position[2] , step = self.stepRotation ) ]
         
         output.insert(0,(tuple(initial_position[0]),output[0][0]) )
         output.insert(len(output),(output[-1][-1],tuple(final_position[0])) )
@@ -98,11 +104,17 @@ class prePackage:
         for indexCountRealOutput in range(len(realOutput)-1):
 
             for splitSubRotation in self.getSubRotation(start= realOutput[indexCountRealOutput][3], stop=realOutput[indexCountRealOutput+1][3],step= self.stepRotation):
-                priorityOutput.append([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], 
-                                realOutput[indexCountRealOutput][2], splitSubRotation ])
+                
+                # append data to package if it not in package
+                # if str([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], realOutput[indexCountRealOutput][2], splitSubRotation ]) not in [str(key) for key in priorityOutput]:
+                if len(priorityOutput) == 0:
+                    priorityOutput.append([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], 
+                                    realOutput[indexCountRealOutput][2], splitSubRotation ])
+                
+                elif str([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], realOutput[indexCountRealOutput][2], splitSubRotation ]) != str(priorityOutput[-1]) :
+                    priorityOutput.append([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], 
+                                    realOutput[indexCountRealOutput][2], splitSubRotation ])
 
-
-        # print(priorityOutput)
         return priorityOutput
 
 
@@ -159,13 +171,13 @@ class prePackage:
                 key = []
                 # ofset before get pai to get pai 
 
-                for deltaPosition in self.sendToPoint(ofsetPosition,position):
+                for deltaPosition in self.sendToPoint(ofsetPosition,position,'ofset'):
                     key.append([deltaPosition,wall,0,oreintation] )
                 # open valve
                 key.append([deltaPosition,wall,1,oreintation] )
    
                 # get pai to ofset after get pai 
-                for deltaPosition in self.sendToPoint(position,nextOfsetPosition):
+                for deltaPosition in self.sendToPoint(position,nextOfsetPosition,'ofset'):
                     key.append([deltaPosition,wall,1,oreintation] )
 
                 # ofset from get pai to ofset before put pai
@@ -173,31 +185,79 @@ class prePackage:
                     key.append([deltaPosition,wall,1,oreintation] )
             
                 # ofset before put pai to put pai
-                for deltaPosition in self.sendToPoint(self.ofsetPlatePosition[tagCount],self.platePosition[tagCount]):
+                for deltaPosition in self.sendToPoint(self.ofsetPlatePosition[tagCount],self.platePosition[tagCount],'ofset'):
                     key.append([deltaPosition,'F',1,self.MAN.RE_F] )
                 # off valve
                 key.append([deltaPosition,'F',0,self.MAN.RE_F] )
 
                 # putpai to ofset after put pai
-                for deltaPosition in self.sendToPoint(self.platePosition[tagCount],self.nextOfsetPlatePosition[tagCount]):
+                for deltaPosition in self.sendToPoint(self.platePosition[tagCount],self.nextOfsetPlatePosition[tagCount],'ofset'):
                     key.append([deltaPosition,'F',0,self.MAN.RE_F] )
                 output.append(key)
                 tagCount +=1
-        # print(output)
+        
         return output
 
-    def sendToPoint(self,start,end):
-        ofsetNewAxis = [500,300,0]
-        newStart = [(start[0]+ofsetNewAxis[0])/10, (start[1]+ofsetNewAxis[1])/10, start[2]/10 ]
-        newEnd = [(ofsetNewAxis[0]+end[0])/10, (ofsetNewAxis[1]+end[1])/10, end[2]/10 ]    
-        if self.pathPlaning:
-            data = [[int(x*10-ofsetNewAxis[0]),int(y*10-ofsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd)]
-            data.append(list(end))
-        else :
-            # data = [[int(y*10-ofsetNewAxis[1]),int(-x*10+ofsetNewAxis[0]),int(z*10)] for x,y,z in zip(newStart,newEnd) ]
-            data = [list(start)]+[list(end)]
-        return data
-        
+    def sendToPoint(self,start,end,case=''):
+        output = []
+        ofsetNewAxis = [500,300,0] 
+        if self.pathPlaning == 1: # path planing wan
+            
+ 
+            newStart = [(start[0]+ofsetNewAxis[0])/10, (start[1]+ofsetNewAxis[1])/10, start[2]/10 ]
+            newEnd = [(ofsetNewAxis[0]+end[0])/10, (ofsetNewAxis[1]+end[1])/10, end[2]/10 ]    
+            
+            if self.pathPlaning != 0:
+                for splitPosition in [[int(x*10-ofsetNewAxis[0]),int(y*10-ofsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd)]:
+                    output.append(splitPosition)
+                # data.append(list(end))
+            else :
+                # data = [[int(y*10-ofsetNewAxis[1]),int(-x*10+ofsetNewAxis[0]),int(z*10)] for x,y,z in zip(newStart,newEnd) ]
+                output.append(list(start))
+            output.append(list(end))
+
+        elif self.pathPlaning == 2: # path planing zumo
+            if self.pathPlaning != 0 and case != 'ofset':
+                output = self.enlightMeTheWay(start,end)
+            else :
+                output = [start]+[end]
+
+        elif self.pathPlaning == 3 : # path planing zumo in wisa
+
+            if case != 'ofset':
+                enlight = self.enlightMeTheWay(start,end)
+                
+                for listEnlight in range(len(enlight)-1):
+                    start = enlight[listEnlight]
+                    end = enlight[listEnlight+1]
+                    newStart = [(start[0]+ofsetNewAxis[0])/10, (start[1]+ofsetNewAxis[1])/10, start[2]/10 ]
+                    newEnd = [(ofsetNewAxis[0]+end[0])/10, (ofsetNewAxis[1]+end[1])/10, end[2]/10 ]    
+                    
+                    if self.pathPlaning != 0  :
+                        for splitPosition in [[int(x*10-ofsetNewAxis[0]),int(y*10-ofsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd)]:
+                            output.append(splitPosition)
+                        # data.append(list(end))
+                    else :
+                        # data = [[int(y*10-ofsetNewAxis[1]),int(-x*10+ofsetNewAxis[0]),int(z*10)] for x,y,z in zip(newStart,newEnd) ]
+                        output.append(list(start))
+                    output.append(list(end))
+            else :
+                newStart = [(start[0]+ofsetNewAxis[0])/10, (start[1]+ofsetNewAxis[1])/10, start[2]/10 ]
+                newEnd = [(ofsetNewAxis[0]+end[0])/10, (ofsetNewAxis[1]+end[1])/10, end[2]/10 ]    
+                
+                if self.pathPlaning != 0:
+                    for splitPosition in [[int(x*10-ofsetNewAxis[0]),int(y*10-ofsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd)]:
+                        output.append(splitPosition)
+                    # data.append(list(end))
+                else :
+                    # data = [[int(y*10-ofsetNewAxis[1]),int(-x*10+ofsetNewAxis[0]),int(z*10)] for x,y,z in zip(newStart,newEnd) ]
+                    output.append(list(start))
+                output.append(list(end))
+        else:
+            output = [start]+[end]
+
+        return output
+
     def boxbreak(self,listQ= [0,0,0,0,0,0]):
         a = [[int(listQ[0])],[int(listQ[1])],[int(listQ[2])],[int(listQ[3])],[int(listQ[4])],[int(listQ[5])]]
         box,laser = self.matlab.callMatFunc('collision_check',a,1)[0]
@@ -232,3 +292,20 @@ class prePackage:
             output.append(start)
 
         return output
+
+    def enlightMeTheWay(self, initial,final):
+
+        onRight = (initial[0] > 0) and (final[0]>0)
+        onLeft = (initial[0] <= 0) and (final[0]<=0)
+        metaPoint = [self.MID_POS]
+        if onLeft or onRight:
+            if onLeft:
+                metaPoint = [self.LEF_POS]
+            elif onRight:
+                metaPoint = [self.RIG_POS]
+        else:
+            if initial[0] > 0:
+                metaPoint = [self.RIG_POS,self.MID_POS,self.LEF_POS]
+            else:
+                metaPoint = [self.LEF_POS,self.MID_POS,self.RIG_POS]
+        return [initial]+metaPoint+[final]

@@ -78,13 +78,13 @@ MAN = MANipulator()
 PORT = 3
 SEND_SERIAL = False
 RECIEVE_SERIAL = SEND_SERIAL
-MANUAL_STEP = True
+MANUAL_STEP = False
 
 # main serial setting
 RUN_MATLAB = False
 CHECK_LASER = False
-PATH_PLANING = False
-SERVO_PLANING = False
+PATH_PLANING_MODE = 2 # 0 -> None , 1-> wan , 2 -> zumo , 3 -> combine
+SERVO_PLANING = True
 HALF_IK = False
 
 # initial constant 
@@ -102,6 +102,9 @@ STEP_ROTATION = 4
 #ofset set Q
 OFSET_Q = [230,30,150,135,135,135] # [230,32,147,135,135,135]
 GAIN_Q = [-1,1,1,1,1,1]
+OFSET_BACKLASH = 2
+# CASE_BACKLASH = [90,]
+ENLIGHT_POS = [[10,500,800],[-250,500,750],[250,500,750]]
 
 # test condition
 TEST_MODE = True
@@ -221,10 +224,11 @@ listCam = [ cam4, cam5]
 
 
 send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL, manualStep= MANUAL_STEP, 
-                pathPlaning = PATH_PLANING, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL , extraOfset= EXTRA_OFSET, 
+                pathPlaning = PATH_PLANING_MODE, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL , extraOfset= EXTRA_OFSET, 
                 half_IK= HALF_IK, platePositionX= PLATE_POSITION_X, platePositionY = PLATE_POSITION_Y , servoPlaning= SERVO_PLANING, 
                 platePositionZ = PLATE_POSITION_Z, ofsetLenght = OFSET_LENGHT, plateHeight = PLATE_HEIGHT, ofsetLenght2= OFSET_LENGHT_2,
-                workspace = WORKSPACE, ofsetQ = OFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION)
+                workspace = WORKSPACE, ofsetQ = OFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION,
+                enLightPos=ENLIGHT_POS)
 
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
