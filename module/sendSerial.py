@@ -70,6 +70,7 @@ class sendSerial:
             # data = position wall predict orentation
             data = self.package.make10PathLine(dataList= data) 
             # data = [position wall valve orentation]
+            # print(data)
             data= self.package.sortBestPosition(dataList= data,initial_position=self.initial_position  ,final_position=self.final_position )
             # data = position wall valve orentation
 
@@ -154,7 +155,7 @@ class sendSerial:
                 # print(serRead)
                 time.sleep(0.1)
                 # pass
-        input('press any key')
+            input('press any key')
         return 0
 
 

@@ -75,8 +75,8 @@ sep = os.path.sep
 MAN = MANipulator()
 
 # protocal serial setting
-PORT = 4
-SEND_SERIAL = True
+PORT = 3
+SEND_SERIAL = False
 RECIEVE_SERIAL = SEND_SERIAL
 
 # main serial setting
@@ -95,23 +95,23 @@ OFSET_LENGHT = 60  # before to position
 OFSET_LENGHT_2 = 120 # after to position
 PLATE_HEIGHT = 50
 WORKSPACE = [-500,500,-400,600,0,1000]
-STEP_ROTATION = 8
+STEP_ROTATION = 4
 
 #ofset set Q
 OFSET_Q = [230,30,150,135,135,135] # [230,32,147,135,135,135]
 GAIN_Q = [-1,1,1,1,1,1]
 
 # test condition
-TEST_MODE = True
+TEST_MODE = False
 MODE_POSITION = True
-MODE_FIX_DATA = True
+MODE_FIX_DATA = False
 
 
 # test data
 if TEST_MODE:
     if MODE_POSITION:
-        # data = [ [[200,400,100],'B',0,MAN.RE_B], [[-400,200,800],'L',1,MAN.RE_L] ]
-        data = [ [[0,450,300],'B',0,MAN.RE_B] ] 
+        data = [ [[200,400,100],'B',0,MAN.RE_B], [[-400,200,800],'L',1,MAN.RE_L] ]
+        # data = [ [[0,450,300],'B',0,MAN.RE_B] ] 
         # daat = [[0,],'F',0,MAN.RE_F]
     else:
        data= [93/180*pi,90/180*pi,-100/180*pi,-90/180*pi,-90/180*pi,-90/180*pi]
@@ -121,6 +121,11 @@ if TEST_MODE:
 # data = [1/2*pi,0*pi,-110/180*pi,0*pi,0*pi,0*pi]                             # hua pak           
 # data = [1/2*pi,-35/180*pi,-110/180*pi,0*pi,0*pi,0*pi]                       # drin the dodge
 
+IMG_PATH = 'picture\\testpic\\BottomLeftLeftSide.jpg'
+ROTATION = 90
+SAVE_IMG_NAME = 'BL_Bside.jpg'
+FOUR_POINTS = np.array([[557, 202], [377, 197], [289, 595], [559, 638]])
+IMAGE_SIZE = (32,64)
 CAMERA_ALL_OFFSET_Z = 25
 
 # Camera Left
@@ -132,8 +137,8 @@ CAM_LEFT_FOUR_POINTS = np.array([[0, 0], [300, 300], [0, 300], [300, 0]])
 # Camera Right
 CAM_RIGHT_PORT = 2
 CAM_RIGHT_MODE = 1
-CAM_RIGHT_ORIENTATION = -90
-CAM_RIGHT_FOUR_POINTS = np.array([[0, 0], [300, 300], [0, 300], [300, 0]])
+CAM_RIGHT_ORIENTATION = 0
+CAM_RIGHT_FOUR_POINTS = np.array([[93,81],[116,450],[523,560],[559,81]])
 
 # Camera Bottom Middle
 CAM_BOTTOM_MIDDLE_PORT = 3
@@ -145,16 +150,15 @@ CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[0, 0], [300, 300], [0, 300], [300, 0]
 CAM_BOTTOM_RIGHT_PORT = 4
 CAM_BOTTOM_RIGHT_MODE = 1
 CAM_BOTTOM_RIGHT_ORIENTATION = -90
-CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM = np.array([[72,638],[273,232],[93,227],[333,639]])
-CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT = np.array([[0, 0], [300, 300], [0, 300], [300, 0]])
+CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM = np.array([[70,639],[105,221],[301,228],[360,639]])
+CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT = np.array([[275, 238], [320, 1], [542, 564], [356, 638]])
 
 # Camera Bottom Left
-CAM_BOTTOM_LEFT_PORT = 1
+CAM_BOTTOM_LEFT_PORT = 5
 CAM_BOTTOM_LEFT_MODE = 1
 CAM_BOTTOM_LEFT_ORIENTATION = 90
 CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM = np.array([[335,193],[538,182],[587,638],[294,639]])
-CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT = np.array([[0, 0], [80, 640], [0, 640], [80, 0]])
-
+CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT = np.array([[380, 223], [335, 9], [150, 523], [305, 638]])
 
 
 IMAGE_SIZE = (32,64)
@@ -203,15 +207,15 @@ gainQ = [-1,1,1,1,1,1]
 
 # cam = Retinutella('cam1',1,0,cameraMode=1)
 # cam1 = Camera_left(CAM_LEFT_PORT, CAM_LEFT_ORIENTATION, CAM_LEFT_MODE, CAMERA_ALL_OFFSET_Z, CAM_LEFT_FOUR_POINTS)
-# cam2 = Camera_right(CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAMERA_ALL_OFFSET_Z, CAM_RIGHT_FOUR_POINTS)
+cam2 = Camera_right(CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAMERA_ALL_OFFSET_Z, CAM_RIGHT_FOUR_POINTS)
 # cam3 = Camera_Bottom_middle(CAM_BOTTOM_MIDDLE_PORT, CAM_BOTTOM_MIDDLE_ORIENTATION, CAM_BOTTOM_MIDDLE_MODE,
 #                             CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_MIDDLE_FOUR_POINTS)
 # cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
 #                            CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT)
-cam5 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
-                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
+# cam5 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
+#                            CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
 
-listCam = [cam5,cam5,cam5,cam5,cam5]
+listCam = [cam2]
 
 
 send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL,
@@ -375,7 +379,10 @@ if TEST_MODE == False:
         # 'plate'.
     while len(all_image) == 0:
         for cam in listCam:
-                org,plate,platePos,plateOrientation = cam.getListOfPlate(image_size=IMAGE_SIZE,platePos= True,show= True,plateOrientation= True)
+                org,plate,platePos,plateOrientation = cam.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
+                                                                                plateOrientation=True, show=True,
+                                                                                LOAD_IMAGE=True,
+                                                                                FILENAME='picture\\testpic\TestBottomRightSide.jpg')
 
                 plate, platePos, plateOrientation = IP.filter_plate(plate_img = plate, plate_position = platePos, plate_Orientation= plateOrientation)
                 # print('--------------')
@@ -421,8 +428,8 @@ if TEST_MODE == False:
             wall = 'R'
         data.append( [selectPosition, wall, mainPredict([selectPlate],model=MODEL)[0] ,selectOreintation] )
 
-# print(data)
-
+print(data)
+input('check point')
 if len(data) > 10:
     data = data[:10]
 if MODE_POSITION or (TEST_MODE == False) :

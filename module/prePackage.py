@@ -64,15 +64,17 @@ class prePackage:
                 output.append(select)
             else:
                 break    
-        
-        # add home and final position
-        keep[(tuple(initial_position[0]),output[0][0])] = [[data, 'F', 0, keep[output[0]][0][3] ] for data in self.sendToPoint(initial_position[0],output[0][0])]
-        keep[(output[-1][-1],tuple(final_position[0]))] = [[data, 'F', 0, keep[output[-1]][0][3] ] for data in self.sendToPoint(output[-1][-1],final_position[0])]
 
+
+        # add home and final position
+
+        keep[(tuple(initial_position[0]),output[0][0])] = [[initial_position[0], keep[output[0]][0][1], 0 , R]  for R in self.getSubRotation(start=initial_position[2],stop = keep[output[0]][0][3] , step = self.stepRotation ) ] + [[data, keep[output[0]][0][1], 0, keep[output[0]][0][3] ] for data in self.sendToPoint(initial_position[0],output[0][0])]
+        keep[(output[-1][-1],tuple(final_position[0]))] = [[data, keep[output[-1]][0][1], 0, keep[output[-1]][0][3] ] for data in self.sendToPoint(output[-1][-1],final_position[0])] + [[final_position[0], final_position[1] , 0 , R]  for R in self.getSubRotation(start= keep[output[-1]][0][3],stop = final_position[2] , step = self.stepRotation ) ]
+        
         output.insert(0,(tuple(initial_position[0]),output[0][0]) )
         output.insert(len(output),(output[-1][-1],tuple(final_position[0])) )
 
-
+        
         # add all sub position in path
         count = 0
         for index in range(1,len(output)-2):
@@ -81,10 +83,10 @@ class prePackage:
             start = output[index+count-1][1]
             end = output[index+count][0]
             output.insert(index+count,(start,end))
-            
-            keep[(start,end)] = [[data, keep[output[index]][0][1], keep[output[index]][0][2], keep[output[index]][0][3] ] for data in self.sendToPoint(start,end)] 
+
+            keep[(start,end)] = [[data, keep[output[index]][0][1], keep[output[index]][0][2], keep[output[index+count+1]][0][3] ] for data in self.sendToPoint(start,end)] 
+
          # connect all path and keep in 1 list 
-        
         for index in output: 
             for data in keep[index]:
                 if len(realOutput) == 0:
@@ -95,17 +97,12 @@ class prePackage:
         # add rotation sub path in all loop
         for indexCountRealOutput in range(len(realOutput)-1):
 
-            if str(realOutput[indexCountRealOutput][3]) == str(realOutput[indexCountRealOutput+1][3]):
-                priorityOutput.append(realOutput[indexCountRealOutput])
-            else :
-                if self.servoPlaning:
-                    subRotation = self.getSubRotation(start= realOutput[indexCountRealOutput][3], stop=realOutput[indexCountRealOutput+1][3],step= self.stepRotation)
-                    for splitSubRotation in subRotation:
-                        priorityOutput.append([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], 
-                                        realOutput[indexCountRealOutput][2], splitSubRotation ])
-                else:
-                    priorityOutput.append(realOutput[indexCountRealOutput])
+            for splitSubRotation in self.getSubRotation(start= realOutput[indexCountRealOutput][3], stop=realOutput[indexCountRealOutput+1][3],step= self.stepRotation):
+                priorityOutput.append([realOutput[indexCountRealOutput][0], realOutput[indexCountRealOutput][1], 
+                                realOutput[indexCountRealOutput][2], splitSubRotation ])
 
+
+        # print(priorityOutput)
         return priorityOutput
 
 
@@ -136,16 +133,16 @@ class prePackage:
                 nextOfsetPosition = [int(val) for val in position]
                 if wall == 'F':
                     ofsetPosition[1] = int(ofsetPosition[1])-self.ofsetlenght
-                    nextOfsetPosition[1] = int(ofsetPosition[1])-(self.ofsetlenght2)
+                    nextOfsetPosition[1] = int(nextOfsetPosition[1])-(self.ofsetlenght2)
                 if wall == 'L':
                     ofsetPosition[0] = int(ofsetPosition[0])+self.ofsetlenght
-                    nextOfsetPosition[0] = int(ofsetPosition[0])+(self.ofsetlenght2)
+                    nextOfsetPosition[0] = int(nextOfsetPosition[0])+(self.ofsetlenght2)
                 if wall == 'R':
                     ofsetPosition[0] = int(ofsetPosition[0])-self.ofsetlenght
-                    nextOfsetPosition[0] = int(ofsetPosition[0])-(self.ofsetlenght2)
+                    nextOfsetPosition[0] = int(nextOfsetPosition[0])-(self.ofsetlenght2)
                 if wall == 'B':
                     ofsetPosition[2] = int(ofsetPosition[2])+self.ofsetlenght   
-                    nextOfsetPosition[2] = int(ofsetPosition[2])+(self.ofsetlenght2)   
+                    nextOfsetPosition[2] = int(nextOfsetPosition[2])+(self.ofsetlenght2)   
 
                 key = []
                 # ofset before get pai to get pai 
@@ -154,13 +151,13 @@ class prePackage:
                     key.append([deltaPosition,wall,0,orentation] )
                 # open valve
                 key.append([deltaPosition,wall,1,orentation] )
-
+   
                 # get pai to ofset after get pai 
                 for deltaPosition in self.sendToPoint(position,nextOfsetPosition):
                     key.append([deltaPosition,wall,1,orentation] )
 
                 # ofset from get pai to ofset before put pai
-                for deltaPosition in self.sendToPoint(ofsetPosition,self.ofsetPlatePosition[tagCount]):
+                for deltaPosition in self.sendToPoint(nextOfsetPosition,self.ofsetPlatePosition[tagCount]):
                     key.append([deltaPosition,wall,1,self.MAN.RE_F] )
             
                 # ofset before put pai to put pai
@@ -170,10 +167,9 @@ class prePackage:
                 key.append([deltaPosition,'F',0,self.MAN.RE_F] )
 
                 # putpai to ofset after put pai
-                for deltaPosition in self.sendToPoint(self.platePosition[tagCount],self.ofsetPlatePosition[tagCount]):
+                for deltaPosition in self.sendToPoint(self.platePosition[tagCount],self.nextOfsetPlatePosition[tagCount]):
                     key.append([deltaPosition,'F',0,self.MAN.RE_F] )
                 output.append(key)
-                
                 tagCount +=1
         # print(output)
         return output
@@ -199,20 +195,28 @@ class prePackage:
         output = []
         subRotation = []
 
-        for row in range(0,3):
-            for col in range(0,3):
-                section = (stop[row][col]-start[row][col])/(step-1)
-                if abs(float(section)) != 0.0:
-                    subRotation.append(np.arange(start[row][col], stop[row][col]+(section/2), section))
+        if str(start) != str(stop):
 
-                else:
-                    subRotation.append(np.array([start[row][col]] * step))
+            if self.servoPlaning:
+                    for row in range(0,3):
+                        for col in range(0,3):
+                            section = (stop[row][col]-start[row][col])/(step-1)
+                            if abs(float(section)) != 0.0:
+                                subRotation.append(np.arange(start[row][col], stop[row][col]+(section/2), section))
 
-        for listIndex in range(step):
-            key = []
-            for row in range(0,3):
-                for col in range(0,3):
-                    key.append(subRotation[3*row+col][listIndex])
-            output.append(np.array(key).reshape(3,3))
+                            else:
+                                subRotation.append(np.array([start[row][col]] * step))
+
+                    for listIndex in range(step):
+                        key = []
+                        for row in range(0,3):
+                            for col in range(0,3):
+                                key.append(subRotation[3*row+col][listIndex])
+                        output.append(np.array(key).reshape(3,3))
+            else:
+                output.append(start)
+                output.append(stop)
+        else:
+            output.append(start)
 
         return output

@@ -81,7 +81,7 @@ class Retinutella():
             ret, img = self.cam.read(self.cameraMode)
 
         if self.cameraMode == self.ROD:
-            if LOAD_IMAGE:
+            if  LOAD_IMAGE:
                 pass
             else:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
