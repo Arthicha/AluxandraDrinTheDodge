@@ -120,9 +120,21 @@ class prePackage:
         
         # list -> dict
         toDict = {}
+        
         for  position,wall,pred,oreintation in dataList:
+            
+            if pred not in toDict:
+                toDict[pred] = [position,wall,oreintation]
+            else:
+                count = 1
+                while True:
+                    if pred+count not in toDict:
+                        toDict[pred+count] = [position,wall,oreintation]
+                        break
+                    else:
+                        count +=1
 
-            toDict[pred] = [position,wall,oreintation]
+    
         # sorted toDict and add all required position
         for keyList in sortList: # count pai position
             if keyList in toDict.keys(): #if detect position-number language -> True

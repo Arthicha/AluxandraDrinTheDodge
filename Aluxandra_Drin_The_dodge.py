@@ -78,6 +78,7 @@ MAN = MANipulator()
 PORT = 3
 SEND_SERIAL = False
 RECIEVE_SERIAL = SEND_SERIAL
+MANUAL_STEP = False
 
 # main serial setting
 RUN_MATLAB = False
@@ -103,7 +104,7 @@ OFSET_Q = [230,30,150,135,135,135] # [230,32,147,135,135,135]
 GAIN_Q = [-1,1,1,1,1,1]
 
 # test condition
-TEST_MODE = False
+TEST_MODE = True
 MODE_POSITION = True
 MODE_FIX_DATA = False
 
@@ -111,7 +112,7 @@ MODE_FIX_DATA = False
 # test data
 if TEST_MODE:
     if MODE_POSITION:
-        data = [ [[200,400,100],'B',0,MAN.RE_B], [[-400,200,800],'L',1,MAN.RE_L] ]
+        data = [ [[200,400,100],'B',10,MAN.RE_B], [[-400,200,800],'L',10,MAN.RE_L],[[400,200,700],'R',10,MAN.RE_R],  [[0,450,300],'B',10,MAN.RE_B]  ]
         # data = [ [[0,450,300],'B',0,MAN.RE_B] ] 
         # daat = [[0,],'F',0,MAN.RE_F]
     else:
@@ -219,7 +220,7 @@ cam5 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM
 listCam = [ cam4, cam5]
 
 
-send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL,
+send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL, manualStep= MANUAL_STEP, 
                 pathPlaning = PATH_PLANING, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL , extraOfset= EXTRA_OFSET, 
                 half_IK= HALF_IK, platePositionX= PLATE_POSITION_X, platePositionY = PLATE_POSITION_Y , servoPlaning= SERVO_PLANING, 
                 platePositionZ = PLATE_POSITION_Z, ofsetLenght = OFSET_LENGHT, plateHeight = PLATE_HEIGHT, ofsetLenght2= OFSET_LENGHT_2,
@@ -429,7 +430,8 @@ if TEST_MODE == False:
             wall = 'R'
         data.append( [selectPosition, wall, mainPredict([selectPlate],model=MODEL)[0] ,selectOreintation] )
 
-print(data)
+# print(data)
+# input('check input data')
 if len(data) > 10:
     data = data[:10]
 if MODE_POSITION or (TEST_MODE == False) :
