@@ -78,7 +78,7 @@ MAN = MANipulator()
 PORT = 3
 SEND_SERIAL = False
 RECIEVE_SERIAL = SEND_SERIAL
-MANUAL_STEP = False
+MANUAL_STEP = True
 
 # main serial setting
 RUN_MATLAB = False
