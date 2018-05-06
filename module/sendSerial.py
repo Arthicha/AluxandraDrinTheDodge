@@ -13,8 +13,8 @@ from module.prePackage import prePackage
 class sendSerial:
 
     def __init__(self,port=4,checkLaser = False, runMatlab= True, sendSerial= True,
-                 pathPlaning = True, initial_position = [200,200,200], recieveSerial= True ,half_IK=False,
-                 platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300],
+                 pathPlaning = True, initial_position = [200,200,200], recieveSerial= True ,half_IK=False, manualStep = False, 
+                 platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], extraOfset = 60,
                  ofsetLenght = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], ofsetQ = [205,35,150,0,0,0],
                 gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,ofsetLenght2 = 40, servoPlaning = True):
     
@@ -23,6 +23,7 @@ class sendSerial:
         self.platePositionZ = platePositionZ
         self.ofsetLenght = ofsetLenght
         self.ofsetLenght2 = ofsetLenght2
+        self.extraOfset = extraOfset
         self.plateHeight = plateHeight
 
         self.stepRotation = stepRotation
@@ -42,6 +43,7 @@ class sendSerial:
         self.servoPlaning = servoPlaning
 
         self.recieveSerial = recieveSerial
+        self.manualStep = manualStep
 
         self.half_IK = half_IK
 
@@ -52,12 +54,12 @@ class sendSerial:
         '''-----------------------------------------------------------------------------'''
 
         self.ser = serial_commu(port=port, sendSerial=self.sendSerial)
-        input('press reset board')
+        input('press reset board and press any key and enter:')
         self.MAN = MANipulator()
         # self.R_e = MAN.RE_R
         self.package = prePackage(pathPlaning=self.pathPlaning, runMatLab=self.runMatLab, ofsetlenght=self.ofsetLenght,
                                     plateHeight=self.plateHeight ,platePositionX=self.platePositionX,
-                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ,
+                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ, extraOfset =self.extraOfset, 
                                     stepRotation= self.stepRotation,ofsetlenght2=self.ofsetLenght2, servoPlaning = self.servoPlaning)
 
         self.ser.clearSerialData()
@@ -70,6 +72,7 @@ class sendSerial:
             # data = position wall predict orentation
             data = self.package.make10PathLine(dataList= data) 
             # data = [position wall valve orentation]
+
             data= self.package.sortBestPosition(dataList= data,initial_position=self.initial_position  ,final_position=self.final_position )
             # data = position wall valve orentation
 
@@ -80,16 +83,6 @@ class sendSerial:
             
             R_e = orentation
 
-            # # wall 'F'front,'L'left,'R'right,'B'buttom
-            # if wall == 'F':
-            #     R_e = self.MAN.RE_F
-            # elif wall == 'L':
-            #     R_e = self.MAN.RE_L
-            # elif wall == 'R':
-            #     R_e = self.MAN.RE_R
-            # elif wall == 'B':
-            #     R_e = self.MAN.RE_B
-
             dd = self.MAN.d6*R_e[:,2]
             dx = x-dd[0]
             dy = y-dd[1]
@@ -99,7 +92,6 @@ class sendSerial:
                 ans = self.MAN.inverse_kinamatic2(dx,dy,dz,self.MAN.DH_param,R_e)
                 ans = self.MAN.setJointLimits(ans,self.MAN.jointLimit)
             except :
-                # ser.write(q=[0,0,0,0,0,0], jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=0)
                 sys.exit('IK calculate fail')
         
             if len(ans) >= 1:
@@ -154,7 +146,8 @@ class sendSerial:
                 # print(serRead)
                 time.sleep(0.1)
                 # pass
-        input('press any key')
+        if self.manualStep :
+            input('press any key and enter to continue :')
         return 0
 
 
