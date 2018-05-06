@@ -109,7 +109,7 @@ class Retinutella():
 
             cv2.imshow('image',img)
             cv2.setMouseCallback('image',m_click)
-            cv2.waitKey(100)
+            cv2.waitKey(10)
 
         path = os.getcwd()
         if fileName != None:

@@ -10,41 +10,50 @@ from sklearn.externals import joblib
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
 from module.Retinutella_theRobotEye import Retinutella
 from module.UniqueCameraClass import *
+
 # Measures are in milimeters
 
-LOAD_IMAGE_NAME = 'BL_Bside.jpg'
-SAVE_IMAGE_NAME = 'Bl_b.png'
-FROM_FILE = False
+LOAD_IMAGE_NAME = 'newR_test.png'
+SAVE_IMAGE_NAME = 'SS.png'
+FROM_FILE = True
 TEST_MODEL = True
-MODEL_FILE_NAME = 'Bm'
-CAM_ORIENT = -180
-CAM_FOUR_POINT = ((479,289),(635,495),(14,506),(168,294))
+CLASS = True
+MODEL_FILE_NAME = 'R'
+CAM_ORIENT = 0
+CAM_FOUR_POINT = np.array([[9, 494], [9, 102], [523, 639], [590, 97]])
+# np.array([[290,230],[356,638],[96,225],[63,639]])
 '''Regression Parameter'''
-SAVED_MODEL_NAME = 'Bm'
-KERNEL_SIZE = (4,5)
-NUMBER_OF_POINTS = (15,14)
-DIFFERENCE_DISTANCE_PER_POINT = [30,30]
-SHIFT_X = -500+312.5
-SHIFT_Y = 700-462.5
+SAVED_MODEL_NAME = 'R'
+KERNEL_SIZE = (5, 5)
+NUMBER_OF_POINTS = (15, 15)
+DIFFERENCE_DISTANCE_PER_POINT = [-30, 30]
+SHIFT_X = 700 - 207.5
+SHIFT_Y = 1000 - 570
+BINARY_THRESHOLD = 60
+# right
+# from above = 57
+# from inside = 20.75
 
-
+# left
+# from above = 54 cm
+# from inside = 65 cm
 '''Cam config for run with cam'''
-CAMERA_ALL_OFFSET_Z =25
+CAMERA_ALL_OFFSET_Z = 25
 
 CAM_BOTTOM_RIGHT_PORT = 4
 CAM_BOTTOM_RIGHT_MODE = 1
 CAM_BOTTOM_RIGHT_ORIENTATION = -90
-CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM = np.array([[70,639],[105,221],[301,228],[360,639]])
+CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM = np.array([[70, 639], [105, 221], [301, 228], [360, 639]])
 CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT = np.array([[275, 238], [320, 1], [542, 564], [356, 638]])
 
 CAM_BOTTOM_LEFT_PORT = 5
 CAM_BOTTOM_LEFT_MODE = 1
 CAM_BOTTOM_LEFT_ORIENTATION = 90
-CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM = np.array([[335,193],[538,182],[587,638],[294,639]])
+CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM = np.array([[335, 193], [538, 182], [587, 638], [294, 639]])
 CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT = np.array([[380, 223], [335, 9], [150, 523], [305, 638]])
 
 cam = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
-                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT)
+                          CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT)
 
 '''********************************************************'''
 
@@ -67,7 +76,7 @@ def Regression_HaHA(Image_naja, kernel_size=(4, 4), binarization_thresh_kernel_s
     imgBW = imgC
     # imgBW = cv2.cvtColor(imgC, cv2.COLOR_BGR2GRAY)
     # img = IP.binarize(imgBW, IP.SAUVOLA_THRESHOLDING, binarization_thresh_kernel_size)
-    ret, img = cv2.threshold(imgBW, 155, 255, cv2.THRESH_BINARY)
+    ret, img = cv2.threshold(imgBW, BINARY_THRESHOLD, 255, cv2.THRESH_BINARY)
     cv2.imshow('gray', img)
     cv2.waitKey(0)
     img = cv2.bitwise_not(img)
@@ -177,8 +186,8 @@ def m_click(event, x, y, k, l):
 # (96,0),(355,15),(81,476),(623,429)
 if FROM_FILE:
     pass
-else:
-    cam = Retinutella('cam1',1,CAM_ORIENT,cameraMode=1,four_points=CAM_FOUR_POINT)
+
+cam = Retinutella('cam1', 1, CAM_ORIENT, cameraMode=1, four_points=CAM_FOUR_POINT)
 # cam.getImage()
 # cam = cv2.VideoCapture(1)
 # ret,im = cam.read()
@@ -190,41 +199,48 @@ if FROM_FILE:
 while (1):
     # ret,im = cam.read()
     if not FROM_FILE:
-        capture,im,matri =cam.getImage(remove_pers=True)
+        capture, im, matri = cam.getImage(remove_pers=True)
+    elif FROM_FILE and CLASS:
+        capture, im, matri = cam.getImage(remove_pers=True, LOAD_IMAGE=True, FILE_NAME_or_PATH=LOAD_IMAGE_NAME)
     else:
         im = cv2.imread(LOAD_IMAGE_NAME, cv2.IMREAD_GRAYSCALE)
     # ret, im = cam.read()
     cv2.imshow('image1', im)
     cv2.setMouseCallback('image1', m_click)
+    cv2.imwrite(SAVE_IMAGE_NAME, capture)
     k = cv2.waitKey(10)
     if k == ord('r'):
-        if FROM_FILE:
+        if FROM_FILE and CLASS:
+            capture, im, matri = cam.getImage(remove_pers=True, LOAD_IMAGE=True, FILE_NAME_or_PATH=LOAD_IMAGE_NAME)
+        elif FROM_FILE:
             im = cv2.imread(LOAD_IMAGE_NAME, cv2.IMREAD_GRAYSCALE)
         '''shift x y
             input real world coordinate of bottom left square
         '''
         Regression_HaHA(im, camera_name=SAVED_MODEL_NAME, number_of_points=NUMBER_OF_POINTS, kernel_size=KERNEL_SIZE,
-                        binarization_thresh_kernel_size=19, difference_distance_per_point=DIFFERENCE_DISTANCE_PER_POINT, shift_x=SHIFT_X,
+                        binarization_thresh_kernel_size=19, difference_distance_per_point=DIFFERENCE_DISTANCE_PER_POINT,
+                        shift_x=SHIFT_X,
                         shift_y=SHIFT_Y)
-    if k == ord('e'):
+    elif k == ord('e'):
         break
     elif k == ord('s'):
-        cv2.imwrite(SAVE_IMAGE_NAME,im)
-        pass
+        cv2.imwrite(SAVE_IMAGE_NAME, capture)
     else:
         pass
 if TEST_MODEL:
     while 1:
         #
-        if FROM_FILE:
+        if FROM_FILE and CLASS:
+            capture, im, matri = cam.getImage(remove_pers=True, LOAD_IMAGE=True, FILE_NAME_or_PATH=LOAD_IMAGE_NAME)
+        elif FROM_FILE:
             im = cv2.imread(LOAD_IMAGE_NAME, cv2.IMREAD_GRAYSCALE)
         else:
             capture, im, matri = cam.getImage(remove_pers=True)
         cv2.imshow('image1', im)
         print('test_model')
         cv2.imshow('image1', im)
-        model_X = joblib.load('X_'+MODEL_FILE_NAME+'.gz')
-        model_Y = joblib.load('Y_'+MODEL_FILE_NAME+'.gz')
+        model_X = joblib.load('X_' + MODEL_FILE_NAME + '.gz')
+        model_Y = joblib.load('Y_' + MODEL_FILE_NAME + '.gz')
         cv2.waitKey(0)
         j = int(input('X value'))
         k = int(input('Y value'))
