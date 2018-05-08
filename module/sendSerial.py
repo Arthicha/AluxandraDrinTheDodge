@@ -19,7 +19,7 @@ class sendSerial:
                  platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], extraoffset = 60,
                  offsetLenght = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], offsetQ = [205,35,150,0,0,0],
                 gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,offsetLenght2 = 40, servoPlaning = True, 
-                offsetBacklash = [0,0,0,0,0,0],caseBacklash = [90,90,90,135,135,135] ):
+                offsetBacklash = [0,0,0,0,0,0],caseBacklash = [90,90,90,135,135,135], gainMagnetic = 7/9, qForBackLash= []):
     
         self.platePositionX = platePositionX
         self.platePositionY = platePositionY
@@ -37,8 +37,10 @@ class sendSerial:
 
         self.offsetQ = offsetQ
         self.gainQ = gainQ
+        self.gainMagnetic = gainMagnetic
         self.offsetBacklash = offsetBacklash
         self.caseBacklash = caseBacklash
+        self.qForBackLash = qForBackLash
 
         self.runMatLab = runMatlab
 
@@ -128,6 +130,7 @@ class sendSerial:
                     print('ALERT LASER!!!')
 
         new_set_q = copy.deepcopy(set_q)
+        new_set_q = self.reMagnetic(new_set_q,gain = self.gainMagnetic)
         new_set_q = self.offsetBackLash(new_set_q)
 
         set_q_after_offset = [sum(q) for q in zip( [qi[0]*qi[1] for qi in zip(new_set_q,self.gainQ)] ,[radians(qi) for qi in self.offsetQ] )]
@@ -146,9 +149,9 @@ class sendSerial:
 
         print('\nFK position : ' +str((x,y,z)))
         print('set_q unoffset : '+str([qi for qi in set_q]))
-        # print('set_q unoffset : '+str([degrees(qi) for qi in set_q]))
-        # print('set_q backlash : '+str([qi/pi for qi in new_set_q]))
-        # print('set_q backlash : '+ str( [degrees(qi) for qi in new_set_q]))
+        print('set_q unoffset : '+str([degrees(qi) for qi in set_q]))
+        print('set_q backlash : '+str([qi/pi for qi in new_set_q]))
+        print('set_q backlash : '+ str( [degrees(qi) for qi in new_set_q]))
 
         self.ser.write(q=set_q_after_offset,valve=valve)
         
@@ -166,15 +169,19 @@ class sendSerial:
         
         dataToFunction = [0, set_q[1], 0, 0, 0 ,0]
         caseBacklash = [self.caseBacklash[index](dataToFunction[index]) for index in range(6) ]
-
+        offsetBacklash = [self.offsetBacklash[index](self.qForBackLash[0](set_q)) for index in range(6)] 
         output = set_q
         for indexQ in range(len(set_q)):
             if set_q[indexQ] > radians(caseBacklash[indexQ]):
-                output[indexQ] = set_q[indexQ]-radians(self.offsetBacklash[indexQ]) 
+                output[indexQ] = set_q[indexQ]-radians(offsetBacklash[indexQ]) 
             else :
-                output[indexQ] = set_q[indexQ]+radians(self.offsetBacklash[indexQ])
+                output[indexQ] = set_q[indexQ]+radians(offsetBacklash[indexQ])
         return output
 
 # a = sendSerial(port=3)
 # a.getXYZAndWrite([ [[500,500,800],1,'F'] ])
 # a.getSetQAndWrite([95/180*pi,115/180*pi,0/180*pi,135/180*pi,135/180*pi,135/180*pi],0)
+
+    def reMagnetic(self, set_q,gain = 7/9):
+        set_q[0] = ((set_q[0]- radians(90))*gain ) + radians(90)
+        return set_q

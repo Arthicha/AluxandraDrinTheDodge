@@ -34,8 +34,8 @@ class prePackage:
         self.MAN = MANipulator()
         self.stepRotation = stepRotation
 
-        self.MID_POS = enLightPos[0]
-        self.LEF_POS = enLightPos[1]
+        self.LEF_POS = enLightPos[0]
+        self.MID_POS = enLightPos[1]
         self.RIG_POS = enLightPos[2]
 
     def sortBestPosition(self,dataList,initial_position , final_position ):

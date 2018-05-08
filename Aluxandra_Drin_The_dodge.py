@@ -83,7 +83,7 @@ MANUAL_STEP = True
 # main serial setting
 RUN_MATLAB = False
 CHECK_LASER = False
-PATH_PLANING_MODE = 2 # 0 -> None , 1-> wan , 2 -> zumo , 3 -> combine
+PATH_PLANING_MODE = 3 # 0 -> None , 1-> wan , 2 -> zumo , 3 -> combine
 SERVO_PLANING = False
 HALF_IK = False
 
@@ -91,24 +91,29 @@ HALF_IK = False
 INITIAL_POSITION = [[0,400,700],'F',MAN.RE_F]
 PLATE_POSITION_X = [-300,-100,100,300]
 PLATE_POSITION_Y = 650
-PLATE_POSITION_Z = [600,450,300]  
+PLATE_POSITION_Z = [700,500,300]  
 OFFSET_LENGHT = 120  # before to position
 OFFSET_LENGHT_2 = 120 # after to position
-EXTRA_OFFSET = 180 # OFFSET out from put pai
-PLATE_HEIGHT = 100
+EXTRA_OFFSET = 50 # OFFSET out from put pai
+PLATE_HEIGHT = 50
 WORKSPACE = [-500,500,-400,600,0,1000]
 STEP_ROTATION = 4
 
 #offset set Q
-OFFSET_Q = [223,30,175,135,135,135] # [230,32,147,135,135,135]
+OFFSET_Q = [230,30,175,135,135,135] # [230,32,147,135,135,135]
 GAIN_Q = [-1,1,1,1,1,1]
-OFFSET_BACKLASH = [0,2,-2,0,0,0]
+GAIN_MAGNETIC = 7/9
+
+Q_FOR_BACKLASH = [lambda x: 0, lambda x: x[1],lambda x: x[1]+x[2],lambda x: 0,
+                        lambda x: 0,lambda x: 0 ]
+OFFSET_BACKLASH = [lambda x: 0, lambda x: np.cos(x)*0,lambda x: np.cos(x)*0,lambda x: 0,
+                        lambda x: 0,lambda x: 0 ]
 CASE_BACKLASH = [lambda x:  radians(90), lambda x: radians(90)-x, lambda x: radians(90), lambda x: radians(135), 
                     lambda x: radians(135), lambda x: radians(135)]
-ENLIGHT_POS = [[0,400,700],[-250,500,750],[250,500,750]]
+ENLIGHT_POS = [[-250,500,700],[0,400,700],[250,500,700]]
 
 # test condition
-TEST_MODE = True
+TEST_MODE = False
 MODE_POSITION = True
 MODE_FIX_DATA = False
 
@@ -119,8 +124,9 @@ if TEST_MODE:
         # data = [ [[-200,400,700],'L',10,MAN.RE_L]]
         # data = [ [[200,650,600],'F',0,MAN.RE_F] ] 
         # daat = [[0,],'F',0,MAN.RE_F]
+        data = [ [[400,0,700], 'R',0, MAN.RE_R ]]
     else:
-       data= [93/180*pi,90/180*pi,-100/180*pi,-90/180*pi,-90/180*pi,-90/180*pi]
+       data= [90/180*pi,140/180*pi,-145/180*pi,0/180*pi,0/180*pi,0/180*pi]
 
 
 # data = [95/180*pi,115/180*pi,-120/180*pi,135/180*pi,135/180*pi,135/180*pi]  # up rising
@@ -229,7 +235,8 @@ send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MAT
                 half_IK= HALF_IK, platePositionX= PLATE_POSITION_X, platePositionY = PLATE_POSITION_Y , servoPlaning= SERVO_PLANING, 
                 platePositionZ = PLATE_POSITION_Z, offsetLenght=  OFFSET_LENGHT, plateHeight = PLATE_HEIGHT, offsetLenght2 = OFFSET_LENGHT_2,
                 workspace = WORKSPACE, offsetQ= OFFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION,
-                enLightPos=ENLIGHT_POS, offsetBacklash = OFFSET_BACKLASH ,caseBacklash = CASE_BACKLASH)
+                enLightPos=ENLIGHT_POS, offsetBacklash = OFFSET_BACKLASH ,caseBacklash = CASE_BACKLASH, gainMagnetic= GAIN_MAGNETIC,
+                qForBackLash= Q_FOR_BACKLASH)
 
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
