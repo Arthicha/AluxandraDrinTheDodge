@@ -1071,9 +1071,14 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
 
         X = point[0]
         Y = point[1]
+        X_divide = 1 / (0.00001 + point[0])
+        Y_divide = 1 / (0.00001 + point[1])
+        XY_divide = X_divide * Y_divide
 
-        feature_x = np.array([X,Y, XY2,  X2, Y2, XY])#np.array([X,Y,YX2,X3, XY2, X5, X3Y2, XY4, X2, Y2, XY])
-        feature_y = np.array([X,Y,YX2, X2, Y2, XY])#np.array([X,Y,XY2,YX2, Y3, YX4, X2Y3, Y5, X2, Y2, XY])
+        feature_x = np.array([X,Y,XY2, X2, Y2,  XY])#np.array([X,Y,YX2,X3, XY2, X5, X3Y2, XY4, X2, Y2, XY]) ,X_divide,Y_divide,XY_divid
+        # ,XY2, X2, Y2
+        feature_y = np.array([X,Y,YX2, X2, Y2, XY])#np.array([X,Y,XY2,YX2, Y3, YX4, X2Y3, Y5, X2, Y2, XY]) ,X_divide,Y_divide,XY_divide
+        #  YX2, X2, Y2,
         return feature_x,feature_y
     # extract plate from image
     # example

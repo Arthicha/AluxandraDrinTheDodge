@@ -5,6 +5,7 @@ import random
 import math
 from matplotlib import pyplot as plt
 from sklearn import linear_model
+from sklearn.svm import SVR,LinearSVR
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.externals import joblib
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
@@ -13,23 +14,38 @@ from module.UniqueCameraClass import *
 
 # Measures are in milimeters
 
-LOAD_IMAGE_NAME = 'newR_test.png'
-SAVE_IMAGE_NAME = 'SS.png'
+LOAD_IMAGE_NAME = 'Bm_tune.png'#newR_test.png
+SAVE_IMAGE_NAME = 'Bm_tune.png'
 FROM_FILE = True
 TEST_MODEL = True
 CLASS = True
-MODEL_FILE_NAME = 'R'
+MODEL_FILE_NAME = 'Bm'
 CAM_ORIENT = 0
-CAM_FOUR_POINT = np.array([[9, 494], [9, 102], [523, 639], [590, 97]])
+CAM_FOUR_POINT = np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
+#np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
+#np.array([[72, 1], [608, 78], [472, 567], [72, 625]])
+#np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
+#  np.array([[82, 0], [614, 93], [463, 609], [17, 638]])
+#    np.array([[82, 0], [614, 93], [463, 609], [17, 638]])
+# np.array([[106, 167], [301, 182], [349, 619], [68, 629]])
+#np.array([[353, 153], [277, 588], [556, 613], [553, 143]])
+# np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
+#    np.array([[119, 173], [51, 639], [358, 638], [314, 189]])
+    #np.array([[544, 173], [553, 638], [269, 621], [348, 182]])
 # np.array([[290,230],[356,638],[96,225],[63,639]])
 '''Regression Parameter'''
-SAVED_MODEL_NAME = 'R'
-KERNEL_SIZE = (5, 5)
-NUMBER_OF_POINTS = (15, 15)
-DIFFERENCE_DISTANCE_PER_POINT = [-30, 30]
-SHIFT_X = 700 - 207.5
-SHIFT_Y = 1000 - 570
-BINARY_THRESHOLD = 60
+SAVED_MODEL_NAME = 'Bm'
+KERNEL_SIZE = (2, 2)
+NUMBER_OF_POINTS = (15, 14)
+DIFFERENCE_DISTANCE_PER_POINT = [30, 30]
+SHIFT_X = -500+310
+# -190
+#527.5
+# 527.5-240 = 287.5
+SHIFT_Y = 700-455
+#420
+# 420+210 =630
+BINARY_THRESHOLD = 100
 # right
 # from above = 57
 # from inside = 20.75
@@ -106,6 +122,8 @@ def Regression_HaHA(Image_naja, kernel_size=(4, 4), binarization_thresh_kernel_s
     print('center Y:')
     print(conWorldMatY)
     print('------------------')
+    cv2.imshow('dot',imgC)
+    cv2.waitKey(0)
     # *************************************************************************
     # REAL WORLD POINTS
     # *************************************************************************
@@ -162,14 +180,23 @@ def Regression_HaHA(Image_naja, kernel_size=(4, 4), binarization_thresh_kernel_s
         '''my data'''
         X = conWorldMatX[k]
         Y = conWorldMatY[k]
+        X_divide = 1 / (0.00001 + conWorldMatX[k])
+        Y_divide = 1 / (0.00001 + conWorldMatY[k])
+        XY_divide = X_divide * Y_divide
 
-        dummyX = np.array([X, Y, XY2, X2, Y2, XY])  # X3,X5, X3Y2, XY4,
+        dummyX = np.array([X, Y,XY2, X2, Y2, XY])  # X3,X5, X3Y2, XY4, , X_divide,Y_divide,XY_divide
+        #, XY2, X2, Y2
         DisX[k] = dummyX
-        dummyY = np.array([X, Y, YX2, X2, Y2, XY])  # Y3, YX4, X2Y3, Y5,
+        dummyY = np.array([X, Y,YX2, X2, Y2,  XY])  # Y3, YX4, X2Y3, Y5,   ,X_divide,Y_divide,XY_divide
+        #, YX2, X2, Y2
         DisY[k] = dummyY
 
+    # regX = LinearSVR()
+    # regX = SVR()
     regX = linear_model.LinearRegression()
     regX.fit(DisX, RealWorldMatX)
+    # regY = LinearSVR()
+    # regY = SVR()
     regY = linear_model.LinearRegression()
     regY.fit(DisY, RealWorldMatY)
     print("X_SCORE =" + str(regX.score(DisX, RealWorldMatX)))
@@ -207,8 +234,8 @@ while (1):
     # ret, im = cam.read()
     cv2.imshow('image1', im)
     cv2.setMouseCallback('image1', m_click)
-    cv2.imwrite(SAVE_IMAGE_NAME, capture)
-    k = cv2.waitKey(10)
+    # cv2.imwrite(SAVE_IMAGE_NAME, capture)
+    k = cv2.waitKey(100)
     if k == ord('r'):
         if FROM_FILE and CLASS:
             capture, im, matri = cam.getImage(remove_pers=True, LOAD_IMAGE=True, FILE_NAME_or_PATH=LOAD_IMAGE_NAME)

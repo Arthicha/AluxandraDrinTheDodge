@@ -132,29 +132,29 @@ while 1:
     # IP.filter_plate()
     img = cv2.imread(IMG_PATH)
     print(img.shape)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    cv2.imshow('image', img)
-    cv2.setMouseCallback('image', m_click)
-    cv2.waitKey(0)
-    rows, cols = img.shape
-    maxima = max(img.shape)
-    print(maxima)
-    blank_image = np.ones((cols, cols), np.uint8) * 255
-    blank_image[int((maxima - rows) / 2):int(maxima - (maxima - rows) / 2),
-    int((maxima - cols) / 2):int(maxima - (maxima - cols) / 2)] = img
-    cv2.imshow('image', blank_image)
-    cv2.setMouseCallback('image', m_click)
-    cv2.waitKey(0)
-    new_image_rows, new_image_cols = blank_image.shape
-    # blank_image[:,:]
-    M = cv2.getRotationMatrix2D((maxima / 2, maxima / 2), ROTATION, 1)
-    img = cv2.warpAffine(blank_image, M, (cols, cols), borderValue=255)
-    print(img.shape)
-    cv2.imshow('image', img)
-    cv2.setMouseCallback('image', m_click)
-    cv2.waitKey(0)
-    path = os.getcwd()
+    # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #
+    # cv2.imshow('image', img)
+    # cv2.setMouseCallback('image', m_click)
+    # cv2.waitKey(0)
+    # rows, cols = img.shape
+    # maxima = max(img.shape)
+    # print(maxima)
+    # blank_image = np.ones((cols, cols), np.uint8) * 255
+    # blank_image[int((maxima - rows) / 2):int(maxima - (maxima - rows) / 2),
+    # int((maxima - cols) / 2):int(maxima - (maxima - cols) / 2)] = img
+    # cv2.imshow('image', blank_image)
+    # cv2.setMouseCallback('image', m_click)
+    # cv2.waitKey(0)
+    # new_image_rows, new_image_cols = blank_image.shape
+    # # blank_image[:,:]
+    # M = cv2.getRotationMatrix2D((maxima / 2, maxima / 2), ROTATION, 1)
+    # img = cv2.warpAffine(blank_image, M, (cols, cols), borderValue=255)
+    # print(img.shape)
+    # cv2.imshow('image', img)
+    # cv2.setMouseCallback('image', m_click)
+    # cv2.waitKey(0)
+    # path = os.getcwd()
     ''' my code '''
     # 335 193
     # 538 182
@@ -171,9 +171,9 @@ while 1:
     # 116 450
     # 523 560
     # 559 81
-    capture, matrice = IP.four_point_transform(img, FOUR_POINTS, True)
-
-    cv2.imshow('image', capture)
-    k = cv2.waitKey(0)
-    if k == ord('s'):
-        cv2.imwrite(SAVE_IMG_NAME, capture)
+    # capture, matrice = IP.four_point_transform(img, FOUR_POINTS, True)
+    #
+    # cv2.imshow('image', capture)
+    # k = cv2.waitKey(0)
+    # if k == ord('s'):
+    #     cv2.imwrite(SAVE_IMG_NAME, capture)
