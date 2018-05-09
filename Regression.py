@@ -14,8 +14,8 @@ from module.UniqueCameraClass import *
 
 # Measures are in milimeters
 
-LOAD_IMAGE_NAME = 'Bm_tune.png'#newR_test.png
-SAVE_IMAGE_NAME = 'Bm_tune.png'
+LOAD_IMAGE_NAME = 'Bm_tune_edit.png'#newR_test.png
+SAVE_IMAGE_NAME = 'Bm_tune_edit.png'
 FROM_FILE = True
 TEST_MODEL = True
 CLASS = True

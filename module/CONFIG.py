@@ -28,7 +28,8 @@ CAM_RIGHT_FOUR_POINTS =np.array([[560, 1], [71, 64], [164, 527], [560, 639]])
 CAM_BOTTOM_MIDDLE_PORT = 3
 CAM_BOTTOM_MIDDLE_MODE = 1
 CAM_BOTTOM_MIDDLE_ORIENTATION = -180
-CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
+CAM_BOTTOM_MIDDLE_FOUR_POINTS =  np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
+#np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
 # np.array([[479, 289], [635, 495], [14, 506], [168, 294]])
 
 # Camera Bottom Right
