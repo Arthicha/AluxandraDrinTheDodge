@@ -78,7 +78,7 @@ MAN = MANipulator()
 PORT = 3
 SEND_SERIAL = False
 RECIEVE_SERIAL = SEND_SERIAL
-MANUAL_STEP = True
+MANUAL_STEP = False
 
 # main serial setting
 RUN_MATLAB = False
@@ -90,23 +90,24 @@ HALF_IK = False
 # initial constant 
 INITIAL_POSITION = [[0,400,700],'F',MAN.RE_F]
 PLATE_POSITION_X = [-300,-100,100,300]
-PLATE_POSITION_Y = 650
+PLATE_POSITION_Y = 625
 PLATE_POSITION_Z = [700,500,300]  
-OFFSET_LENGHT = 120  # before to position
+OFFSET_LENGHT = 180  # before to position   
 OFFSET_LENGHT_2 = 120 # after to position
-EXTRA_OFFSET = 50 # OFFSET out from put pai
-PLATE_HEIGHT = 50
+EXTRA_OFFSET = 50 # ofset of OFSET_LENGHT use with plate keep position
+PLATE_HEIGHT = 50 
 WORKSPACE = [-500,500,-400,600,0,1000]
 STEP_ROTATION = 4
+STEP_DISTANCE = 10
 
 #offset set Q
-OFFSET_Q = [230,30,175,135,135,135] # [230,32,147,135,135,135]
+OFFSET_Q = [230,35,160 ,135,135,135] # [230,32,147,135,135,135]
 GAIN_Q = [-1,1,1,1,1,1]
 GAIN_MAGNETIC = 7/9
 
 Q_FOR_BACKLASH = [lambda x: 0, lambda x: x[1],lambda x: x[1]+x[2],lambda x: 0,
                         lambda x: 0,lambda x: 0 ]
-OFFSET_BACKLASH = [lambda x: 0, lambda x: np.cos(x)*0,lambda x: np.cos(x)*0,lambda x: 0,
+OFFSET_BACKLASH = [lambda x: 0, lambda x: 0,lambda x: 0,lambda x: 0,
                         lambda x: 0,lambda x: 0 ]
 CASE_BACKLASH = [lambda x:  radians(90), lambda x: radians(90)-x, lambda x: radians(90), lambda x: radians(135), 
                     lambda x: radians(135), lambda x: radians(135)]
@@ -124,9 +125,9 @@ if TEST_MODE:
         # data = [ [[-200,400,700],'L',10,MAN.RE_L]]
         # data = [ [[200,650,600],'F',0,MAN.RE_F] ] 
         # daat = [[0,],'F',0,MAN.RE_F]
-        data = [ [[400,0,700], 'R',0, MAN.RE_R ]]
+        data = [ [[400,0,100], 'B',0, MAN.RE_B ]]
     else:
-       data= [90/180*pi,140/180*pi,-145/180*pi,0/180*pi,0/180*pi,0/180*pi]
+       data= [0/180*pi,0/180*pi,-0/180*pi,0/180*pi,0/180*pi,0/180*pi]
 
 
 # data = [95/180*pi,115/180*pi,-120/180*pi,135/180*pi,135/180*pi,135/180*pi]  # up rising
@@ -224,8 +225,8 @@ gainQ = [-1,1,1,1,1,1]
 #                             CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_MIDDLE_FOUR_POINTS)
 cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
                            CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT)
-cam5 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
-                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
+# cam5 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
+#                            CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
 
 listCam = [ cam4]
 
@@ -236,7 +237,7 @@ send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MAT
                 platePositionZ = PLATE_POSITION_Z, offsetLenght=  OFFSET_LENGHT, plateHeight = PLATE_HEIGHT, offsetLenght2 = OFFSET_LENGHT_2,
                 workspace = WORKSPACE, offsetQ= OFFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION,
                 enLightPos=ENLIGHT_POS, offsetBacklash = OFFSET_BACKLASH ,caseBacklash = CASE_BACKLASH, gainMagnetic= GAIN_MAGNETIC,
-                qForBackLash= Q_FOR_BACKLASH)
+                qForBackLash= Q_FOR_BACKLASH, planingStepDistance= STEP_DISTANCE)
 
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",

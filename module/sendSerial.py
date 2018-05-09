@@ -19,7 +19,8 @@ class sendSerial:
                  platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], extraoffset = 60,
                  offsetLenght = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], offsetQ = [205,35,150,0,0,0],
                 gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,offsetLenght2 = 40, servoPlaning = True, 
-                offsetBacklash = [0,0,0,0,0,0],caseBacklash = [90,90,90,135,135,135], gainMagnetic = 7/9, qForBackLash= []):
+                offsetBacklash = [0,0,0,0,0,0],caseBacklash = [90,90,90,135,135,135], gainMagnetic = 7/9, qForBackLash= [], 
+                planingStepDistance = 10.0):
     
         self.platePositionX = platePositionX
         self.platePositionY = platePositionY
@@ -48,6 +49,7 @@ class sendSerial:
 
         self.pathPlaning = pathPlaning
         self.servoPlaning = servoPlaning
+        self.planingStepDistance = planingStepDistance
 
         self.recieveSerial = recieveSerial
         self.manualStep = manualStep
@@ -68,7 +70,7 @@ class sendSerial:
                                     plateHeight=self.plateHeight ,platePositionX=self.platePositionX,
                                     platePositionY =self.platePositionY, platePositionZ=self.platePositionZ, extraoffset =self.extraoffset, 
                                     stepRotation= self.stepRotation,offsetlenght2=self.offsetLenght2, servoPlaning = self.servoPlaning,
-                                    enLightPos= enLightPos)
+                                    enLightPos= enLightPos, planingStepDistance= self.planingStepDistance)
 
         self.ser.clearSerialData()
 
@@ -146,12 +148,11 @@ class sendSerial:
             xi, yi ,zi = [ int(i) for i in Hi[index_Hi,0:3,3]]
             print('joint '+str(index_Hi+1) + ' : ' + str((xi,yi,zi)))
         
-
         print('\nFK position : ' +str((x,y,z)))
-        print('set_q unoffset : '+str([qi for qi in set_q]))
-        print('set_q unoffset : '+str([degrees(qi) for qi in set_q]))
-        print('set_q backlash : '+str([qi/pi for qi in new_set_q]))
-        print('set_q backlash : '+ str( [degrees(qi) for qi in new_set_q]))
+        # print('set_q unoffset : '+str([qi for qi in set_q]))
+        # print('set_q unoffset : '+str([degrees(qi) for qi in set_q]))
+        # print('set_q backlash : '+str([qi/pi for qi in new_set_q]))
+        # print('set_q backlash : '+ str( [degrees(qi) for qi in new_set_q]))
 
         self.ser.write(q=set_q_after_offset,valve=valve)
         

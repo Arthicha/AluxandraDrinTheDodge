@@ -1,6 +1,7 @@
 
 from math import pow, sqrt
 import numpy as np
+from copy import deepcopy
 
 from module.MATLAPUTOPPU import MATLAPUTOPPU
 from module.MotionPlanningZ import point
@@ -10,7 +11,7 @@ from module.MANipulatorKinematics import MANipulator
 class prePackage:
     def __init__(self,pathPlaning =3,servoPlaning = True,runMatLab=True,extraoffset =60, offsetlenght=20,
     offsetlenght2 = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],
-    stepRotation = 5, enLightPos=[[0,500,800],[-250,500,750],[250,500,750]]):
+    stepRotation = 5, enLightPos=[[0,500,800],[-250,500,750],[250,500,750]], planingStepDistance = 10.0):
         
         self.runMatlab = runMatLab
         if self.runMatlab:
@@ -22,7 +23,7 @@ class prePackage:
         self.offsetlenght2 = offsetlenght2
         
         self.plateHeight = plateHeight
-        Y = platePositionY-int(plateHeight/2)
+        Y = platePositionY
 
         self.platePosition = [[platePositionX[0],Y,platePositionZ[0] ],[platePositionX[1],Y,platePositionZ[0] ],
                         [platePositionX[2],Y,platePositionZ[0] ],[platePositionX[3],Y,platePositionZ[0] ],
@@ -33,6 +34,7 @@ class prePackage:
         self.nextoffsetPlatePosition = [[x,y-offsetlenght2,z] for x,y,z in self.platePosition]
         self.MAN = MANipulator()
         self.stepRotation = stepRotation
+        self.planingStepDistance = planingStepDistance/10.0
 
         self.LEF_POS = enLightPos[0]
         self.MID_POS = enLightPos[1]
@@ -154,28 +156,29 @@ class prePackage:
 
                 # offset position
                 position,wall,oreintation = toDict[keyList]
-                offsetPosition = [int(val) for val in position]
-                nextoffsetPosition = [int(val) for val in position]
+                position =  [int(val) for val in position]
+                offsetPosition =  deepcopy(position)
+                nextoffsetPosition = deepcopy(position)
                 if wall == 'F':
-                    position[1] = int(offsetPosition[1])-int(self.plateHeight)
-                    offsetPosition[1] = int(offsetPosition[1])-self.offsetlenght-int(self.plateHeight)
-                    nextoffsetPosition[1] = int(nextoffsetPosition[1])-(self.offsetlenght2)-int(self.plateHeight)
+                    position[1] = int(position[1])-int(self.plateHeight)
+                    offsetPosition[1] = int(offsetPosition[1])-int(self.offsetlenght)-int(self.plateHeight)
+                    nextoffsetPosition[1] = int(nextoffsetPosition[1])-int(self.offsetlenght2)-int(self.plateHeight)
                 if wall == 'L':
-                    position[0] = int(offsetPosition[0])+int(self.plateHeight)
-                    offsetPosition[0] = int(offsetPosition[0])+self.offsetlenght+int(self.plateHeight)
-                    nextoffsetPosition[0] = int(nextoffsetPosition[0])+(self.offsetlenght2)+int(self.plateHeight)
+                    position[0] = int(position[0])+int(self.plateHeight)
+                    offsetPosition[0] = int(offsetPosition[0])+int(self.offsetlenght)+int(self.plateHeight)
+                    nextoffsetPosition[0] = int(nextoffsetPosition[0])+int(self.offsetlenght2)+int(self.plateHeight)
                 if wall == 'R':
 
-                    position[0] = int(offsetPosition[0])-int(self.plateHeight)
-                    offsetPosition[0] = int(offsetPosition[0])-self.offsetlenght-int(self.plateHeight)
-                    nextoffsetPosition[0] = int(nextoffsetPosition[0])-(self.offsetlenght2)-int(self.plateHeight)
+                    position[0] = int(position[0])-int(self.plateHeight)
+                    offsetPosition[0] = int(offsetPosition[0])-int(self.offsetlenght)-int(self.plateHeight)
+                    nextoffsetPosition[0] = int(nextoffsetPosition[0])-int(self.offsetlenght2)-int(self.plateHeight)
                 if wall == 'B':
-                    position[2] = int(offsetPosition[2])+int(self.plateHeight)
-                    offsetPosition[2] = int(offsetPosition[2])+self.offsetlenght   +int(self.plateHeight)
-                    nextoffsetPosition[2] = int(nextoffsetPosition[2])+(self.offsetlenght2)   +int(self.plateHeight)
+                    position[2] = int(position[2])+int(self.plateHeight)
+                    offsetPosition[2] = int(offsetPosition[2])+int(self.offsetlenght)   +int(self.plateHeight)
+                    nextoffsetPosition[2] = int(nextoffsetPosition[2])+int(self.offsetlenght2)   +int(self.plateHeight)
 
                 key = []
-                # offset before get pai to get pai 
+                # offset before get pai to get pai
 
                 for deltaPosition in self.sendToPoint(offsetPosition,position,'offset'):
                     key.append([deltaPosition,wall,0,oreintation] )
@@ -201,7 +204,7 @@ class prePackage:
                     key.append([deltaPosition,'F',0,self.MAN.RE_F] )
                 output.append(key)
                 tagCount +=1
-        
+  
         return output
 
     def sendToPoint(self,start,end,case=''):
@@ -209,21 +212,18 @@ class prePackage:
         offsetNewAxis = [500,300,0] 
         if self.pathPlaning == 1: # path planing wan
             
- 
             newStart = [(start[0]+offsetNewAxis[0])/10, (start[1]+offsetNewAxis[1])/10, start[2]/10 ]
             newEnd = [(offsetNewAxis[0]+end[0])/10, (offsetNewAxis[1]+end[1])/10, end[2]/10 ]    
             
-            if self.pathPlaning != 0:
-                for splitPosition in [[int(x*10-offsetNewAxis[0]),int(y*10-offsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd)]:
-                    output.append(splitPosition)
+            output.append(start)
+            for splitPosition in [[int(x*10-offsetNewAxis[0]),int(y*10-offsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd,stepDistance= self.planingStepDistance)]:
+                output.append(splitPosition)
                 # data.append(list(end))
-            else :
-                # data = [[int(y*10-offsetNewAxis[1]),int(-x*10+offsetNewAxis[0]),int(z*10)] for x,y,z in zip(newStart,newEnd) ]
-                output.append(list(start))
+            
             output.append(list(end))
 
         elif self.pathPlaning == 2: # path planing zumo
-            if self.pathPlaning != 0 and case != 'offset':
+            if case != 'offset':
                 output = self.enlightMeTheWay(start,end)
             else :
                 output = [start]+[end]
@@ -232,32 +232,25 @@ class prePackage:
 
             if case != 'offset':
                 enlight = self.enlightMeTheWay(start,end)
-                
+
                 for listEnlight in range(len(enlight)-1):
                     start = enlight[listEnlight]
                     end = enlight[listEnlight+1]
                     newStart = [(start[0]+offsetNewAxis[0])/10, (start[1]+offsetNewAxis[1])/10, start[2]/10 ]
                     newEnd = [(offsetNewAxis[0]+end[0])/10, (offsetNewAxis[1]+end[1])/10, end[2]/10 ]    
                     
-                    if self.pathPlaning != 0  :
-                        for splitPosition in [[int(x*10-offsetNewAxis[0]),int(y*10-offsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd)]:
-                            output.append(splitPosition)
-                        # data.append(list(end))
-                    else :
-                        # data = [[int(y*10-offsetNewAxis[1]),int(-x*10+offsetNewAxis[0]),int(z*10)] for x,y,z in zip(newStart,newEnd) ]
-                        output.append(list(start))
+                    output.append(start)
+                    for splitPosition in [[int(x*10-offsetNewAxis[0]),int(y*10-offsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd,stepDistance= self.planingStepDistance)]:
+                        output.append(splitPosition)
+
                     output.append(list(end))
             else :
                 newStart = [(start[0]+offsetNewAxis[0])/10, (start[1]+offsetNewAxis[1])/10, start[2]/10 ]
                 newEnd = [(offsetNewAxis[0]+end[0])/10, (offsetNewAxis[1]+end[1])/10, end[2]/10 ]    
                 
-                if self.pathPlaning != 0:
-                    for splitPosition in [[int(x*10-offsetNewAxis[0]),int(y*10-offsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd)]:
-                        output.append(splitPosition)
-                    # data.append(list(end))
-                else :
-                    # data = [[int(y*10-offsetNewAxis[1]),int(-x*10+offsetNewAxis[0]),int(z*10)] for x,y,z in zip(newStart,newEnd) ]
-                    output.append(list(start))
+                output.append(start)
+                for splitPosition in [[int(x*10-offsetNewAxis[0]),int(y*10-offsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd,stepDistance= self.planingStepDistance)]:
+                    output.append(splitPosition)
                 output.append(list(end))
         else:
             output = [start]+[end]

@@ -29,7 +29,7 @@ class MANipulator():
         self.a2 = 300.0
         self.a3 = 30.0
         self.d4 = 448.0
-        self.d6 = 112.0
+        self.d6 = 152.0
         self.DH_param = np.array([[0,self.d1,self.a1,math.pi/2],
                             [0,0,self.a2,0],
                             [math.pi/2,0,self.a3,math.pi/2], # fixed

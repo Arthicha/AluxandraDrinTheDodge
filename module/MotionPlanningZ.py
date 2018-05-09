@@ -136,7 +136,7 @@ def draw_heatmap(data):
     plt.pcolor(data, vmax=100.0, cmap=plt.cm.Blues)
 
 
-def point(start, goal,laserPosition=[50.0, 80.0]):
+def point(start, goal,laserPosition=[50.0, 80.0],stepDistance=1.0):
     print("potential_field_planning start")
 
     sx = start[0]  # start x position [cm]
@@ -145,7 +145,7 @@ def point(start, goal,laserPosition=[50.0, 80.0]):
     gx = goal[0]  # goal x position [cm]
     gy = goal[1]  # goal y position [cm]
     gz= goal[2]
-    grid_size = 1.0  # potential grid size [cm]
+    grid_size = stepDistance  # potential grid size [cm]
     robot_radius = 1.0  # robot radius [cm]
 
     ox = [laserPosition[0]]  # obstacle x position list [cm]
