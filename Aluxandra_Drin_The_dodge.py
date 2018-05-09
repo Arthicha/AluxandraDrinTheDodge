@@ -99,7 +99,7 @@ EXTRA_OFFSET_OUT = 50 # after put
 PLATE_HEIGHT = 50 
 WORKSPACE = [-500,500,-400,600,0,1000]
 STEP_ROTATION = 4
-STEP_DISTANCE = 10
+STEP_DISTANCE = 150
 
 #offset set Q
 OFFSET_Q = [230,35,160 ,135,135,135] # [230,32,147,135,135,135]
@@ -235,7 +235,7 @@ listCam = [ cam4]
 send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL, manualStep= MANUAL_STEP, 
                 pathPlaning = PATH_PLANING_MODE, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL , extraoffsetIn= EXTRA_OFFSET_IN, 
                 half_IK= HALF_IK, platePositionX= PLATE_POSITION_X, platePositionY = PLATE_POSITION_Y , servoPlaning= SERVO_PLANING, 
-                platePositionZ = PLATE_POSITION_Z, offsetLenght=  OFFSET_LENGHT_IN, plateHeight = PLATE_HEIGHT, offsetLenghtOut = OFFSET_LENGHT_OUT,
+                platePositionZ = PLATE_POSITION_Z, offsetLenghtIn=  OFFSET_LENGHT_IN, plateHeight = PLATE_HEIGHT, offsetLenghtOut = OFFSET_LENGHT_OUT,
                 workspace = WORKSPACE, offsetQ= OFFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION,
                 enLightPos=ENLIGHT_POS, offsetBacklash = OFFSET_BACKLASH ,caseBacklash = CASE_BACKLASH, gainMagnetic= GAIN_MAGNETIC,
                 qForBackLash= Q_FOR_BACKLASH, planingStepDistance= STEP_DISTANCE, extraoffsetOut= EXTRA_OFFSET_OUT)
