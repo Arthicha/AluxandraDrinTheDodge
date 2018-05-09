@@ -14,7 +14,7 @@ import math
 import os
 import random
 import sys
-from math import degrees, pi
+from math import degrees, radians, pi
 
 # 6. image processing module
 import cv2
@@ -83,43 +83,52 @@ MANUAL_STEP = False
 # main serial setting
 RUN_MATLAB = False
 CHECK_LASER = False
-PATH_PLANING_MODE = 2 # 0 -> None , 1-> wan , 2 -> zumo , 3 -> combine
-SERVO_PLANING = True
+PATH_PLANING_MODE = 3 # 0 -> None , 1-> wan , 2 -> zumo , 3 -> combine
+SERVO_PLANING = False
 HALF_IK = False
 
 # initial constant 
-INITIAL_POSITION = [[0,400,600],'F',MAN.RE_F]
+INITIAL_POSITION = [[0,400,700],'F',MAN.RE_F]
 PLATE_POSITION_X = [-300,-100,100,300]
-PLATE_POSITION_Y = 600
+PLATE_POSITION_Y = 625
 PLATE_POSITION_Z = [700,500,300]  
-OFSET_LENGHT = 60  # before to position
-OFSET_LENGHT_2 = 120 # after to position
-EXTRA_OFSET = 180 # ofset out from put pai
-PLATE_HEIGHT = 50
+OFFSET_LENGHT_IN = 180  # before to position   
+OFFSET_LENGHT_OUT = 120 # after to position
+EXTRA_OFFSET_IN = 50 # before put
+EXTRA_OFFSET_OUT = 50 # after put
+PLATE_HEIGHT = 50 
 WORKSPACE = [-500,500,-400,600,0,1000]
 STEP_ROTATION = 4
+STEP_DISTANCE = 150
 
-#ofset set Q
-OFSET_Q = [230,30,150,135,135,135] # [230,32,147,135,135,135]
+#offset set Q
+OFFSET_Q = [230,35,160 ,135,135,135] # [230,32,147,135,135,135]
 GAIN_Q = [-1,1,1,1,1,1]
-OFSET_BACKLASH = 2
-# CASE_BACKLASH = [90,]
-ENLIGHT_POS = [[10,500,800],[-250,500,750],[250,500,750]]
+GAIN_MAGNETIC = 7/9
+
+Q_FOR_BACKLASH = [lambda x: 0, lambda x: x[1],lambda x: x[1]+x[2],lambda x: 0,
+                        lambda x: 0,lambda x: 0 ]
+OFFSET_BACKLASH = [lambda x: 0, lambda x: 0,lambda x: 0,lambda x: 0,
+                        lambda x: 0,lambda x: 0 ]
+CASE_BACKLASH = [lambda x:  radians(90), lambda x: radians(90)-x, lambda x: radians(90), lambda x: radians(135), 
+                    lambda x: radians(135), lambda x: radians(135)]
+ENLIGHT_POS = [[-250,500,700],[0,400,700],[250,500,700]]
 
 # test condition
-TEST_MODE = True
+TEST_MODE = False
 MODE_POSITION = True
 MODE_FIX_DATA = False
-
 
 # test data
 if TEST_MODE:
     if MODE_POSITION:
         data = [ [[200,400,100],'B',10,MAN.RE_B], [[-400,200,800],'L',10,MAN.RE_L],[[400,200,700],'R',10,MAN.RE_R],  [[0,450,300],'B',10,MAN.RE_B]  ]
-        # data = [ [[0,450,300],'B',0,MAN.RE_B] ] 
+        # data = [ [[-200,400,700],'L',10,MAN.RE_L]]
+        # data = [ [[200,650,600],'F',0,MAN.RE_F] ] 
         # daat = [[0,],'F',0,MAN.RE_F]
+        data = [ [[400,0,100], 'B',0, MAN.RE_B ]]
     else:
-       data= [93/180*pi,90/180*pi,-100/180*pi,-90/180*pi,-90/180*pi,-90/180*pi]
+       data= [0/180*pi,0/180*pi,-0/180*pi,0/180*pi,0/180*pi,0/180*pi]
 
 
 # data = [95/180*pi,115/180*pi,-120/180*pi,135/180*pi,135/180*pi,135/180*pi]  # up rising
@@ -127,7 +136,7 @@ if TEST_MODE:
 # data = [1/2*pi,-35/180*pi,-110/180*pi,0*pi,0*pi,0*pi]                       # drin the dodge
 
 IMG_PATH = 'picture\\testpic\\BottomLeftLeftSide.jpg'
-ROTATION = 90
+ROTATION = -90
 SAVE_IMG_NAME = 'BL_Bside.jpg'
 FOUR_POINTS = np.array([[557, 202], [377, 197], [289, 595], [559, 638]])
 IMAGE_SIZE = (32,64)
@@ -199,7 +208,7 @@ np.set_printoptions(threshold=np.inf)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # control config
-ofsetQ = [205,35,150,0,0,0]
+offsetQ = [205,35,150,0,0,0]
 gainQ = [-1,1,1,1,1,1]
 
 
@@ -217,18 +226,19 @@ gainQ = [-1,1,1,1,1,1]
 #                             CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_MIDDLE_FOUR_POINTS)
 cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
                            CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT)
-cam5 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
-                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
+# cam5 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
+#                            CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
 
-listCam = [ cam4, cam5]
+listCam = [ cam4]
 
 
 send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL, manualStep= MANUAL_STEP, 
-                pathPlaning = PATH_PLANING_MODE, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL , extraOfset= EXTRA_OFSET, 
+                pathPlaning = PATH_PLANING_MODE, initial_position = INITIAL_POSITION, recieveSerial= RECIEVE_SERIAL , extraoffsetIn= EXTRA_OFFSET_IN, 
                 half_IK= HALF_IK, platePositionX= PLATE_POSITION_X, platePositionY = PLATE_POSITION_Y , servoPlaning= SERVO_PLANING, 
-                platePositionZ = PLATE_POSITION_Z, ofsetLenght = OFSET_LENGHT, plateHeight = PLATE_HEIGHT, ofsetLenght2= OFSET_LENGHT_2,
-                workspace = WORKSPACE, ofsetQ = OFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION,
-                enLightPos=ENLIGHT_POS)
+                platePositionZ = PLATE_POSITION_Z, offsetLenghtIn=  OFFSET_LENGHT_IN, plateHeight = PLATE_HEIGHT, offsetLenghtOut = OFFSET_LENGHT_OUT,
+                workspace = WORKSPACE, offsetQ= OFFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION,
+                enLightPos=ENLIGHT_POS, offsetBacklash = OFFSET_BACKLASH ,caseBacklash = CASE_BACKLASH, gainMagnetic= GAIN_MAGNETIC,
+                qForBackLash= Q_FOR_BACKLASH, planingStepDistance= STEP_DISTANCE, extraoffsetOut= EXTRA_OFFSET_OUT)
 
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
@@ -289,7 +299,7 @@ if GETT_CNN_PATH != None:
 
 '''*************************************************
 *                                                  *
-*                    KNN model                     *
+*                    KNN model  0                   *
 *                                                  *
 *************************************************'''
 
@@ -434,18 +444,19 @@ if TEST_MODE == False:
             wall = 'R'
         data.append( [selectPosition, wall, mainPredict([selectPlate],model=MODEL)[0] ,selectOreintation] )
 
-# print(data)
-# input('check input data')
+print(data)
+input('data from detection :')
+
 if len(data) > 10:
     data = data[:10]
 if MODE_POSITION or (TEST_MODE == False) :
     # data = position wall predict orentation
     send_serial.getXYZAndWrite(data)
 else :
-    send_serial.getSetQAndWrite(data,00)
+    send_serial.getSetQAndWrite(data,0)
         
 
-input("press some key and enter to exit")
+input("press some key and enter to exit : ")
 
 
 

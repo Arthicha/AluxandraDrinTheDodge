@@ -29,7 +29,7 @@ class MANipulator():
         self.a2 = 300.0
         self.a3 = 30.0
         self.d4 = 448.0
-        self.d6 = 112.0
+        self.d6 = 152.0
         self.DH_param = np.array([[0,self.d1,self.a1,math.pi/2],
                             [0,0,self.a2,0],
                             [math.pi/2,0,self.a3,math.pi/2], # fixed
@@ -38,7 +38,7 @@ class MANipulator():
                             [0,self.d6,0,0]],dtype=np.float32)
         self.jointLimit = [[-1/4*math.pi,5/4*math.pi],
                     [1/12*math.pi,math.pi],
-                    [-11/12*math.pi,0*math.pi],
+                    [-11/12*math.pi,0/12*math.pi],
                     [-3/4*math.pi,3/4*math.pi],
                     [-3/4*math.pi,3/4*math.pi],
                     [-3/4*math.pi,3/4*math.pi]]

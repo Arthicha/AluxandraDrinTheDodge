@@ -1,10 +1,12 @@
 import sys
 import time
 from math import degrees, radians, pi, sqrt, pow
+import copy
 
 import cv2
 import numpy as np
 import serial
+
 
 from module.MANipulatorKinematics import MANipulator
 from module.serialCommu import serial_commu
@@ -14,16 +16,19 @@ class sendSerial:
 
     def __init__(self,port=4,checkLaser = False, runMatlab= True, sendSerial= True, enLightPos = [[0,500,800],[-250,500,750],[250,500,750]],
                  pathPlaning = 3, initial_position = [200,200,200], recieveSerial= True ,half_IK=False, manualStep = False, 
-                 platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], extraOfset = 60,
-                 ofsetLenght = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], ofsetQ = [205,35,150,0,0,0],
-                gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,ofsetLenght2 = 40, servoPlaning = True):
+                 platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], 
+                 offsetLenghtIn = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], offsetQ = [205,35,150,0,0,0],
+                gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,offsetLenghtOut = 40, servoPlaning = True, 
+                offsetBacklash = [0,0,0,0,0,0],caseBacklash = [90,90,90,135,135,135], gainMagnetic = 7/9, qForBackLash= [], 
+                planingStepDistance = 10.0, extraoffsetIn = 60,extraoffsetOut = 60):
     
         self.platePositionX = platePositionX
         self.platePositionY = platePositionY
         self.platePositionZ = platePositionZ
-        self.ofsetLenght = ofsetLenght
-        self.ofsetLenght2 = ofsetLenght2
-        self.extraOfset = extraOfset
+        self.offsetLenghtIn = offsetLenghtIn
+        self.offsetLenghtOut = offsetLenghtOut
+        self.extraoffsetIn = extraoffsetIn
+        self.extraoffsetOut = extraoffsetOut
         self.plateHeight = plateHeight
 
         self.stepRotation = stepRotation
@@ -32,8 +37,12 @@ class sendSerial:
 
         self.workspace = workspace
 
-        self.ofsetQ = ofsetQ
+        self.offsetQ = offsetQ
         self.gainQ = gainQ
+        self.gainMagnetic = gainMagnetic
+        self.offsetBacklash = offsetBacklash
+        self.caseBacklash = caseBacklash
+        self.qForBackLash = qForBackLash
 
         self.runMatLab = runMatlab
 
@@ -41,6 +50,7 @@ class sendSerial:
 
         self.pathPlaning = pathPlaning
         self.servoPlaning = servoPlaning
+        self.planingStepDistance = planingStepDistance
 
         self.recieveSerial = recieveSerial
         self.manualStep = manualStep
@@ -53,15 +63,15 @@ class sendSerial:
 
         '''-----------------------------------------------------------------------------'''
 
-        self.ser = serial_commu(port=port, sendSerial=self.sendSerial)
+        self.ser = serial_commu(port=port, sendSerial=self.sendSerial, manualStep= self.manualStep)
         input('press reset board and press any key and enter:')
         self.MAN = MANipulator()
         # self.R_e = MAN.RE_R
-        self.package = prePackage(pathPlaning=self.pathPlaning, runMatLab=self.runMatLab, ofsetlenght=self.ofsetLenght,
+        self.package = prePackage(pathPlaning=self.pathPlaning, runMatLab=self.runMatLab, offsetlenghtIn=self.offsetLenghtIn,
                                     plateHeight=self.plateHeight ,platePositionX=self.platePositionX,
-                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ, extraOfset =self.extraOfset, 
-                                    stepRotation= self.stepRotation,ofsetlenght2=self.ofsetLenght2, servoPlaning = self.servoPlaning,
-                                    enLightPos= enLightPos)
+                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ, extraoffsetIn =self.extraoffsetIn, 
+                                    stepRotation= self.stepRotation,offsetlenghtOut=self.offsetLenghtOut, servoPlaning = self.servoPlaning,
+                                    enLightPos= enLightPos, planingStepDistance= self.planingStepDistance, extraoffsetOut =self.extraoffsetOut)
 
         self.ser.clearSerialData()
 
@@ -79,7 +89,7 @@ class sendSerial:
 
         # data = position wall valve orentation
         for position,wall,valve,orentation in data:
-            print('get position : '+str(position))
+            print('------------\nget position : '+str(position))
             x,y,z = position
             
             R_e = orentation
@@ -88,10 +98,12 @@ class sendSerial:
             dx = x-dd[0]
             dy = y-dd[1]
             dz = z-dd[2]
+
             dis = sqrt(pow(x,2)+pow(y-85,2)+pow(z-500,2) )
             try :
                 ans = self.MAN.inverse_kinamatic2(dx,dy,dz,self.MAN.DH_param,R_e)
                 ans = self.MAN.setJointLimits(ans,self.MAN.jointLimit)
+
             except :
                 sys.exit('IK calculate fail')
         
@@ -102,12 +114,6 @@ class sendSerial:
 
                 self.getSetQAndWrite(ans,valve)
 
-                # # display simulator
-                # H,Hi = self.MAN.forward_kin(self.MAN.DH_param,ans)
-                # H_a = [Hi[:,:4,3]]
-                # self.MAN.plot(H_a,matplotLibs=False,plotTarget=[x,y,z])
-            # return [ans,valve]
-
         
     def getSetQAndWrite(self,set_q,valve):
         '''param set_Q : [q1,q2,q3,q4,q5,q6]\n\t
@@ -116,29 +122,40 @@ class sendSerial:
         if self.runMatLab :
             boxHit,laserHit = self.package.boxbreak(set_q)
             if boxHit ==0:
-                # ser.write(q=[0,0,0,0,0,0], jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=0)
+                # ser.write(q=[0,0,0,0,0,0], jointLimit=MAN.jointLimit, offset=MAN.offset, valve=0)
                 sys.exit('BOX HIT!!!')
             
             if laserHit == 1 :
                 if  self.checkLaser:
-                    # ser.write(q=[0,0,0,0,0,0], jointLimit=MAN.jointLimit, ofset=MAN.ofset, valve=0)
+                    # ser.write(q=[0,0,0,0,0,0], jointLimit=MAN.jointLimit, offset=MAN.offset, valve=0)
                     sys.exit('ALERT LASER!!!')
                 else :
                     print('ALERT LASER!!!')
 
-        set_q_after_ofset = [sum(q) for q in zip( [qi[0]*qi[1] for qi in zip(set_q,self.gainQ)] ,[radians(qi) for qi in self.ofsetQ] )]
-        # print('ofset_q : '+str([degrees(qi) for qi in set_q_after_ofset]))
-        # print('ofset_q : '+str([qi/pi for qi in set_q_after_ofset]))
+        new_set_q = copy.deepcopy(set_q)
+        new_set_q = self.reMagnetic(new_set_q,gain = self.gainMagnetic)
+        new_set_q = self.offsetBackLash(new_set_q)
+
+        set_q_after_offset = [sum(q) for q in zip( [qi[0]*qi[1] for qi in zip(new_set_q,self.gainQ)] ,[radians(qi) for qi in self.offsetQ] )]
+
         H,Hi = self.MAN.forward_kin(self.MAN.DH_param,set_q)
+
         H_a = [Hi[:,:4,3]]
         x,y,z = [int(i) for i in  Hi[-1,0:3,3]]
-        print('FK position : ' +str((x,y,z)))
-        print('set_q unofset : '+str([qi/pi for qi in set_q]))
         self.MAN.plot(H_a,matplotLibs=False,plotTarget=[x,y,z])
 
-        self.ser.write(q=set_q_after_ofset,valve=valve)
-        # time.sleep(1)
-        # print(self.ser.readLine(26))
+        print('\nposition per joint : ') 
+        for index_Hi in range(Hi.shape[0]):
+            xi, yi ,zi = [ int(i) for i in Hi[index_Hi,0:3,3]]
+            print('joint '+str(index_Hi+1) + ' : ' + str((xi,yi,zi)))
+        
+        print('\nFK position : ' +str((x,y,z)))
+        # print('set_q unoffset : '+str([qi for qi in set_q]))
+        # print('set_q unoffset : '+str([degrees(qi) for qi in set_q]))
+        # print('set_q backlash : '+str([qi/pi for qi in new_set_q]))
+        # print('set_q backlash : '+ str( [degrees(qi) for qi in new_set_q]))
+
+        self.ser.write(q=set_q_after_offset,valve=valve)
         
         if self.recieveSerial:
             serRead = self.ser.read() 
@@ -147,11 +164,26 @@ class sendSerial:
                 # print(serRead)
                 time.sleep(0.1)
                 # pass
-        if self.manualStep :
-            input('press any key and enter to continue :')
+        
         return 0
 
+    def offsetBackLash(self, set_q):
+        
+        dataToFunction = [0, set_q[1], 0, 0, 0 ,0]
+        caseBacklash = [self.caseBacklash[index](dataToFunction[index]) for index in range(6) ]
+        offsetBacklash = [self.offsetBacklash[index](self.qForBackLash[0](set_q)) for index in range(6)] 
+        output = set_q
+        for indexQ in range(len(set_q)):
+            if set_q[indexQ] > radians(caseBacklash[indexQ]):
+                output[indexQ] = set_q[indexQ]-radians(offsetBacklash[indexQ]) 
+            else :
+                output[indexQ] = set_q[indexQ]+radians(offsetBacklash[indexQ])
+        return output
 
 # a = sendSerial(port=3)
 # a.getXYZAndWrite([ [[500,500,800],1,'F'] ])
 # a.getSetQAndWrite([95/180*pi,115/180*pi,0/180*pi,135/180*pi,135/180*pi,135/180*pi],0)
+
+    def reMagnetic(self, set_q,gain = 7/9):
+        set_q[0] = ((set_q[0]- radians(90))*gain ) + radians(90)
+        return set_q
