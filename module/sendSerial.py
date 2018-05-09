@@ -16,18 +16,19 @@ class sendSerial:
 
     def __init__(self,port=4,checkLaser = False, runMatlab= True, sendSerial= True, enLightPos = [[0,500,800],[-250,500,750],[250,500,750]],
                  pathPlaning = 3, initial_position = [200,200,200], recieveSerial= True ,half_IK=False, manualStep = False, 
-                 platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], extraoffset = 60,
-                 offsetLenght = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], offsetQ = [205,35,150,0,0,0],
-                gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,offsetLenght2 = 40, servoPlaning = True, 
+                 platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], 
+                 offsetLenghtIn = 20, plateHeight = 50, workspace = [-400,600,-500,500,0,1000], offsetQ = [205,35,150,0,0,0],
+                gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,offsetLenghtOut = 40, servoPlaning = True, 
                 offsetBacklash = [0,0,0,0,0,0],caseBacklash = [90,90,90,135,135,135], gainMagnetic = 7/9, qForBackLash= [], 
-                planingStepDistance = 10.0):
+                planingStepDistance = 10.0, extraoffsetIn = 60,extraoffsetOut = 60):
     
         self.platePositionX = platePositionX
         self.platePositionY = platePositionY
         self.platePositionZ = platePositionZ
-        self.offsetLenght = offsetLenght
-        self.offsetLenght2 = offsetLenght2
-        self.extraoffset = extraoffset
+        self.offsetLenghtIn = offsetLenghtIn
+        self.offsetLenghtOut = offsetLenghtOut
+        self.extraoffsetIn = extraoffsetIn
+        self.extraoffsetOut = extraoffsetOut
         self.plateHeight = plateHeight
 
         self.stepRotation = stepRotation
@@ -66,11 +67,11 @@ class sendSerial:
         input('press reset board and press any key and enter:')
         self.MAN = MANipulator()
         # self.R_e = MAN.RE_R
-        self.package = prePackage(pathPlaning=self.pathPlaning, runMatLab=self.runMatLab, offsetlenght=self.offsetLenght,
+        self.package = prePackage(pathPlaning=self.pathPlaning, runMatLab=self.runMatLab, offsetlenghtIn=self.offsetLenghtIn,
                                     plateHeight=self.plateHeight ,platePositionX=self.platePositionX,
-                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ, extraoffset =self.extraoffset, 
-                                    stepRotation= self.stepRotation,offsetlenght2=self.offsetLenght2, servoPlaning = self.servoPlaning,
-                                    enLightPos= enLightPos, planingStepDistance= self.planingStepDistance)
+                                    platePositionY =self.platePositionY, platePositionZ=self.platePositionZ, extraoffsetIn =self.extraoffsetIn, 
+                                    stepRotation= self.stepRotation,offsetlenghtOut=self.offsetLenghtOut, servoPlaning = self.servoPlaning,
+                                    enLightPos= enLightPos, planingStepDistance= self.planingStepDistance, extraoffsetOut =self.extraoffsetOut)
 
         self.ser.clearSerialData()
 

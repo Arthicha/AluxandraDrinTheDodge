@@ -9,8 +9,8 @@ from module.MANipulatorKinematics import MANipulator
 
 
 class prePackage:
-    def __init__(self,pathPlaning =3,servoPlaning = True,runMatLab=True,extraoffset =60, offsetlenght=20,
-    offsetlenght2 = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],
+    def __init__(self,pathPlaning =3,servoPlaning = True,runMatLab=True,extraoffsetIn =60,extraoffsetOut = 60, offsetlenghtIn=20,
+    offsetlenghtOut = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],
     stepRotation = 5, enLightPos=[[0,500,800],[-250,500,750],[250,500,750]], planingStepDistance = 10.0):
         
         self.runMatlab = runMatLab
@@ -19,8 +19,8 @@ class prePackage:
         self.pathPlaning = pathPlaning
         self.servoPlaning = servoPlaning
 
-        self.offsetlenght = offsetlenght
-        self.offsetlenght2 = offsetlenght2
+        self.offsetlenghtIn = offsetlenghtIn
+        self.offsetlenghtOut = offsetlenghtOut
         
         self.plateHeight = plateHeight
         Y = platePositionY
@@ -30,8 +30,8 @@ class prePackage:
                         [platePositionX[0],Y,platePositionZ[1] ],[platePositionX[1],Y,platePositionZ[1] ],
                         [platePositionX[2],Y,platePositionZ[1] ],[platePositionX[3],Y,platePositionZ[1] ],
                         [platePositionX[1],Y,platePositionZ[2] ],[platePositionX[2],Y,platePositionZ[2] ] ]
-        self.offsetPlatePosition = [[x,y-offsetlenght-extraoffset,z] for x,y,z in self.platePosition]
-        self.nextoffsetPlatePosition = [[x,y-offsetlenght2,z] for x,y,z in self.platePosition]
+        self.offsetPlatePosition = [[x,y-extraoffsetIn,z] for x,y,z in self.platePosition]
+        self.nextoffsetPlatePosition = [[x,y-extraoffsetOut,z] for x,y,z in self.platePosition]
         self.MAN = MANipulator()
         self.stepRotation = stepRotation
         self.planingStepDistance = planingStepDistance/10.0
@@ -161,21 +161,21 @@ class prePackage:
                 nextoffsetPosition = deepcopy(position)
                 if wall == 'F':
                     position[1] = int(position[1])-int(self.plateHeight)
-                    offsetPosition[1] = int(offsetPosition[1])-int(self.offsetlenght)-int(self.plateHeight)
-                    nextoffsetPosition[1] = int(nextoffsetPosition[1])-int(self.offsetlenght2)-int(self.plateHeight)
+                    offsetPosition[1] = int(offsetPosition[1])-int(self.offsetlenghtIn)-int(self.plateHeight)
+                    nextoffsetPosition[1] = int(nextoffsetPosition[1])-int(self.offsetlenghtOut)-int(self.plateHeight)
                 if wall == 'L':
                     position[0] = int(position[0])+int(self.plateHeight)
-                    offsetPosition[0] = int(offsetPosition[0])+int(self.offsetlenght)+int(self.plateHeight)
-                    nextoffsetPosition[0] = int(nextoffsetPosition[0])+int(self.offsetlenght2)+int(self.plateHeight)
+                    offsetPosition[0] = int(offsetPosition[0])+int(self.offsetlenghtIn)+int(self.plateHeight)
+                    nextoffsetPosition[0] = int(nextoffsetPosition[0])+int(self.offsetlenghtOut)+int(self.plateHeight)
                 if wall == 'R':
 
                     position[0] = int(position[0])-int(self.plateHeight)
-                    offsetPosition[0] = int(offsetPosition[0])-int(self.offsetlenght)-int(self.plateHeight)
-                    nextoffsetPosition[0] = int(nextoffsetPosition[0])-int(self.offsetlenght2)-int(self.plateHeight)
+                    offsetPosition[0] = int(offsetPosition[0])-int(self.offsetlenghtIn)-int(self.plateHeight)
+                    nextoffsetPosition[0] = int(nextoffsetPosition[0])-int(self.offsetlenghtOut)-int(self.plateHeight)
                 if wall == 'B':
                     position[2] = int(position[2])+int(self.plateHeight)
-                    offsetPosition[2] = int(offsetPosition[2])+int(self.offsetlenght)   +int(self.plateHeight)
-                    nextoffsetPosition[2] = int(nextoffsetPosition[2])+int(self.offsetlenght2)   +int(self.plateHeight)
+                    offsetPosition[2] = int(offsetPosition[2])+int(self.offsetlenghtIn)   +int(self.plateHeight)
+                    nextoffsetPosition[2] = int(nextoffsetPosition[2])+int(self.offsetlenghtOut)   +int(self.plateHeight)
 
                 key = []
                 # offset before get pai to get pai
