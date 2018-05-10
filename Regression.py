@@ -14,14 +14,14 @@ from module.UniqueCameraClass import *
 
 # Measures are in milimeters
 
-LOAD_IMAGE_NAME = 'Bm_test.png'#newR_test.png
-SAVE_IMAGE_NAME = 'Bm_test.png'
-FROM_FILE = False
+LOAD_IMAGE_NAME = 'Bl_tune.png'#newR_test.png
+SAVE_IMAGE_NAME = 'Bl_tune.png'
+FROM_FILE = True
 TEST_MODEL = True
 CLASS = True
-MODEL_FILE_NAME = 'Bm'
-CAM_ORIENT = -180
-CAM_FOUR_POINT = np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
+MODEL_FILE_NAME = 'Bl_bottom'
+CAM_ORIENT = 0
+CAM_FOUR_POINT = np.array([[113, 167], [308, 181], [356, 631], [68, 638]])
 #np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
 #np.array([[72, 1], [608, 78], [472, 567], [72, 625]])
 #np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
@@ -34,18 +34,18 @@ CAM_FOUR_POINT = np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
     #np.array([[544, 173], [553, 638], [269, 621], [348, 182]])
 # np.array([[290,230],[356,638],[96,225],[63,639]])
 '''Regression Parameter'''
-SAVED_MODEL_NAME = 'Bm'
-KERNEL_SIZE = (2, 2)
-NUMBER_OF_POINTS = (15, 14)
+SAVED_MODEL_NAME = 'Bl_bottom'
+KERNEL_SIZE = (5, 5)
+NUMBER_OF_POINTS = (15, 10)
 DIFFERENCE_DISTANCE_PER_POINT = [30, 30]
-SHIFT_X = -500+310
+SHIFT_X = 500-298
 # -190
 #527.5
 # 527.5-240 = 287.5
-SHIFT_Y = 700-455
+SHIFT_Y = 700-452.5
 #420
 # 420+210 =630
-BINARY_THRESHOLD = 100
+BINARY_THRESHOLD = 60
 # right
 # from above = 57
 # from inside = 20.75
