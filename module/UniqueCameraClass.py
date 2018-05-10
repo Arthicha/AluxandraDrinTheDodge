@@ -13,7 +13,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.externals import joblib
 
 class Camera_left(Retinutella):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0)),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.01,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0)),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.01,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0,closing_kernel_size = 5):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -53,6 +53,7 @@ class Camera_left(Retinutella):
         self.binarize_method = binarize_method
         self.Offset_homo_x = Offset_homo_x
         self.Offset_homo_y = Offset_homo_y
+        self.closing_kernel_size = closing_kernel_size
 
     def getListOfPlate(self,image_size=(30,60),platePos=False,plateOrientation = False,show=False,LOAD_IMAGE =False,FILENAME='picture\\testpic\TestBottomRightSide.jpg'):
         ''' '''
@@ -67,15 +68,17 @@ class Camera_left(Retinutella):
         '''have been edited'''
         image,capture,matrice= self.getImage(remove_pers=True,LOAD_IMAGE =LOAD_IMAGE,FILE_NAME_or_PATH=FILENAME)
         if platePos and plateOrientation:
-            plate_capture, plate_pos,plate_orientation = IP.Get_Plate2(capture,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True, before=True,orientation=True,model_x=self.model_x,model_y=self.model_y,binarization_method=self.binarize_method)
+            plate_capture, plate_pos,plate_orientation = IP.Get_Plate2(capture,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True, before=True,orientation=True,model_x=self.model_x,model_y=self.model_y,binarization_method=self.binarize_method,closing_kernel_size=self.closing_kernel_size)
         elif platePos:
             ''' have been edited'''
             plate_capture,plate_pos = IP.Get_Plate2(capture,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent,center=True,before=True,binarization_method=self.binarize_method)
             '''end of edit'''
 
         #ret, image = cv2.threshold(image, 100, 255,0)
-        plate,platePos_ = IP.Get_Plate2(image,thres_kirnel=self.thresh_kernel_original,max_area= self.maximum_area_original,min_area=self.minimum_area_original,lengPercent=self.length_percent_original,center=True,before=True,binarization_method=self.binarize_method)
+        plate,platePos_ = IP.Get_Plate2(image,thres_kirnel=self.thresh_kernel_original,max_area= self.maximum_area_original,min_area=self.minimum_area_original,lengPercent=self.length_percent_original,center=True,before=True,binarization_method=self.binarize_method,closing_kernel_size=self.closing_kernel_size)
+        # print(plate)
         plate = IP.Get_Word2(plate,image_size=image_size,boundary=self.boundary)
+        # print(plate)
         #listOfImage = IP.get_plate(image,(64, 32))
         #print('return from get plate',listOfImage)
         ''' my part '''
@@ -125,8 +128,9 @@ class Camera_left(Retinutella):
                     return np.array([[np.cos(orientation[0]), np.sin(orientation[0]), 0], [np.sin(orientation[0]), -np.cos(orientation[0]), 0],
                               [0,0,-1]])
 
+        print(platePos_)
         # platePos_ = list(map(lambda x:calculate_position(x,matrice),platePos_))
-        platePos  = list(map(lambda x:[x[0]+self.Offset_homo_x,x[1]+self.Offset_homo_y],platePos_))
+        platePos_ = list(map(lambda x:[x[0]+self.Offset_homo_x,x[1]+self.Offset_homo_y],platePos_))
         sorted_plate_pos = [x for x in platePos_]
         sorted_plate_orientation = [x for x in platePos_]
         # print(platePos_)
@@ -167,6 +171,7 @@ class Camera_left(Retinutella):
 
         plate, sorted_plate_pos, sorted_plate_orientation = IP.filter_plate(plate, sorted_plate_pos,  sorted_plate_orientation)
         '''end'''
+        print(len(plate),platePos,plateOrientation)
         if platePos and plateOrientation:
             return image, plate, sorted_plate_pos,sorted_plate_orientation
         elif platePos:
@@ -176,7 +181,7 @@ class Camera_left(Retinutella):
             return image,plate
 
 class Camera_right(Camera_left):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0)),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.01,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0)),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.01,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0,closing_kernel_size=5):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -217,10 +222,11 @@ class Camera_right(Camera_left):
         self.binarize_method = binarize_method
         self.Offset_homo_x = Offset_homo_x
         self.Offset_homo_y = Offset_homo_y
+        self.closing_kernel_size = closing_kernel_size
 
 
 class Camera_Bottom_middle(Camera_left):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0)),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.01,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0)),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.01,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0,closing_kernel_size=5):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -261,9 +267,10 @@ class Camera_Bottom_middle(Camera_left):
         self.binarize_method = binarize_method
         self.Offset_homo_x = Offset_homo_x
         self.Offset_homo_y = Offset_homo_y
+        self.closing_kernel_size = closing_kernel_size
 
 class Camera_Bottom_right(Camera_left):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points_bottom=[[0,0],[300,300],[0,300],[300,0]],four_points_side = [[0,0],[300,300],[0,300],[300,0]],thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.15,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points_bottom=[[0,0],[300,300],[0,300],[300,0]],four_points_side = [[0,0],[300,300],[0,300],[300,0]],thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.15,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0,closing_kernel_size=5):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -308,7 +315,7 @@ class Camera_Bottom_right(Camera_left):
         self.binarize_method = binarize_method
         self.Offset_homo_x = Offset_homo_x
         self.Offset_homo_y = Offset_homo_y
-
+        self.closing_kernel_size = closing_kernel_size
 
     def getImage(self, fileName=None, remove_pers=False, show=True,LOAD_IMAGE=False,FILE_NAME_or_PATH = 'picture\\testpic\TestBottomRightSide.jpg'):
 
@@ -383,9 +390,9 @@ class Camera_Bottom_right(Camera_left):
 
         if platePos and plateOrientation:
             plate_capture, plate_pos, plate_orientation = IP.Get_Plate2(capture,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True,
-                                                                        before=True, orientation=True,model_x=self.model_x_bottom,model_y=self.model_y_bottom)
-            plate_capture2, plate_pos2, plate_orientation2 = IP.Get_Plate2(capture2,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True,
-                                                                        before=True, orientation=True,model_x=self.model_x_side,model_y=self.model_y_side)
+                                                                        before=True, orientation=True,model_x=self.model_x_bottom,model_y=self.model_y_bottom,closing_kernel_size=self.closing_kernel_size)
+            plate_capture2, plate_pos2, plate_orientation2 = IP.Get_Plate2(capture2,thres_kirnel=21,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True,
+                                                                        before=True, orientation=True,model_x=self.model_x_side,model_y=self.model_y_side,closing_kernel_size=self.closing_kernel_size)
         elif platePos:
             ''' have been edited'''
             plate_capture, plate_pos = IP.Get_Plate2(capture,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True,
@@ -393,12 +400,13 @@ class Camera_Bottom_right(Camera_left):
             '''end of edit'''
 
         # ret, image = cv2.threshold(image, 100, 255,0)
-        plate, platePos_ = IP.Get_Plate2(image,thres_kirnel=self.thresh_kernel_original,max_area= self.maximum_area_original,min_area=self.minimum_area_original,lengPercent=self.length_percent_original, center=True, before=True)
+        plate, platePos_ = IP.Get_Plate2(image,thres_kirnel=self.thresh_kernel_original,max_area= self.maximum_area_original,min_area=self.minimum_area_original,lengPercent=self.length_percent_original, center=True, before=True,closing_kernel_size=self.closing_kernel_size)
+        # print(plate)
         plate = IP.Get_Word2(plate, image_size=image_size,boundary=self.boundary)
         # listOfImage = IP.get_plate(image,(64, 32))
         # print('return from get plate',listOfImage)
         ''' my part '''
-
+        # print(plate)
         if show:
             show_capture = copy.deepcopy(capture)
             show_capture = cv2.cvtColor(show_capture, cv2.COLOR_GRAY2BGR)
@@ -475,6 +483,7 @@ class Camera_Bottom_right(Camera_left):
 
         # platePos_dum = list(map(lambda x: calculate_position(x, matrice), platePos_))
         # print(platePos_dum)
+        # print(platePos_)
         platePos_dum = list(map(lambda x: [x[0] + self.Offset_homo_x, x[1] + self.Offset_homo_y], platePos_))
         sorted_plate_pos = [x for x in platePos_dum]
         sorted_plate_orientation = [x for x in platePos_dum]
@@ -508,7 +517,7 @@ class Camera_Bottom_right(Camera_left):
                         sorted_plate_orientation[x] = None
                         # print(sorted_plate_pos)
                         # print("----------------")
-
+        print(sorted_plate_pos)
         # print(sorted_plate_pos)
         # print("----------------")
         sorted_plate_pos = list(map(lambda x: regress_to_real_world( x,self.model_x_bottom,self.model_y_bottom), sorted_plate_pos))
@@ -520,41 +529,42 @@ class Camera_Bottom_right(Camera_left):
         # print(platePos_)
         ''' sorted plate pos in here'''
 
-        if platePos:
-            if platePos_dum != [] and plate_pos2 != []:
-                tree = cKDTree(platePos_dum)
-                dist, index = tree.query(plate_pos2)
-                # print("***********")
-                # # print(index)
-                # # print(platePos_)
-                # print(plate_pos2)
-                # print(plate_orientation2)
-                # print("**********")
-                if platePos and plateOrientation:
-                    for x, y, z in zip(index, plate_pos2, plate_orientation2):
-                        sorted_plate_pos2[x] = y
-                        sorted_plate_orientation2[x] = z
-
-                else:
-                    for x, y in zip(index, plate_pos2):
-                        sorted_plate_pos2[x] = y
-
-                for x in range(0, len(sorted_plate_pos2)):
-                    if x in index:
-                        pass
-                    else:
-                        sorted_plate_pos2[x] = ()
-                        sorted_plate_orientation2[x] = None
-                        # print(sorted_plate_pos)
-                        # print("----------------")
-                sorted_plate_pos2 = list(
-                    map(lambda x: regress_to_real_world(x, self.model_x_side, self.model_y_side,side=True), sorted_plate_pos2))
-                sorted_plate_orientation2 = list(map(lambda x: orientation_to_mat(self, x,side=True), sorted_plate_orientation2))
-
-                for i in range(0,len(sorted_plate_pos2)):
-                    if sorted_plate_pos[i] == ():
-                        sorted_plate_pos[i] = sorted_plate_pos2[i]
-                        sorted_plate_orientation[i] = sorted_plate_orientation2[i]
+        # if platePos:
+        #     if platePos_dum != [] and plate_pos2 != []:
+        #         tree = cKDTree(platePos_dum)
+        #         dist, index = tree.query(plate_pos2)
+        #         # print("***********")
+        #         # # print(index)
+        #         # # print(platePos_)
+        #         # print(plate_pos2)
+        #         # print(plate_orientation2)
+        #         # print("**********")
+        #         if platePos and plateOrientation:
+        #             for x, y, z in zip(index, plate_pos2, plate_orientation2):
+        #                 sorted_plate_pos2[x] = y
+        #                 sorted_plate_orientation2[x] = z
+        #
+        #         else:
+        #             for x, y in zip(index, plate_pos2):
+        #                 sorted_plate_pos2[x] = y
+        #
+        #         for x in range(0, len(sorted_plate_pos2)):
+        #             if x in index:
+        #                 pass
+        #             else:
+        #                 sorted_plate_pos2[x] = ()
+        #                 sorted_plate_orientation2[x] = None
+        #                 # print(sorted_plate_pos)
+        #                 # print("----------------")
+        #         sorted_plate_pos2 = list(
+        #             map(lambda x: regress_to_real_world(x, self.model_x_side, self.model_y_side,side=True), sorted_plate_pos2))
+        #         sorted_plate_orientation2 = list(map(lambda x: orientation_to_mat(self, x,side=True), sorted_plate_orientation2))
+        #
+        #         for i in range(0,len(sorted_plate_pos2)):
+        #             if sorted_plate_pos[i] == ():
+        #                 sorted_plate_pos[i] = sorted_plate_pos2[i]
+        #                 sorted_plate_orientation[i] = sorted_plate_orientation2[i]
+        # print(plate)
         plate, sorted_plate_pos, sorted_plate_orientation =IP.filter_plate(plate, sorted_plate_pos, sorted_plate_orientation)
         '''end'''
         # plate, sorted_plate_pos, sorted_plate_orientation = IP.find_same_point_and_average_it(plate,
@@ -570,7 +580,7 @@ class Camera_Bottom_right(Camera_left):
 
 
 class Camera_Bottom_left(Camera_Bottom_right):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points_bottom=np.array([[0,0],[300,300],[0,300],[300,0]]),four_points_side = np.array([[300,0],[600,300],[300,300],[600,0]]),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.15,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 100,Offset_homo_y=100):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points_bottom=np.array([[0,0],[300,300],[0,300],[300,0]]),four_points_side = np.array([[300,0],[600,300],[300,300],[600,0]]),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.15,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 100,Offset_homo_y=100,closing_kernel_size=5):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -613,7 +623,7 @@ class Camera_Bottom_left(Camera_Bottom_right):
         self.binarize_method = binarize_method
         self.Offset_homo_x = Offset_homo_x
         self.Offset_homo_y = Offset_homo_y
-
+        self.closing_kernel_size = closing_kernel_size
 
 
 

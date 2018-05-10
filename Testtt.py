@@ -37,47 +37,81 @@ FOUR_POINTS = np.array([[557, 202], [377, 197], [289, 595], [559, 638]])
 IMAGE_SIZE = (32,64)
 CAMERA_ALL_OFFSET_Z = 25
 
+CAM_LEFT_PORT = 1
+CAM_LEFT_MODE = 1
+CAM_LEFT_ORIENTATION = 0
+CAM_LEFT_FOUR_POINTS = np.array([[81, 0], [81, 639], [493, 530], [603, 85]])
+CAM_LEFT_MINIMUM_AREA = 0.01
+CAM_LEFT_MAXIMUM_AREA = 0.9
+CAM_LEFT_LENGTH_PERCENT = 0.01
+CAM_LEFT_THRESH_KERNEL = 21
+CAM_LEFT_MINIMUM_AREA_ORIGINAL = 0.01
+CAM_LEFT_MAXIMUM_AREA_ORIGINAL = 0.9
+CAM_LEFT_LENGTH_PERCENT_ORIGINAL = 0.01
+CAM_LEFT_THRESH_KERNEL_ORIGINAL = 21
+CAM_LEFT_BOUNDARY = 20
+CAM_LEFT_BINARIZE_METHOD = IP.SAUVOLA_THRESHOLDING
+CAM_LEFT_CLOSING_KERNEL_SIZE = 5
+CAM_LEFT_OFFSET_HOMO_X = -81#-300
+CAM_LEFT_OFFSET_HOMO_Y = 0#-100
+
+# Camera Right
 CAM_RIGHT_PORT = 2
 CAM_RIGHT_MODE = 1
 CAM_RIGHT_ORIENTATION = 0
-CAM_RIGHT_FOUR_POINTS = np.array([[93,81],[116,450],[523,560],[559,81]])
+CAM_RIGHT_FOUR_POINTS =np.array([[559, 4], [560, 639], [145, 504], [42, 77]])
+CAM_RIGHT_MINIMUM_AREA = 0.01
+CAM_RIGHT_MAXIMUM_AREA = 0.9
+CAM_RIGHT_LENGTH_PERCENT = 0.01
+CAM_RIGHT_THRESH_KERNEL = 21
+CAM_RIGHT_MINIMUM_AREA_ORIGINAL = 0.01
+CAM_RIGHT_MAXIMUM_AREA_ORIGINAL = 0.9
+CAM_RIGHT_LENGTH_PERCENT_ORIGINAL = 0.01
+CAM_RIGHT_THRESH_KERNEL_ORIGINAL = 37
+CAM_RIGHT_BOUNDARY = 20
+CAM_RIGHT_BINARIZE_METHOD = IP.SAUVOLA_THRESHOLDING
+CAM_RIGHT_CLOSING_KERNEL_SIZE = 4
+CAM_RIGHT_OFFSET_HOMO_X = -42#-300
+CAM_RIGHT_OFFSET_HOMO_Y = 0#-100
 
-
-
+# Camera Bottom Middle
 CAM_BOTTOM_MIDDLE_PORT = 3
 CAM_BOTTOM_MIDDLE_MODE = 1
 CAM_BOTTOM_MIDDLE_ORIENTATION = 0
-CAM_BOTTOM_MIDDLE_FOUR_POINTS =  np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
+CAM_BOTTOM_MIDDLE_FOUR_POINTS =  np.array([[17, 483], [178, 293], [485, 285], [637, 479]])
 CAM_BOTTOM_MIDDLE_MINIMUM_AREA = 0.01
 CAM_BOTTOM_MIDDLE_MAXIMUM_AREA = 0.9
 CAM_BOTTOM_MIDDLE_LENGTH_PERCENT = 0.03
-CAM_BOTTOM_MIDDLE_THRESH_KERNEL = 175
+CAM_BOTTOM_MIDDLE_THRESH_KERNEL = 140
 CAM_BOTTOM_MIDDLE_MINIMUM_AREA_ORIGINAL = 0.01
 CAM_BOTTOM_MIDDLE_MAXIMUM_AREA_ORIGINAL = 0.9
 CAM_BOTTOM_MIDDLE_LENGTH_PERCENT_ORIGINAL = 0.01
-CAM_BOTTOM_MIDDLE_THRESH_KERNEL_ORIGINAL = 175
+CAM_BOTTOM_MIDDLE_THRESH_KERNEL_ORIGINAL = 140
 CAM_BOTTOM_MIDDLE_BOUNDARY = 10
-CAM_BOTTOM_MIDDLE_BINARIZE_METHOD = -1
-CAM_BOTTOM_MIDDLE_OFFSET_HOMO_X = -20
-CAM_BOTTOM_MIDDLE_OFFSET_HOMO_Y = -305
+CAM_BOTTOM_MIDDLE_BINARIZE_METHOD = -2
+CAM_BOTTOM_MIDDLE_CLOSING_KERNEL_SIZE =1
+CAM_BOTTOM_MIDDLE_OFFSET_HOMO_X = -17
+CAM_BOTTOM_MIDDLE_OFFSET_HOMO_Y = -285
 
+# Camera Bottom Right
 CAM_BOTTOM_RIGHT_PORT = 4
 CAM_BOTTOM_RIGHT_MODE = 1
 CAM_BOTTOM_RIGHT_ORIENTATION = 0
-CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM = np.array([[106, 167], [301, 182], [349, 619], [68, 629]])
+CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM = np.array([[113, 167], [308, 181], [356, 631], [68, 638]])
 # np.array([[119, 173], [51, 639], [358, 638], [314, 189]])
 # np.array([[302,237],[106,230],[65,638],[358,638]])
 CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT = np.array([[275, 238], [320, 1], [542, 564], [356, 638]])
 CAM_BOTTOM_RIGHT_MINIMUM_AREA = 0.01
 CAM_BOTTOM_RIGHT_MAXIMUM_AREA = 0.9
-CAM_BOTTOM_RIGHT_LENGTH_PERCENT = 0.15
+CAM_BOTTOM_RIGHT_LENGTH_PERCENT = 0.10
 CAM_BOTTOM_RIGHT_THRESH_KERNEL = 37
 CAM_BOTTOM_RIGHT_MINIMUM_AREA_ORIGINAL = 0.01
 CAM_BOTTOM_RIGHT_MAXIMUM_AREA_ORIGINAL = 0.9
-CAM_BOTTOM_RIGHT_LENGTH_PERCENT_ORIGINAL = 0.01
+CAM_BOTTOM_RIGHT_LENGTH_PERCENT_ORIGINAL = 0.001
 CAM_BOTTOM_RIGHT_THRESH_KERNEL_ORIGINAL = 21
 CAM_BOTTOM_RIGHT_BOUNDARY = 20
 CAM_BOTTOM_RIGHT_BINARIZE_METHOD = IP.SAUVOLA_THRESHOLDING
+CAM_BOTTOM_RIGHT_CLOSING_KERNEL_SIZE = 5
 CAM_BOTTOM_RIGHT_OFFSET_HOMO_X = -68#-50
 CAM_BOTTOM_RIGHT_OFFSET_HOMO_Y = -167#-100
 
@@ -85,22 +119,24 @@ CAM_BOTTOM_RIGHT_OFFSET_HOMO_Y = -167#-100
 CAM_BOTTOM_LEFT_PORT = 5
 CAM_BOTTOM_LEFT_MODE = 1
 CAM_BOTTOM_LEFT_ORIENTATION = 0
-CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM = np.array([[353, 153], [277, 588], [556, 613], [553, 143]])
+CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM = np.array([[348, 147], [547, 138], [549, 629], [269, 599]])
 # np.array([[544, 173], [553, 638], [269, 621], [348, 182]])
 # np.array([[342,145],[267,628],[554,639],[550,143]])
 CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT = np.array([[380, 223], [335, 9], [150, 523], [305, 638]])
 CAM_BOTTOM_LEFT_MINIMUM_AREA = 0.01
 CAM_BOTTOM_LEFT_MAXIMUM_AREA = 0.9
 CAM_BOTTOM_LEFT_LENGTH_PERCENT = 0.15
-CAM_BOTTOM_LEFT_THRESH_KERNEL = 37
+CAM_BOTTOM_LEFT_THRESH_KERNEL = 21
 CAM_BOTTOM_LEFT_MINIMUM_AREA_ORIGINAL = 0.01
 CAM_BOTTOM_LEFT_MAXIMUM_AREA_ORIGINAL = 0.9
 CAM_BOTTOM_LEFT_LENGTH_PERCENT_ORIGINAL = 0.01
-CAM_BOTTOM_LEFT_THRESH_KERNEL_ORIGINAL = 47
+CAM_BOTTOM_LEFT_THRESH_KERNEL_ORIGINAL = 21
 CAM_BOTTOM_LEFT_BOUNDARY = 20
-CAM_BOTTOM_LEFT_BINARIZE_METHOD = IP.SAUVOLA_THRESHOLDING
-CAM_BOTTOM_LEFT_OFFSET_HOMO_X = -277#-300
-CAM_BOTTOM_LEFT_OFFSET_HOMO_Y = -143#-100
+CAM_BOTTOM_LEFT_CLOSING_KERNEL_SIZE = 3
+CAM_BOTTOM_LEFT_BINARIZE_METHOD = -2
+CAM_BOTTOM_LEFT_OFFSET_HOMO_X = -269#-300
+CAM_BOTTOM_LEFT_OFFSET_HOMO_Y = -138#-100
+
 
 cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
                                CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM,
@@ -108,7 +144,7 @@ cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, 
                              thresh_kernel_original=CAM_BOTTOM_RIGHT_THRESH_KERNEL_ORIGINAL,minimum_area=CAM_BOTTOM_RIGHT_MINIMUM_AREA
                              ,minimum_area_original=CAM_BOTTOM_RIGHT_MINIMUM_AREA_ORIGINAL,maximum_area=CAM_BOTTOM_RIGHT_MAXIMUM_AREA,
                              maximum_area_original=CAM_BOTTOM_RIGHT_MAXIMUM_AREA_ORIGINAL,lengthpercent=CAM_BOTTOM_RIGHT_LENGTH_PERCENT,
-                               Offset_homo_x=CAM_BOTTOM_RIGHT_OFFSET_HOMO_X,Offset_homo_y=CAM_BOTTOM_RIGHT_OFFSET_HOMO_Y)
+                               Offset_homo_x=CAM_BOTTOM_RIGHT_OFFSET_HOMO_X,Offset_homo_y=CAM_BOTTOM_RIGHT_OFFSET_HOMO_Y,closing_kernel_size=CAM_RIGHT_CLOSING_KERNEL_SIZE)
 
 def m_click(event, x, y, k, l):
     if (event == cv2.EVENT_LBUTTONUP):
@@ -125,30 +161,32 @@ def calculate_position(position, HomoMatrix):
 
 
 while 1:
-    org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
-                                                                                plateOrientation=True, show=True,
-                                                                                LOAD_IMAGE=True,
-                                                                                FILENAME='Br_test.png')
-    cv2.imshow('org',org)
-    for p in range(0,len(plate)):
-        plate[p] = Zkele(plate[p],method='3d')
-        print(sorted_plate_pos[p])
-        print(sorted_plate_orientation[p])
-        cv2.imshow('plate',plate[p])
-        cv2.waitKey(200)
+    # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
+    #                                                                             plateOrientation=True, show=True,
+    #                                                                             LOAD_IMAGE=True,
+    #                                                                             FILENAME='Br_test1.png')
+    #
+    # # print(sorted_plate_pos)
+    # cv2.imshow('org',org)
+    # for p in range(0,len(plate)):
+    #     plate[p] = Zkele(plate[p],method='3d')
+    #     print(sorted_plate_pos[p])
+    #     print(sorted_plate_orientation[p])
+    #     cv2.imshow('plate',plate[p])
+    #     cv2.waitKey(200)
 
     cam4.close()
     cv2.waitKey(0)
-    # cam4 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
-    #                        CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT,thresh_kernel=CAM_BOTTOM_LEFT_THRESH_KERNEL,
-    #                          thresh_kernel_original=CAM_BOTTOM_LEFT_THRESH_KERNEL_ORIGINAL,minimum_area=CAM_BOTTOM_LEFT_MINIMUM_AREA
-    #                          ,minimum_area_original=CAM_BOTTOM_LEFT_MINIMUM_AREA_ORIGINAL,maximum_area=CAM_BOTTOM_LEFT_MAXIMUM_AREA,
-    #                          maximum_area_original=CAM_BOTTOM_LEFT_MAXIMUM_AREA_ORIGINAL,lengthpercent=CAM_BOTTOM_LEFT_LENGTH_PERCENT,
-    #                           Offset_homo_x=CAM_BOTTOM_LEFT_OFFSET_HOMO_X,Offset_homo_y=CAM_BOTTOM_LEFT_OFFSET_HOMO_Y)
+    cam4 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
+                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT,thresh_kernel=CAM_BOTTOM_LEFT_THRESH_KERNEL,
+                             thresh_kernel_original=CAM_BOTTOM_LEFT_THRESH_KERNEL_ORIGINAL,minimum_area=CAM_BOTTOM_LEFT_MINIMUM_AREA
+                             ,minimum_area_original=CAM_BOTTOM_LEFT_MINIMUM_AREA_ORIGINAL,maximum_area=CAM_BOTTOM_LEFT_MAXIMUM_AREA,
+                             maximum_area_original=CAM_BOTTOM_LEFT_MAXIMUM_AREA_ORIGINAL,lengthpercent=CAM_BOTTOM_LEFT_LENGTH_PERCENT,
+                              Offset_homo_x=CAM_BOTTOM_LEFT_OFFSET_HOMO_X,Offset_homo_y=CAM_BOTTOM_LEFT_OFFSET_HOMO_Y,closing_kernel_size=CAM_BOTTOM_LEFT_CLOSING_KERNEL_SIZE)
     # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
     #                                                                              plateOrientation=True, show=True,
     #                                                                              LOAD_IMAGE=True,
-    #                                                                              FILENAME='Bl_test.png')
+    #                                                                              FILENAME='Bl_test1.png')
     # cv2.imshow('org', org)
     # for p in range(0, len(plate)):
     #     plate[p] = Zkele(plate[p], method='3d')
@@ -159,15 +197,28 @@ while 1:
     #
     # cam4.close()
     # cv2.waitKey(0)
-    # cam4 = Camera_right(CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAMERA_ALL_OFFSET_Z, CAM_RIGHT_FOUR_POINTS)
-    #
+
+    cam4 = Camera_right(CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAMERA_ALL_OFFSET_Z,
+                        CAM_RIGHT_FOUR_POINTS,
+                        thresh_kernel=CAM_RIGHT_THRESH_KERNEL,
+                        thresh_kernel_original=CAM_RIGHT_THRESH_KERNEL_ORIGINAL,
+                        minimum_area=CAM_RIGHT_MINIMUM_AREA
+                        , minimum_area_original=CAM_RIGHT_MINIMUM_AREA_ORIGINAL,
+                        maximum_area=CAM_RIGHT_MAXIMUM_AREA,
+                        maximum_area_original=CAM_RIGHT_MAXIMUM_AREA_ORIGINAL,
+                        lengthpercent=CAM_RIGHT_LENGTH_PERCENT,
+                        lengthpercent_original=CAM_RIGHT_LENGTH_PERCENT_ORIGINAL,
+                        word_boundary=CAM_RIGHT_BOUNDARY, binarize_method=CAM_RIGHT_BINARIZE_METHOD,closing_kernel_size=CAM_RIGHT_CLOSING_KERNEL_SIZE
+                        )
     # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
     #                                                                              plateOrientation=True, show=True,
     #                                                                              LOAD_IMAGE=True,
-    #                                                                              FILENAME='picture\\testpic\TestRightSide.jpg')
+    #                                                                              FILENAME='R_test1.png')
     #
     # cv2.waitKey(0)
     # cv2.imshow('org', org)
+    # print(len(plate))
+    #
     # for p in range(0, len(plate)):
     #     plate[p] = Zkele(plate[p], method='3d')
     #     print(sorted_plate_pos[p])
@@ -175,17 +226,43 @@ while 1:
     #     cv2.imshow('plate', plate[p])
     #     cv2.waitKey(200)
     # cv2.waitKey(0)
+    # #
+    cam4 = Camera_Bottom_middle(CAM_BOTTOM_MIDDLE_PORT, CAM_BOTTOM_MIDDLE_ORIENTATION, CAM_BOTTOM_MIDDLE_MODE,
+                            CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_MIDDLE_FOUR_POINTS,thresh_kernel=CAM_BOTTOM_MIDDLE_THRESH_KERNEL,
+                            thresh_kernel_original=CAM_BOTTOM_MIDDLE_THRESH_KERNEL_ORIGINAL,minimum_area=CAM_BOTTOM_MIDDLE_MINIMUM_AREA
+                            ,minimum_area_original=CAM_BOTTOM_MIDDLE_MINIMUM_AREA_ORIGINAL,maximum_area=CAM_BOTTOM_MIDDLE_MAXIMUM_AREA,
+                            maximum_area_original=CAM_BOTTOM_MIDDLE_MAXIMUM_AREA_ORIGINAL,lengthpercent=CAM_BOTTOM_MIDDLE_LENGTH_PERCENT,
+                            lengthpercent_original=CAM_BOTTOM_MIDDLE_LENGTH_PERCENT_ORIGINAL,word_boundary=CAM_BOTTOM_MIDDLE_BOUNDARY,binarize_method=CAM_BOTTOM_MIDDLE_BINARIZE_METHOD,
+                                closing_kernel_size=CAM_BOTTOM_MIDDLE_CLOSING_KERNEL_SIZE)
+    org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
+                                                                                 plateOrientation=True, show=True,
+                                                                                 LOAD_IMAGE=True,
+                                                                                 FILENAME='Bm_test1.png')
+    cv2.imshow('org', org)
+    print(len(plate))
+    for p in range(0, len(plate)):
+        plate[p] = Zkele(plate[p], method='3d')
+        print(sorted_plate_pos[p])
+        print(sorted_plate_orientation[p])
+        cv2.imshow('plate', plate[p])
+        cv2.waitKey(200)
 
-    # cam4 = Camera_Bottom_middle(CAM_BOTTOM_MIDDLE_PORT, CAM_BOTTOM_MIDDLE_ORIENTATION, CAM_BOTTOM_MIDDLE_MODE,
-    #                         CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_MIDDLE_FOUR_POINTS,thresh_kernel=CAM_BOTTOM_MIDDLE_THRESH_KERNEL,
-    #                         thresh_kernel_original=CAM_BOTTOM_MIDDLE_THRESH_KERNEL_ORIGINAL,minimum_area=CAM_BOTTOM_MIDDLE_MINIMUM_AREA
-    #                         ,minimum_area_original=CAM_BOTTOM_MIDDLE_MINIMUM_AREA_ORIGINAL,maximum_area=CAM_BOTTOM_MIDDLE_MAXIMUM_AREA,
-    #                         maximum_area_original=CAM_BOTTOM_MIDDLE_MAXIMUM_AREA_ORIGINAL,lengthpercent=CAM_BOTTOM_MIDDLE_LENGTH_PERCENT,
-    #                         lengthpercent_original=CAM_BOTTOM_MIDDLE_LENGTH_PERCENT_ORIGINAL,word_boundary=CAM_BOTTOM_MIDDLE_BOUNDARY,binarize_method=CAM_BOTTOM_MIDDLE_BINARIZE_METHOD)
+    cam4.close()
+    cv2.waitKey(0)
+    cam4 = Camera_left(CAM_LEFT_PORT, CAM_LEFT_ORIENTATION, CAM_LEFT_MODE, CAMERA_ALL_OFFSET_Z, CAM_LEFT_FOUR_POINTS,
+                       thresh_kernel=CAM_LEFT_THRESH_KERNEL,
+                       thresh_kernel_original=CAM_LEFT_THRESH_KERNEL_ORIGINAL,
+                       minimum_area=CAM_LEFT_MINIMUM_AREA
+                       , minimum_area_original=CAM_LEFT_MINIMUM_AREA_ORIGINAL,
+                       maximum_area=CAM_LEFT_MAXIMUM_AREA,
+                       maximum_area_original=CAM_LEFT_MAXIMUM_AREA_ORIGINAL,
+                       lengthpercent=CAM_LEFT_LENGTH_PERCENT,
+                       lengthpercent_original=CAM_LEFT_LENGTH_PERCENT_ORIGINAL,
+                       word_boundary=CAM_LEFT_BOUNDARY, binarize_method=CAM_LEFT_BINARIZE_METHOD,closing_kernel_size=CAM_LEFT_CLOSING_KERNEL_SIZE)
     # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
     #                                                                              plateOrientation=True, show=True,
     #                                                                              LOAD_IMAGE=True,
-    #                                                                              FILENAME='Bm_test_edit.png')
+    #                                                                              FILENAME='L_test.png')
     # cv2.imshow('org', org)
     # print(len(plate))
     # for p in range(0, len(plate)):
@@ -197,7 +274,6 @@ while 1:
     #
     # cam4.close()
     # cv2.waitKey(0)
-
     # cam4.close()
     cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
                                CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM,
@@ -205,7 +281,7 @@ while 1:
                              thresh_kernel_original=CAM_BOTTOM_RIGHT_THRESH_KERNEL_ORIGINAL,minimum_area=CAM_BOTTOM_RIGHT_MINIMUM_AREA
                              ,minimum_area_original=CAM_BOTTOM_RIGHT_MINIMUM_AREA_ORIGINAL,maximum_area=CAM_BOTTOM_RIGHT_MAXIMUM_AREA,
                              maximum_area_original=CAM_BOTTOM_RIGHT_MAXIMUM_AREA_ORIGINAL,lengthpercent=CAM_BOTTOM_RIGHT_LENGTH_PERCENT,
-                               Offset_homo_x=CAM_BOTTOM_RIGHT_OFFSET_HOMO_X,Offset_homo_y=CAM_BOTTOM_RIGHT_OFFSET_HOMO_Y)
+                               Offset_homo_x=CAM_BOTTOM_RIGHT_OFFSET_HOMO_X,Offset_homo_y=CAM_BOTTOM_RIGHT_OFFSET_HOMO_Y,closing_kernel_size=CAM_RIGHT_CLOSING_KERNEL_SIZE)
 
 
     # IP.filter_plate()

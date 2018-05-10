@@ -442,7 +442,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             bl[1] = model_y.predict([feature_y])[0][0]
             return -1 * np.arctan2([br[1] - bl[1]], [br[0] - bl[0]])
 
-    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False,orientation=False,model_x=None,model_y=None,binarization_method = SAUVOLA_THRESHOLDING):
+    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False,orientation=False,model_x=None,model_y=None,binarization_method = SAUVOLA_THRESHOLDING,closing_kernel_size=5):
         '''
         :param org:             image to extract plate?
         :param thres_kirnel:    dimension of kernel use to binarize 
@@ -468,6 +468,10 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         image_area = image.shape[0]*image.shape[1]
         if morph:
             image = __class__.morph(image,mode=__class__.ERODE,value=[5,5])
+        image =255-image
+        closing_kernel = np.ones((closing_kernel_size, closing_kernel_size), np.uint8)
+        image = cv2.morphologyEx(image,cv2.MORPH_CLOSE,closing_kernel)
+        image = 255-image
         plate_hierachy= []
         img, contours, hierarchy = cv2.findContours(image, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
         plate = []
@@ -479,16 +483,16 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             epsilon = lengPercent*cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,epsilon,True)
             area = cv2.contourArea(cnt)
-            # if len(approx)==4:
-            #     print('***********')
-            #     print(area)
-            #     print(hi[2])
-            #     cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
-            #     print(len(approx))
-            #     print(max_area*image_area)
-            #     print(min_area*image_area)
-            #     cv2.imshow('original', org)
-            #     cv2.waitKey(0)
+            # print('***********')
+            # # print(cnt)
+            # print(area)
+            # print(hi[2])
+            # cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
+            # print(len(approx))
+            # print(max_area*image_area)
+            # print(min_area*image_area)
+            # cv2.imshow('original', org)
+            # cv2.waitKey(0)
             if (area>min_area*image_area) and (area < image_area*max_area)and(len(approx) == 4) and(hi[2]!=-1):
                 # print('pass')
                 plate.append(approx)
@@ -512,23 +516,6 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                 platePos.append(__class__.center_of_Mass(plate[i]))
             '''End of my code'''
             plate[i],M = __class__.four_point_transform(org,plate[i],matrice=True)
-            # word,offset = __class__.Get_Word2([plate[i]],Resize=False)
-            # im,cont,hier = cv2.findContours(__class__.morph(word[0],__class__.DILATE,[15,15]), mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
-            '''my code'''
-            # if center and before:
-            #     if Full is False:
-            #         print(len(cont))
-            #         print(cont)
-            #         if len(cont) == 1:
-            #             def calculate_position(position, HomoMatrix):
-            #                 ''' for 2 dimen only'''
-            #                 new_position = (position[0], position[1], 1)
-            #                 new_position = np.matmul(HomoMatrix, np.reshape(new_position, (-1, 1)))
-            #                 new_position = np.reshape(new_position, (1, -1)).tolist()
-            #                 new_position = tuple(new_position[0][0:2])
-            #                 return new_position
-            #             print(np.array(__class__.center_of_Mass(cont[0]))+offset/2)
-            #             platePos.append(calculate_position(__class__.center_of_Mass(cont[0])+(offset/2),M))
 
         if orientation and center:
             return plate, platePos,plateOrientation
