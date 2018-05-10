@@ -10,8 +10,8 @@ from module.MANipulatorKinematics import MANipulator
 
 class prePackage:
     def __init__(self,pathPlaning =3,servoPlaning = True,runMatLab=True,extraoffsetIn =60,extraoffsetOut = 60, offsetlenghtIn=20,
-    offsetlenghtOut = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],
-    stepRotation = 5, enLightPos=[[0,500,800],[-250,500,750],[250,500,750]], planingStepDistance = 10.0):
+    offsetlenghtOutBottom = 40, offsetlenghtOutOther = 40, plateHeight=25, platePositionX=[300,100,-100,300], platePositionY =600, platePositionZ=[700,500,300],
+    stepRotation = 5, enLightPos=[[0,500,800],[-250,500,750],[250,500,750]], planingStepDistance = 10.0, stepOffsetDistance = 10.0):
         
         self.runMatlab = runMatLab
         if self.runMatlab:
@@ -20,7 +20,8 @@ class prePackage:
         self.servoPlaning = servoPlaning
 
         self.offsetlenghtIn = offsetlenghtIn
-        self.offsetlenghtOut = offsetlenghtOut
+        self.offsetlenghtOutBottom = offsetlenghtOutBottom
+        self.offsetlenghtOutOther = offsetlenghtOutOther
         
         self.plateHeight = plateHeight
         Y = platePositionY
@@ -35,6 +36,7 @@ class prePackage:
         self.MAN = MANipulator()
         self.stepRotation = stepRotation
         self.planingStepDistance = planingStepDistance/10.0
+        self.stepOffsetDistance = stepOffsetDistance
 
         self.LEF_POS = enLightPos[0]
         self.MID_POS = enLightPos[1]
@@ -162,20 +164,20 @@ class prePackage:
                 if wall == 'F':
                     position[1] = int(position[1])-int(self.plateHeight)
                     offsetPosition[1] = int(offsetPosition[1])-int(self.offsetlenghtIn)-int(self.plateHeight)
-                    nextoffsetPosition[1] = int(nextoffsetPosition[1])-int(self.offsetlenghtOut)-int(self.plateHeight)
+                    nextoffsetPosition[1] = int(nextoffsetPosition[1])-int(self.offsetlenghtOutOther)-int(self.plateHeight)
                 if wall == 'L':
                     position[0] = int(position[0])+int(self.plateHeight)
                     offsetPosition[0] = int(offsetPosition[0])+int(self.offsetlenghtIn)+int(self.plateHeight)
-                    nextoffsetPosition[0] = int(nextoffsetPosition[0])+int(self.offsetlenghtOut)+int(self.plateHeight)
+                    nextoffsetPosition[0] = int(nextoffsetPosition[0])+int(self.offsetlenghtOutOther)+int(self.plateHeight)
                 if wall == 'R':
 
                     position[0] = int(position[0])-int(self.plateHeight)
                     offsetPosition[0] = int(offsetPosition[0])-int(self.offsetlenghtIn)-int(self.plateHeight)
-                    nextoffsetPosition[0] = int(nextoffsetPosition[0])-int(self.offsetlenghtOut)-int(self.plateHeight)
+                    nextoffsetPosition[0] = int(nextoffsetPosition[0])-int(self.offsetlenghtOutOther)-int(self.plateHeight)
                 if wall == 'B':
                     position[2] = int(position[2])+int(self.plateHeight)
                     offsetPosition[2] = int(offsetPosition[2])+int(self.offsetlenghtIn)   +int(self.plateHeight)
-                    nextoffsetPosition[2] = int(nextoffsetPosition[2])+int(self.offsetlenghtOut)   +int(self.plateHeight)
+                    nextoffsetPosition[2] = int(nextoffsetPosition[2])+int(self.offsetlenghtOutBottom)   +int(self.plateHeight)
 
                 key = []
                 # offset before get pai to get pai
@@ -190,9 +192,15 @@ class prePackage:
                     key.append([deltaPosition,wall,1,oreintation] )
 
                 # offset from get pai to offset before put pai
+                notEnlight = True
                 for deltaPosition in self.sendToPoint(nextoffsetPosition,self.offsetPlatePosition[tagCount]):
-                    key.append([deltaPosition,wall,1,oreintation] )
-            
+                    if notEnlight :
+                        key.append([deltaPosition,wall,1,oreintation] )
+                    else :
+                        key.append([deltaPosition,'F',1,self.MAN.RE_F] )
+                    if deltaPosition in [self.LEF_POS,self.MID_POS,self.RIG_POS]:
+                        notEnlight = False
+
                 # offset before put pai to put pai
                 for deltaPosition in self.sendToPoint(self.offsetPlatePosition[tagCount],self.platePosition[tagCount],'offset'):
                     key.append([deltaPosition,'F',1,self.MAN.RE_F] )
@@ -205,6 +213,7 @@ class prePackage:
                 output.append(key)
                 tagCount +=1
   
+
         return output
 
     def sendToPoint(self,start,end,case=''):
@@ -223,14 +232,16 @@ class prePackage:
             output.append(list(end))
 
         elif self.pathPlaning == 2: # path planing zumo
-            if case != 'offset':
+            if case == '':
                 output = self.enlightMeTheWay(start,end)
+                print((start,end))
+                input(output)
             else :
                 output = [start]+[end]
 
         elif self.pathPlaning == 3 : # path planing zumo in wisa
 
-            if case != 'offset':
+            if case == '':
                 enlight = self.enlightMeTheWay(start,end)
 
                 for listEnlight in range(len(enlight)-1):
@@ -244,14 +255,26 @@ class prePackage:
                         output.append(splitPosition)
 
                     output.append(list(end))
+
+            elif case == 'offset':
+                
+                x = (-start[0]+ end[0])/self.stepOffsetDistance
+                y = (-start[1]+ end[1])/self.stepOffsetDistance
+                z = (-start[2]+ end[2])/self.stepOffsetDistance
+                
+            
+                output = [[start[0]+x*i,start[1]+y*i,start[2]+z*i] for i in range(self.stepOffsetDistance+1)]                
+
             else :
                 newStart = [(start[0]+offsetNewAxis[0])/10, (start[1]+offsetNewAxis[1])/10, start[2]/10 ]
                 newEnd = [(offsetNewAxis[0]+end[0])/10, (offsetNewAxis[1]+end[1])/10, end[2]/10 ]    
                 
                 output.append(start)
-                for splitPosition in [[int(x*10-offsetNewAxis[0]),int(y*10-offsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd,stepDistance= self.planingStepDistance)]:
+                for splitPosition in [[int(x*10-offsetNewAxis[0]),int(y*10-offsetNewAxis[1]),int(z*10)] for x,y,z in point(newStart,newEnd,stepDistance= self.stepOffsetDistance )]:
                     output.append(splitPosition)
                 output.append(list(end))
+
+        
         else:
             output = [start]+[end]
 

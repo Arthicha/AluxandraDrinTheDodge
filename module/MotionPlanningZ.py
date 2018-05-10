@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # Parameters
 KP = 5.0  # attractive potential gain
 ETA = 1000.0  # repulsive potential gain
-AREA_WIDTH = 101.0  # potential area width [m]
+AREA_WIDTH = 99.0  # potential area width [m]
 
 show_animation = False      #if you would like to see a graph, change this to True
 
