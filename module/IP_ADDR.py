@@ -442,7 +442,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             bl[1] = model_y.predict([feature_y])[0][0]
             return -1 * np.arctan2([br[1] - bl[1]], [br[0] - bl[0]])
 
-    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False,orientation=False,model_x=None,model_y=None):
+    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False,orientation=False,model_x=None,model_y=None,binarization_method = SAUVOLA_THRESHOLDING):
         '''
         :param org:             image to extract plate?
         :param thres_kirnel:    dimension of kernel use to binarize 
@@ -461,20 +461,36 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         platePos = []
         plateOrientation=[]
         image = copy.deepcopy(org)
-        image = __class__.binarize(image,method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
+        if binarization_method ==  __class__.SAUVOLA_THRESHOLDING:
+            image = __class__.binarize(image,method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
+        else:
+            lol,image = cv2.threshold(image, thres_kirnel, 255, cv2.THRESH_BINARY)
         image_area = image.shape[0]*image.shape[1]
         if morph:
             image = __class__.morph(image,mode=__class__.ERODE,value=[5,5])
         plate_hierachy= []
         img, contours, hierarchy = cv2.findContours(image, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
         plate = []
+        cv2.imshow('binarize',image)
+        cv2.waitKey(0)
         for i in range(0,len(contours)):
             cnt = contours[i]
             hi = hierarchy[0][i]
             epsilon = lengPercent*cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,epsilon,True)
             area = cv2.contourArea(cnt)
+            # if len(approx)==4:
+            #     print('***********')
+            #     print(area)
+            #     print(hi[2])
+            #     cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
+            #     print(len(approx))
+            #     print(max_area*image_area)
+            #     print(min_area*image_area)
+            #     cv2.imshow('original', org)
+            #     cv2.waitKey(0)
             if (area>min_area*image_area) and (area < image_area*max_area)and(len(approx) == 4) and(hi[2]!=-1):
+                # print('pass')
                 plate.append(approx)
                 plate_hierachy.append(hi)
                 cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
@@ -543,9 +559,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             bou = boundary
             word = 255-np.array(word)
             word = word[bou:wx-bou,bou:wy-bou]
-
             plate[i] = plate[i][bou:wx-bou,bou:wy-bou]
-
             #word = IP.morph(word,mode=IP.OPENING,value=[5,5])
             word = __class__.crop_image(plate[i],word,tol=black_tollerance)
 
@@ -662,10 +676,12 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
 
         # compute the perspective transform matrix and then apply it
         M = cv2.getPerspectiveTransform(rect, dst)
+
         warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
 
         # return the warped image
         if matrice:
+
             return warped,M
         return warped
 
@@ -1094,6 +1110,10 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         new_plate_img = []
         new_plate_position = []
         new_plate_orientation = []
+        # print('--------------------')
+        # print(plate_img)
+        # print(plate_position)
+        # print(plate_Orientation)
         for x, y, z in zip(plate_img, plate_position, plate_Orientation):
             if y == ():
                 pass

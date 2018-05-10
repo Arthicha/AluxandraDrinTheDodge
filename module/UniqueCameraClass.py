@@ -13,8 +13,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.externals import joblib
 
 class Camera_left(Retinutella):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0))):
-
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0)),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.01,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -38,29 +37,45 @@ class Camera_left(Retinutella):
         self.model_x = joblib.load(model_path+'X_'+self.name+'.gz')
         self.model_y = joblib.load(model_path+'Y_'+self.name+'.gz')
         self.z = offset_z
+        self.minimum_area= minimum_area
+        self.maximum_area = maximum_area
+        self.length_percent= lengthpercent
+        self.thresh_kernel= thresh_kernel
+        # self.minimum_area = minimum_area
+        # self.maximum_area = maximum_area
+        # self.length_percent = lengthpercent
+        # self.thresh_kernel = thresh_kernel
+        self.minimum_area_original = minimum_area_original
+        self.maximum_area_original = maximum_area_original
+        self.length_percent_original = lengthpercent_original
+        self.thresh_kernel_original = thresh_kernel_original
+        self.boundary = word_boundary
+        self.binarize_method = binarize_method
+        self.Offset_homo_x = Offset_homo_x
+        self.Offset_homo_y = Offset_homo_y
 
     def getListOfPlate(self,image_size=(30,60),platePos=False,plateOrientation = False,show=False,LOAD_IMAGE =False,FILENAME='picture\\testpic\TestBottomRightSide.jpg'):
         ''' '''
         '''ConFig parameter of bottom_middle left and right side'''
 
-        MINIMUM_AREA_ORIGINAL_PIC = 0.01
-        LENGPERCENT_ORIGINAL_PIC = 0.01
-        MINIMUM_AREA_OTHER_PIC = 0.01
-        LENGPERCENT_OTHER_PIC = 0.01
+        # MINIMUM_AREA_ORIGINAL_PIC = 0.01
+        # LENGPERCENT_ORIGINAL_PIC = 0.01
+        # MINIMUM_AREA_OTHER_PIC = 0.01
+        # LENGPERCENT_OTHER_PIC = 0.01
         ''' ****************************************    '''
 
         '''have been edited'''
         image,capture,matrice= self.getImage(remove_pers=True,LOAD_IMAGE =LOAD_IMAGE,FILE_NAME_or_PATH=FILENAME)
         if platePos and plateOrientation:
-            plate_capture, plate_pos,plate_orientation = IP.Get_Plate2(capture, min_area=MINIMUM_AREA_OTHER_PIC,lengPercent=LENGPERCENT_OTHER_PIC, center=True, before=True,orientation=True,model_x=self.model_x,model_y=self.model_y)
+            plate_capture, plate_pos,plate_orientation = IP.Get_Plate2(capture,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True, before=True,orientation=True,model_x=self.model_x,model_y=self.model_y,binarization_method=self.binarize_method)
         elif platePos:
             ''' have been edited'''
-            plate_capture,plate_pos = IP.Get_Plate2(capture,min_area=MINIMUM_AREA_OTHER_PIC,lengPercent=LENGPERCENT_OTHER_PIC,center=True,before=True)
+            plate_capture,plate_pos = IP.Get_Plate2(capture,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent,center=True,before=True,binarization_method=self.binarize_method)
             '''end of edit'''
 
         #ret, image = cv2.threshold(image, 100, 255,0)
-        plate,platePos_ = IP.Get_Plate2(image,min_area=MINIMUM_AREA_ORIGINAL_PIC,lengPercent=LENGPERCENT_ORIGINAL_PIC,center=True,before=True)
-        plate = IP.Get_Word2(plate,image_size=image_size)
+        plate,platePos_ = IP.Get_Plate2(image,thres_kirnel=self.thresh_kernel_original,max_area= self.maximum_area_original,min_area=self.minimum_area_original,lengPercent=self.length_percent_original,center=True,before=True,binarization_method=self.binarize_method)
+        plate = IP.Get_Word2(plate,image_size=image_size,boundary=self.boundary)
         #listOfImage = IP.get_plate(image,(64, 32))
         #print('return from get plate',listOfImage)
         ''' my part '''
@@ -79,7 +94,7 @@ class Camera_left(Retinutella):
             new_position =(position[0],position[1],1)
             new_position = np.matmul(HomoMatrix,np.reshape(new_position,(-1,1)))
             new_position=np.reshape(new_position,(1,-1)).tolist()
-            new_position=tuple(new_position[0][0:2])
+            new_position=list(new_position[0][0:2])
             return new_position
 
         def regress_to_real_world(self,points):
@@ -110,7 +125,8 @@ class Camera_left(Retinutella):
                     return np.array([[np.cos(orientation[0]), np.sin(orientation[0]), 0], [np.sin(orientation[0]), -np.cos(orientation[0]), 0],
                               [0,0,-1]])
 
-        platePos_ = list(map(lambda x:calculate_position(x,matrice),platePos_))
+        # platePos_ = list(map(lambda x:calculate_position(x,matrice),platePos_))
+        platePos  = list(map(lambda x:[x[0]+self.Offset_homo_x,x[1]+self.Offset_homo_y],platePos_))
         sorted_plate_pos = [x for x in platePos_]
         sorted_plate_orientation = [x for x in platePos_]
         # print(platePos_)
@@ -126,6 +142,7 @@ class Camera_left(Retinutella):
                 # print(plate_pos)
                 # print(plate_orientation)
                 # print("**********")
+                # print(index)
                 if platePos and plateOrientation:
                     for x,y,z in zip(index,plate_pos,plate_orientation):
                         sorted_plate_pos[x]=y
@@ -134,7 +151,6 @@ class Camera_left(Retinutella):
                 else:
                     for x,y in zip(index,plate_pos):
                         sorted_plate_pos[x]=y
-
                 for x in range(0,len(sorted_plate_pos)):
                     if x in index:
                         pass
@@ -149,8 +165,7 @@ class Camera_left(Retinutella):
         sorted_plate_pos = list(map(lambda x:regress_to_real_world(self,x) ,sorted_plate_pos))
         sorted_plate_orientation = list(map(lambda x:orientation_to_mat(self,x),sorted_plate_orientation))
 
-        plate, sorted_plate_pos, sorted_plate_orientation = IP.filter_plate(plate, sorted_plate_pos,
-                                                                            sorted_plate_orientation)
+        plate, sorted_plate_pos, sorted_plate_orientation = IP.filter_plate(plate, sorted_plate_pos,  sorted_plate_orientation)
         '''end'''
         if platePos and plateOrientation:
             return image, plate, sorted_plate_pos,sorted_plate_orientation
@@ -161,7 +176,7 @@ class Camera_left(Retinutella):
             return image,plate
 
 class Camera_right(Camera_left):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0))):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0)),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.01,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -186,10 +201,26 @@ class Camera_right(Camera_left):
         self.model_x = joblib.load(model_path+'X_'+self.name+'.gz')
         self.model_y = joblib.load(model_path+'Y_'+self.name+'.gz')
         self.z = offset_z
+        self.minimum_area = minimum_area
+        self.maximum_area = maximum_area
+        self.length_percent = lengthpercent
+        self.thresh_kernel = thresh_kernel
+        # self.minimum_area = minimum_area
+        # self.maximum_area = maximum_area
+        # self.length_percent = lengthpercent
+        # self.thresh_kernel = thresh_kernel
+        self.minimum_area_original = minimum_area_original
+        self.maximum_area_original = maximum_area_original
+        self.length_percent_original = lengthpercent_original
+        self.thresh_kernel_original = thresh_kernel_original
+        self.boundary = word_boundary
+        self.binarize_method = binarize_method
+        self.Offset_homo_x = Offset_homo_x
+        self.Offset_homo_y = Offset_homo_y
 
 
 class Camera_Bottom_middle(Camera_left):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0))):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points=((0,0),(300,300),(0,300),(300,0)),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.01,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -214,9 +245,25 @@ class Camera_Bottom_middle(Camera_left):
         self.model_x = joblib.load(model_path+'X_'+self.name+'.gz')
         self.model_y = joblib.load(model_path+'Y_'+self.name+'.gz')
         self.z = offset_z
+        self.minimum_area = minimum_area
+        self.maximum_area = maximum_area
+        self.length_percent = lengthpercent
+        self.thresh_kernel = thresh_kernel
+        # self.minimum_area = minimum_area
+        # self.maximum_area = maximum_area
+        # self.length_percent = lengthpercent
+        # self.thresh_kernel = thresh_kernel
+        self.minimum_area_original = minimum_area_original
+        self.maximum_area_original = maximum_area_original
+        self.length_percent_original = lengthpercent_original
+        self.thresh_kernel_original = thresh_kernel_original
+        self.boundary = word_boundary
+        self.binarize_method = binarize_method
+        self.Offset_homo_x = Offset_homo_x
+        self.Offset_homo_y = Offset_homo_y
 
 class Camera_Bottom_right(Camera_left):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points_bottom=[[0,0],[300,300],[0,300],[300,0]],four_points_side = [[0,0],[300,300],[0,300],[300,0]]):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points_bottom=[[0,0],[300,300],[0,300],[300,0]],four_points_side = [[0,0],[300,300],[0,300],[300,0]],thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.15,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 0,Offset_homo_y=0):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -245,6 +292,23 @@ class Camera_Bottom_right(Camera_left):
         self.model_x_bottom = joblib.load(model_path + 'X_' + self.name + '_bottom.gz')
         self.model_y_bottom = joblib.load(model_path + 'Y_' + self.name + '_bottom.gz')
         self.z = offset_z
+        self.minimum_area = minimum_area
+        self.maximum_area = maximum_area
+        self.length_percent = lengthpercent
+        self.thresh_kernel = thresh_kernel
+        # self.minimum_area = minimum_area
+        # self.maximum_area = maximum_area
+        # self.length_percent = lengthpercent
+        # self.thresh_kernel = thresh_kernel
+        self.minimum_area_original = minimum_area_original
+        self.maximum_area_original = maximum_area_original
+        self.length_percent_original = lengthpercent_original
+        self.thresh_kernel_original = thresh_kernel_original
+        self.boundary = word_boundary
+        self.binarize_method = binarize_method
+        self.Offset_homo_x = Offset_homo_x
+        self.Offset_homo_y = Offset_homo_y
+
 
     def getImage(self, fileName=None, remove_pers=False, show=True,LOAD_IMAGE=False,FILE_NAME_or_PATH = 'picture\\testpic\TestBottomRightSide.jpg'):
 
@@ -312,24 +376,25 @@ class Camera_Bottom_right(Camera_left):
         MINIMUM_AREA_ORIGINAL_PIC = 0.01
         LENGPERCENT_ORIGINAL_PIC = 0.01
         MINIMUM_AREA_OTHER_PIC = 0.01
-        LENGPERCENT_OTHER_PIC = 0.01
+        LENGPERCENT_OTHER_PIC = 0.15
         ''' ****************************************    '''
 
         image, capture, matrice , capture2 , matrice2 = self.getImage(remove_pers=True,LOAD_IMAGE=LOAD_IMAGE,FILE_NAME_or_PATH= FILENAME)
 
         if platePos and plateOrientation:
-            plate_capture, plate_pos, plate_orientation = IP.Get_Plate2(capture, min_area=0.01,lengPercent=0.15, center=True,
+            plate_capture, plate_pos, plate_orientation = IP.Get_Plate2(capture,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True,
                                                                         before=True, orientation=True,model_x=self.model_x_bottom,model_y=self.model_y_bottom)
-            plate_capture2, plate_pos2, plate_orientation2 = IP.Get_Plate2(capture2, min_area=0.01, center=True,
+            plate_capture2, plate_pos2, plate_orientation2 = IP.Get_Plate2(capture2,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True,
                                                                         before=True, orientation=True,model_x=self.model_x_side,model_y=self.model_y_side)
         elif platePos:
             ''' have been edited'''
-            plate_capture, plate_pos = IP.Get_Plate2(capture, min_area=0.01, center=True, before=True)
+            plate_capture, plate_pos = IP.Get_Plate2(capture,thres_kirnel=self.thresh_kernel,max_area= self.maximum_area,min_area=self.minimum_area,lengPercent=self.length_percent, center=True,
+                                                                        before=True, orientation=True,model_x=self.model_x_side,model_y=self.model_y_side)
             '''end of edit'''
 
         # ret, image = cv2.threshold(image, 100, 255,0)
-        plate, platePos_ = IP.Get_Plate2(image, min_area=0.01, center=True, before=True)
-        plate = IP.Get_Word2(plate, image_size=image_size)
+        plate, platePos_ = IP.Get_Plate2(image,thres_kirnel=self.thresh_kernel_original,max_area= self.maximum_area_original,min_area=self.minimum_area_original,lengPercent=self.length_percent_original, center=True, before=True)
+        plate = IP.Get_Word2(plate, image_size=image_size,boundary=self.boundary)
         # listOfImage = IP.get_plate(image,(64, 32))
         # print('return from get plate',listOfImage)
         ''' my part '''
@@ -351,7 +416,7 @@ class Camera_Bottom_right(Camera_left):
             new_position = (position[0], position[1], 1)
             new_position = np.matmul(HomoMatrix, np.reshape(new_position, (-1, 1)))
             new_position = np.reshape(new_position, (1, -1)).tolist()
-            new_position = tuple(new_position[0][0:2])
+            new_position = list(new_position[0][0:2])
             return new_position
 
         def regress_to_real_world( points,model_x,model_y,side=False):
@@ -408,7 +473,9 @@ class Camera_Bottom_right(Camera_left):
                         return np.array([[0, 0, 1], [np.cos(orientation[0]), np.sin(orientation[0]), 0],
                                   [-np.sin(orientation[0]), np.cos(orientation[0]), 0]])
 
-        platePos_dum = list(map(lambda x: calculate_position(x, matrice), platePos_))
+        # platePos_dum = list(map(lambda x: calculate_position(x, matrice), platePos_))
+        # print(platePos_dum)
+        platePos_dum = list(map(lambda x: [x[0] + self.Offset_homo_x, x[1] + self.Offset_homo_y], platePos_))
         sorted_plate_pos = [x for x in platePos_dum]
         sorted_plate_orientation = [x for x in platePos_dum]
         # print(platePos_)
@@ -419,11 +486,11 @@ class Camera_Bottom_right(Camera_left):
                 tree = cKDTree(platePos_dum)
                 dist, index = tree.query(plate_pos)
                 print("***********")
-                # print(index)
-                # print(platePos_)
-                # print(plate_pos)
-                # print(plate_orientation)
-                # print("**********")
+                print(index)
+                print(platePos_dum)
+                print(plate_pos)
+                print(plate_orientation)
+                print("**********")
                 if platePos and plateOrientation:
                     for x, y, z in zip(index, plate_pos, plate_orientation):
                         sorted_plate_pos[x] = y
@@ -503,7 +570,7 @@ class Camera_Bottom_right(Camera_left):
 
 
 class Camera_Bottom_left(Camera_Bottom_right):
-    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points_bottom=np.array([[0,0],[300,300],[0,300],[300,0]]),four_points_side = np.array([[300,0],[600,300],[300,300],[600,0]])):
+    def __init__(self,cameraPort,cameraOreintation,cameraMode=1,offset_z = 50,four_points_bottom=np.array([[0,0],[300,300],[0,300],[300,0]]),four_points_side = np.array([[300,0],[600,300],[300,300],[600,0]]),thresh_kernel = 21, minimum_area=0.01,maximum_area = 0.9,lengthpercent =0.15,thresh_kernel_original = 21, minimum_area_original=0.01,maximum_area_original = 0.9,lengthpercent_original =0.01,word_boundary=20,binarize_method=IP.SAUVOLA_THRESHOLDING,Offset_homo_x = 100,Offset_homo_y=100):
         '''
         :param name: camera name
         :param cameraPort: camera usb port
@@ -530,7 +597,22 @@ class Camera_Bottom_left(Camera_Bottom_right):
         self.model_x_bottom = joblib.load(model_path + 'X_' + self.name + '_bottom.gz')
         self.model_y_bottom = joblib.load(model_path + 'Y_' + self.name + '_bottom.gz')
         self.z = offset_z
-
+        self.minimum_area = minimum_area
+        self.maximum_area = maximum_area
+        self.length_percent = lengthpercent
+        self.thresh_kernel = thresh_kernel
+        # self.minimum_area = minimum_area
+        # self.maximum_area = maximum_area
+        # self.length_percent = lengthpercent
+        # self.thresh_kernel = thresh_kernel
+        self.minimum_area_original = minimum_area_original
+        self.maximum_area_original = maximum_area_original
+        self.length_percent_original = lengthpercent_original
+        self.thresh_kernel_original = thresh_kernel_original
+        self.boundary = word_boundary
+        self.binarize_method = binarize_method
+        self.Offset_homo_x = Offset_homo_x
+        self.Offset_homo_y = Offset_homo_y
 
 
 
