@@ -493,12 +493,40 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             # print(min_area*image_area)
             # cv2.imshow('original', org)
             # cv2.waitKey(0)
-            if (area>min_area*image_area) and (area < image_area*max_area)and(len(approx) == 4) and(hi[2]!=-1):
-                # print('pass')
-                plate.append(approx)
-                plate_hierachy.append(hi)
-                cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
+            if (area>min_area*image_area) and (area < image_area*max_area) and(hi[2]!=-1) and((len(approx) == 4)or (len(approx)==5)):
+                print('pass')
+                if len(approx)==4:
+                    plate.append(approx)
+                    plate_hierachy.append(hi)
+                    cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
+                    cv2.imshow('ca',org)
+                    cv2.waitKey(0)
+                else:
+                    new_approx = copy.deepcopy(approx)
+                    new_approx = list(map(lambda x: x[0],new_approx))
+                    # print(new_approx)
+                    tree = cKDTree(new_approx)
+                    minimum_dist = 10000
+                    for point in approx:
+                        distance,indexes=tree.query(point,k=2)
+                        if distance[0][1]<minimum_dist:
+                            index_of_pair_point = indexes
+                    point_to_append = []
+                    for index in range(0,len(approx)):
+                        if index not in index_of_pair_point:
+                            point_to_append.append(approx[index])
 
+                    point1 = approx[index_of_pair_point[0][0]]
+                    point2 = approx[index_of_pair_point[0][1]]
+                    new_point = [int((point1[0][0]+point2[0][0])/2),int((point1[0][1]+point2[0][1])/2)]
+                    point_to_append.append(new_point)
+                    point_to_append=np.array(list(map(lambda x:[x] if type(x)==list else x.tolist(),point_to_append)))
+                    plate.append(point_to_append)
+                    plate_hierachy.append(hi)
+                    cv2.drawContours(org, [point_to_append], -1, (255, 255, 255), 2)
+
+                cv2.imshow('original', org)
+                cv2.waitKey(0)
         for i in range(0,len(plate)):
             plate[i] = np.array(plate[i])
             plate[i] = np.reshape(plate[i],(4,2))
@@ -510,19 +538,17 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             # print(plate[i])
             # Full =True
             if center and before:
-                # if True in np.greater(image.shape[0]-5,plate[i][:,0]) or True in np.greater(image.shape[1]-5,plate[i][:,1]):
-                #     Full=False
-                # else:
                 platePos.append(__class__.center_of_Mass(plate[i]))
             '''End of my code'''
             plate[i],M = __class__.four_point_transform(org,plate[i],matrice=True)
 
+
         if orientation and center:
             return plate, platePos,plateOrientation
         elif orientation:
-            return plate, plateOrientation
+            return plate,None, plateOrientation
         elif center:
-            return plate, platePos
+            return plate, platePos,None
         else:
             return plate
 
@@ -543,6 +569,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             word = __class__.binarize(plate[i],method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
 
             wx,wy = word.shape
+            print(wx,wy)
             bou = boundary
             word = 255-np.array(word)
             word = word[bou:wx-bou,bou:wy-bou]

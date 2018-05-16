@@ -124,14 +124,14 @@ CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM = np.array([[348, 147], [547, 138], [549, 629
 # np.array([[342,145],[267,628],[554,639],[550,143]])
 CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT = np.array([[380, 223], [335, 9], [150, 523], [305, 638]])
 CAM_BOTTOM_LEFT_MINIMUM_AREA = 0.01
-CAM_BOTTOM_LEFT_MAXIMUM_AREA = 0.9
-CAM_BOTTOM_LEFT_LENGTH_PERCENT = 0.15
+CAM_BOTTOM_LEFT_MAXIMUM_AREA = 0.85
+CAM_BOTTOM_LEFT_LENGTH_PERCENT = 0.10
 CAM_BOTTOM_LEFT_THRESH_KERNEL = 21
 CAM_BOTTOM_LEFT_MINIMUM_AREA_ORIGINAL = 0.01
 CAM_BOTTOM_LEFT_MAXIMUM_AREA_ORIGINAL = 0.9
 CAM_BOTTOM_LEFT_LENGTH_PERCENT_ORIGINAL = 0.01
 CAM_BOTTOM_LEFT_THRESH_KERNEL_ORIGINAL = 21
-CAM_BOTTOM_LEFT_BOUNDARY = 20
+CAM_BOTTOM_LEFT_BOUNDARY = 3
 CAM_BOTTOM_LEFT_CLOSING_KERNEL_SIZE = 3
 CAM_BOTTOM_LEFT_BINARIZE_METHOD = -2
 CAM_BOTTOM_LEFT_OFFSET_HOMO_X = -269#-300
@@ -145,6 +145,7 @@ cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, 
                              ,minimum_area_original=CAM_BOTTOM_RIGHT_MINIMUM_AREA_ORIGINAL,maximum_area=CAM_BOTTOM_RIGHT_MAXIMUM_AREA,
                              maximum_area_original=CAM_BOTTOM_RIGHT_MAXIMUM_AREA_ORIGINAL,lengthpercent=CAM_BOTTOM_RIGHT_LENGTH_PERCENT,
                                Offset_homo_x=CAM_BOTTOM_RIGHT_OFFSET_HOMO_X,Offset_homo_y=CAM_BOTTOM_RIGHT_OFFSET_HOMO_Y,closing_kernel_size=CAM_RIGHT_CLOSING_KERNEL_SIZE)
+
 
 def m_click(event, x, y, k, l):
     if (event == cv2.EVENT_LBUTTONUP):
@@ -164,7 +165,7 @@ while 1:
     # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
     #                                                                             plateOrientation=True, show=True,
     #                                                                             LOAD_IMAGE=True,
-    #                                                                             FILENAME='Br_test1.png')
+    #                                                                             FILENAME='Br.jpg')
     #
     # # print(sorted_plate_pos)
     # cv2.imshow('org',org)
@@ -174,30 +175,34 @@ while 1:
     #     print(sorted_plate_orientation[p])
     #     cv2.imshow('plate',plate[p])
     #     cv2.waitKey(200)
-
-    cam4.close()
-    cv2.waitKey(0)
+    #
+    # cam4.close()
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     cam4 = Camera_Bottom_left(CAM_BOTTOM_LEFT_PORT, CAM_BOTTOM_LEFT_ORIENTATION, CAM_BOTTOM_LEFT_MODE,
                            CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT,thresh_kernel=CAM_BOTTOM_LEFT_THRESH_KERNEL,
                              thresh_kernel_original=CAM_BOTTOM_LEFT_THRESH_KERNEL_ORIGINAL,minimum_area=CAM_BOTTOM_LEFT_MINIMUM_AREA
                              ,minimum_area_original=CAM_BOTTOM_LEFT_MINIMUM_AREA_ORIGINAL,maximum_area=CAM_BOTTOM_LEFT_MAXIMUM_AREA,
                              maximum_area_original=CAM_BOTTOM_LEFT_MAXIMUM_AREA_ORIGINAL,lengthpercent=CAM_BOTTOM_LEFT_LENGTH_PERCENT,
                               Offset_homo_x=CAM_BOTTOM_LEFT_OFFSET_HOMO_X,Offset_homo_y=CAM_BOTTOM_LEFT_OFFSET_HOMO_Y,closing_kernel_size=CAM_BOTTOM_LEFT_CLOSING_KERNEL_SIZE)
-    # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
-    #                                                                              plateOrientation=True, show=True,
-    #                                                                              LOAD_IMAGE=True,
-    #                                                                              FILENAME='Bl_test1.png')
-    # cv2.imshow('org', org)
-    # for p in range(0, len(plate)):
-    #     plate[p] = Zkele(plate[p], method='3d')
-    #     print(sorted_plate_pos[p])
-    #     print(sorted_plate_orientation[p])
-    #     cv2.imshow('plate', plate[p])
-    #     cv2.waitKey(0)
-    #
-    # cam4.close()
-    # cv2.waitKey(0)
+    org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
+                                                                                 plateOrientation=True, show=True,
+                                                                                 LOAD_IMAGE=True,
+                                                                                 FILENAME='Bl.jpg')
+    cv2.imshow('org', org)
+    print('len of plate')
+    print(len(plate))
+    for p in range(0, len(plate)):
+        plate[p] = Zkele(plate[p], method='3d')
+        print(sorted_plate_pos[p])
+        print(sorted_plate_orientation[p])
+        print('this should be array')
+        cv2.imshow('plate', plate[p])
+        cv2.waitKey(0)
 
+    cam4.close()
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     cam4 = Camera_right(CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAMERA_ALL_OFFSET_Z,
                         CAM_RIGHT_FOUR_POINTS,
                         thresh_kernel=CAM_RIGHT_THRESH_KERNEL,
@@ -210,22 +215,23 @@ while 1:
                         lengthpercent_original=CAM_RIGHT_LENGTH_PERCENT_ORIGINAL,
                         word_boundary=CAM_RIGHT_BOUNDARY, binarize_method=CAM_RIGHT_BINARIZE_METHOD,closing_kernel_size=CAM_RIGHT_CLOSING_KERNEL_SIZE
                         )
-    # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
-    #                                                                              plateOrientation=True, show=True,
-    #                                                                              LOAD_IMAGE=True,
-    #                                                                              FILENAME='R_test1.png')
-    #
-    # cv2.waitKey(0)
-    # cv2.imshow('org', org)
+    org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
+                                                                                 plateOrientation=True, show=True,
+                                                                                 LOAD_IMAGE=True,
+                                                                                 FILENAME='R.jpg')
+
+    cv2.waitKey(0)
+    cv2.imshow('org', org)
     # print(len(plate))
-    #
-    # for p in range(0, len(plate)):
-    #     plate[p] = Zkele(plate[p], method='3d')
-    #     print(sorted_plate_pos[p])
-    #     print(sorted_plate_orientation[p])
-    #     cv2.imshow('plate', plate[p])
-    #     cv2.waitKey(200)
-    # cv2.waitKey(0)
+
+    for p in range(0, len(plate)):
+        plate[p] = Zkele(plate[p], method='3d')
+        print(sorted_plate_pos[p])
+        print(sorted_plate_orientation[p])
+        cv2.imshow('plate', plate[p])
+        cv2.waitKey(200)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     # #
     cam4 = Camera_Bottom_middle(CAM_BOTTOM_MIDDLE_PORT, CAM_BOTTOM_MIDDLE_ORIENTATION, CAM_BOTTOM_MIDDLE_MODE,
                             CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_MIDDLE_FOUR_POINTS,thresh_kernel=CAM_BOTTOM_MIDDLE_THRESH_KERNEL,
@@ -237,7 +243,7 @@ while 1:
     org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
                                                                                  plateOrientation=True, show=True,
                                                                                  LOAD_IMAGE=True,
-                                                                                 FILENAME='Bm_test1.png')
+                                                                                 FILENAME='Bm.jpg')
     cv2.imshow('org', org)
     print(len(plate))
     for p in range(0, len(plate)):
@@ -249,6 +255,7 @@ while 1:
 
     cam4.close()
     cv2.waitKey(0)
+    cv2.destroyAllWindows()
     cam4 = Camera_left(CAM_LEFT_PORT, CAM_LEFT_ORIENTATION, CAM_LEFT_MODE, CAMERA_ALL_OFFSET_Z, CAM_LEFT_FOUR_POINTS,
                        thresh_kernel=CAM_LEFT_THRESH_KERNEL,
                        thresh_kernel_original=CAM_LEFT_THRESH_KERNEL_ORIGINAL,
@@ -259,22 +266,23 @@ while 1:
                        lengthpercent=CAM_LEFT_LENGTH_PERCENT,
                        lengthpercent_original=CAM_LEFT_LENGTH_PERCENT_ORIGINAL,
                        word_boundary=CAM_LEFT_BOUNDARY, binarize_method=CAM_LEFT_BINARIZE_METHOD,closing_kernel_size=CAM_LEFT_CLOSING_KERNEL_SIZE)
-    # org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
-    #                                                                              plateOrientation=True, show=True,
-    #                                                                              LOAD_IMAGE=True,
-    #                                                                              FILENAME='L_test.png')
-    # cv2.imshow('org', org)
-    # print(len(plate))
-    # for p in range(0, len(plate)):
-    #     plate[p] = Zkele(plate[p], method='3d')
-    #     print(sorted_plate_pos[p])
-    #     print(sorted_plate_orientation[p])
-    #     cv2.imshow('plate', plate[p])
-    #     cv2.waitKey(200)
-    #
-    # cam4.close()
-    # cv2.waitKey(0)
-    # cam4.close()
+    org, plate, sorted_plate_pos, sorted_plate_orientation = cam4.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
+                                                                                 plateOrientation=True, show=True,
+                                                                                 LOAD_IMAGE=True,
+                                                                                 FILENAME='L.jpg')
+    cv2.imshow('org', org)
+    print(len(plate))
+    for p in range(0, len(plate)):
+        plate[p] = Zkele(plate[p], method='3d')
+        print(sorted_plate_pos[p])
+        print(sorted_plate_orientation[p])
+        cv2.imshow('plate', plate[p])
+        cv2.waitKey(200)
+
+    cam4.close()
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    cam4.close()
     cam4 = Camera_Bottom_right(CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION, CAM_BOTTOM_RIGHT_MODE,
                                CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_RIGHT_FOUR_POINTS_BOTTOM,
                                CAM_BOTTOM_RIGHT_FOUR_POINTS_RIGHT,thresh_kernel=CAM_BOTTOM_RIGHT_THRESH_KERNEL,

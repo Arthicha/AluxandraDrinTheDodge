@@ -41,10 +41,7 @@ class Camera_left(Retinutella):
         self.maximum_area = maximum_area
         self.length_percent= lengthpercent
         self.thresh_kernel= thresh_kernel
-        # self.minimum_area = minimum_area
-        # self.maximum_area = maximum_area
-        # self.length_percent = lengthpercent
-        # self.thresh_kernel = thresh_kernel
+
         self.minimum_area_original = minimum_area_original
         self.maximum_area_original = maximum_area_original
         self.length_percent_original = lengthpercent_original
@@ -401,8 +398,10 @@ class Camera_Bottom_right(Camera_left):
 
         # ret, image = cv2.threshold(image, 100, 255,0)
         plate, platePos_ = IP.Get_Plate2(image,thres_kirnel=self.thresh_kernel_original,max_area= self.maximum_area_original,min_area=self.minimum_area_original,lengPercent=self.length_percent_original, center=True, before=True,closing_kernel_size=self.closing_kernel_size)
-        # print(plate)
         plate = IP.Get_Word2(plate, image_size=image_size,boundary=self.boundary)
+        print('............')
+        print(len(plate))
+        print('............')
         # listOfImage = IP.get_plate(image,(64, 32))
         # print('return from get plate',listOfImage)
         ''' my part '''
@@ -519,7 +518,8 @@ class Camera_Bottom_right(Camera_left):
                         # print("----------------")
         print(sorted_plate_pos)
         # print(sorted_plate_pos)
-        # print("----------------")
+        print("----------------")
+        print(len(plate))
         sorted_plate_pos = list(map(lambda x: regress_to_real_world( x,self.model_x_bottom,self.model_y_bottom), sorted_plate_pos))
         sorted_plate_orientation = list(map(lambda x: orientation_to_mat(self, x), sorted_plate_orientation))
 

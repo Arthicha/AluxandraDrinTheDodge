@@ -14,13 +14,13 @@ from module.UniqueCameraClass import *
 
 # Measures are in milimeters
 
-LOAD_IMAGE_NAME = 'Bl_tune.png'#newR_test.png
-SAVE_IMAGE_NAME = 'Bl_tune.png'
-FROM_FILE = True
+LOAD_IMAGE_NAME = 'Bm_test1.png'#newR_test.png
+SAVE_IMAGE_NAME = 'Bm_test1.png'
+FROM_FILE = False
 TEST_MODEL = True
 CLASS = True
 MODEL_FILE_NAME = 'Bl_bottom'
-CAM_ORIENT = 0
+CAM_ORIENT = -180
 CAM_FOUR_POINT = np.array([[113, 167], [308, 181], [356, 631], [68, 638]])
 #np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
 #np.array([[72, 1], [608, 78], [472, 567], [72, 625]])
