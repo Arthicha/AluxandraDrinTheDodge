@@ -264,7 +264,8 @@ class MANipulator():
                     q4 += math.pi
                 q5 = -q5
 
-            Rx = R[:, 0]
+            Rx = R[:, 1]*-1
+            # q6 = 0
             q6 = atan((sin(q4)*Rx[0]-cos(q4)*Rx[1])*sin(q5)/Rx[2])
             q.append([q1,q2,q3,q4,q5,q6])
 
