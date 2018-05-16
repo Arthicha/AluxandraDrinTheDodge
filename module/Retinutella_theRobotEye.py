@@ -54,7 +54,7 @@ class Retinutella():
         '''
         current_path = os.getcwd()
         model_path = current_path.split(os.sep)
-        model_path = model_path[:-1]
+        model_path = model_path[:]
         model_path = os.sep.join(model_path)
         model_path = model_path + os.sep + 'savedModel' + os.sep + 'modelcamera' + os.sep
         self.name = name
