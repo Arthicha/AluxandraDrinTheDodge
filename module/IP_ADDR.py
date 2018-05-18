@@ -9,6 +9,7 @@ from module.Foundation import Binarization, Filter
 import copy
 from scipy.spatial import cKDTree
 
+
 class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
     # def __init__(self):
     # GLOBAL
@@ -137,7 +138,6 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             sys.exit("Unknown method\n")
         return img
 
-
     def resize(image, shape=SHAPE, method=INTER_LINEAR):
         '''
         :param image: image to be resize
@@ -162,7 +162,6 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         '''
         img = cv2.resize(image, shape, interpolation=method)
         return img
-
 
     def capture(cam, size=SHAPE, mode=GRAY_SCALE, config=None):
         '''
@@ -205,14 +204,14 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         '''
         matrix = np.float32([[1, 0, value[0]], [0, 1, value[1]]])
         if config is None:
-            img = cv2.warpAffine(image, dst=None, M=matrix, dsize=(image.shape[1],image.shape[0]))
+            img = cv2.warpAffine(image, dst=None, M=matrix, dsize=(image.shape[1], image.shape[0]))
         elif config[1] == __class__.BORDER_CONSTANT:
-            img = cv2.warpAffine(image, dst=None, M=matrix, dsize=(image.shape[1],image.shape[0]), flags=config[0],
+            img = cv2.warpAffine(image, dst=None, M=matrix, dsize=(image.shape[1], image.shape[0]), flags=config[0],
                                  borderMode=config[1], borderValue=config[2])
         else:
-            img = cv2.warpAffine(image, dst=None, M=matrix, dsize=(image.shape[1],image.shape[0]), flags=config[0],
+            img = cv2.warpAffine(image, dst=None, M=matrix, dsize=(image.shape[1], image.shape[0]), flags=config[0],
                                  borderMode=config[1])
-        return img#
+        return img  #
 
     def blur(image, method=AVERAGING, value=5):
         '''
@@ -296,12 +295,11 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                 cv2.waitKey(0)
         '''
         matrix = cv2.getRotationMatrix2D((center_of_rotation[0], center_of_rotation[1]), angle, 1)
-        img = cv2.warpAffine(image, matrix, (image.shape[1],image.shape[0]), borderMode=__class__.BORDER_CONSTANT,
+        img = cv2.warpAffine(image, matrix, (image.shape[1], image.shape[0]), borderMode=__class__.BORDER_CONSTANT,
                              borderValue=255)
         return img
 
-
-    def font_to_image(font, size=32, index=0, string="0", output_shape = [320,320],border_thickness=2):
+    def font_to_image(font, size=32, index=0, string="0", output_shape=[320, 320], border_thickness=2):
         '''
         :param font:    font only trutype 
                         string of font file / path to font
@@ -321,12 +319,12 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         '''
         Text_Font = ImageFont.truetype(font, size, index, encoding="unic")
         w, h = Text_Font.getsize(string)
-        img = Image.new("L",output_shape , color=255)
+        img = Image.new("L", output_shape, color=255)
         image = ImageDraw.Draw(img)
-        image.text(((output_shape [0] - w) / 2, (output_shape [1] - h) / 2), string, font=Text_Font,
+        image.text(((output_shape[0] - w) / 2, (output_shape[1] - h) / 2), string, font=Text_Font,
                    fill="black")
         img = np.array(img)
-        cv2.rectangle(img, (60, 60), (output_shape [0] - 60,output_shape [1] - 60), 0, thickness=border_thickness)
+        cv2.rectangle(img, (60, 60), (output_shape[0] - 60, output_shape[1] - 60), 0, thickness=border_thickness)
         return img
 
     def distorse(img, function=None, axis='x', alpha=1.0, beta=1.0):
@@ -382,8 +380,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                     img[i, :] = np.roll(img[i, :], int(dist_func(i)))
         return img
 
-
-    def crop_image(img,msk,tol=0):
+    def crop_image(img, msk, tol=0):
         '''
         :param img: image to be crop
         :param msk: mask use for crop
@@ -392,27 +389,28 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         '''
         # img is image data
         # tol  is tolerance
-        mask = msk>tol
-        return img[np.ix_(mask.any(1),mask.any(0))]
+        mask = msk > tol
+        return img[np.ix_(mask.any(1), mask.any(0))]
 
     def center_of_Mass(cnt):
-        M=cv2.moments(cnt)
+        M = cv2.moments(cnt)
         cx = int(M['m10'] / M['m00'])
         cy = int(M['m01'] / M['m00'])
-        return (cx,cy)
+        return (cx, cy)
 
     def line_intersection(line1, line2):
         # print('*************')
         # print(line1, line2)
         xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
         ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])  # Typo was here
+
         def det(a, b):
             return a[0] * b[1] - a[1] * b[0]
 
         div = det(xdiff, ydiff)
         if div == 0:
-            xdiff[1]= -1*xdiff[1]
-            div=det(xdiff,ydiff)
+            xdiff[1] = -1 * xdiff[1]
+            div = det(xdiff, ydiff)
             # raise Exception('lines do not intersect')
 
         d = (det(*line1), det(*line2))
@@ -423,31 +421,33 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
     def find_center(pts):
         point = __class__.order_points(pts)
         (tl, tr, br, bl) = point
-        point = __class__.line_intersection((tl,br),(bl,tr))
+        point = __class__.line_intersection((tl, br), (bl, tr))
         return point
 
-    def find_orient(pts,model_x=None,model_y = None):
+    def find_orient(pts, model_x=None, model_y=None):
         point = __class__.order_points(pts)
         if True:
             (tl, tr, br, bl) = point
-            print(-1*np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])]))
-            return -1*np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])])
+            print(-1 * np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])]))
+            return -1 * np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])])
         else:
             (tl, tr, br, bl) = point
-            feature_x,feature_y = __class__.get_XY_feature(br)
+            feature_x, feature_y = __class__.get_XY_feature(br)
             br = [0, 0]
-            br[0]=model_x.predict([feature_x])[0]
-            br[1]=model_y.predict([feature_y])[0][0]
+            br[0] = model_x.predict([feature_x])[0]
+            br[1] = model_y.predict([feature_y])[0][0]
             br = (0, 0)
             bl[0] = model_x.predict([feature_x])[0]
             bl[1] = model_y.predict([feature_y])[0][0]
             print("-------")
-            print(np.arctan([(br[1] - bl[1])/(br[0] - bl[0])]))
+            print(np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])]))
             print(np.arctan2([br[1] - bl[1]], [br[0] - bl[0]]))
             print("---------")
             return -1 * np.arctan2([br[1] - bl[1]], [br[0] - bl[0]])
 
-    def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False,orientation=False,model_x=None,model_y=None,binarization_method = SAUVOLA_THRESHOLDING,closing_kernel_size=5):
+    def Get_Plate2(org, thres_kirnel=21, min_area=0.01, max_area=0.9, lengPercent=0.01, morph=False, center=False,
+                   before=False, orientation=False, model_x=None, model_y=None,
+                   binarization_method=SAUVOLA_THRESHOLDING, closing_kernel_size=5):
         '''
         :param org:             image to extract plate?
         :param thres_kirnel:    dimension of kernel use to binarize 
@@ -464,30 +464,28 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                     you will get a list of plate image in the image
         '''
         platePos = []
-        plateOrientation=[]
+        plateOrientation = []
         image = copy.deepcopy(org)
         image2 = copy.deepcopy(org)
-        if binarization_method ==  __class__.SAUVOLA_THRESHOLDING:
-            image = __class__.binarize(image,method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
+        if binarization_method == __class__.SAUVOLA_THRESHOLDING:
+            image = __class__.binarize(image, method=__class__.SAUVOLA_THRESHOLDING, value=thres_kirnel)
         else:
-            lol,image = cv2.threshold(image, thres_kirnel, 255, cv2.THRESH_BINARY)
-        image_area = image.shape[0]*image.shape[1]
+            lol, image = cv2.threshold(image, thres_kirnel, 255, cv2.THRESH_BINARY)
+        image_area = image.shape[0] * image.shape[1]
         if morph:
-            image = __class__.morph(image,mode=__class__.ERODE,value=[5,5])
-        image =255-image
+            image = __class__.morph(image, mode=__class__.ERODE, value=[5, 5])
+        image = 255 - image
         closing_kernel = np.ones((closing_kernel_size, closing_kernel_size), np.uint8)
-        image = cv2.morphologyEx(image,cv2.MORPH_CLOSE,closing_kernel)
-        image = 255-image
-        plate_hierachy= []
+        image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, closing_kernel)
+        image = 255 - image
+        plate_hierachy = []
         img, contours, hierarchy = cv2.findContours(image, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
         plate = []
-        cv2.imshow('binarize',image)
-        cv2.waitKey(0)
-        for i in range(0,len(contours)):
+        for i in range(0, len(contours)):
             cnt = contours[i]
             hi = hierarchy[0][i]
-            epsilon = lengPercent*cv2.arcLength(cnt,True)
-            approx = cv2.approxPolyDP(cnt,epsilon,True)
+            epsilon = lengPercent * cv2.arcLength(cnt, True)
+            approx = cv2.approxPolyDP(cnt, epsilon, True)
             area = cv2.contourArea(cnt)
             # print('***********')
             # # print(cnt)
@@ -499,42 +497,44 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             # print(min_area*image_area)
             # cv2.imshow('original', org)
             # cv2.waitKey(0)
-            if (area>min_area*image_area) and (area < image_area*max_area) and(hi[2]!=-1) and((len(approx) == 4)or (len(approx)==5)):
+            if (area > min_area * image_area) and (area < image_area * max_area) and (hi[2] != -1) and (
+                (len(approx) == 4) or (len(approx) == 5)):
                 print('pass')
-                if len(approx)==4:
+                if len(approx) == 4:
                     plate.append(approx)
                     plate_hierachy.append(hi)
                     cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
                 else:
                     new_approx = copy.deepcopy(approx)
-                    new_approx = list(map(lambda x: x[0],new_approx))
+                    new_approx = list(map(lambda x: x[0], new_approx))
                     # print(new_approx)
                     tree = cKDTree(new_approx)
                     minimum_dist = 10000
                     for point in approx:
-                        distance,indexes=tree.query(point,k=2)
-                        if distance[0][1]<minimum_dist:
+                        distance, indexes = tree.query(point, k=2)
+                        if distance[0][1] < minimum_dist:
                             index_of_pair_point = indexes
                     point_to_append = []
-                    for index in range(0,len(approx)):
+                    for index in range(0, len(approx)):
                         if index not in index_of_pair_point:
                             point_to_append.append(approx[index])
 
                     point1 = approx[index_of_pair_point[0][0]]
                     point2 = approx[index_of_pair_point[0][1]]
-                    new_point = [int((point1[0][0]+point2[0][0])/2),int((point1[0][1]+point2[0][1])/2)]
+                    new_point = [int((point1[0][0] + point2[0][0]) / 2), int((point1[0][1] + point2[0][1]) / 2)]
                     point_to_append.append(new_point)
-                    point_to_append=np.array(list(map(lambda x:[x] if type(x)==list else x.tolist(),point_to_append)))
+                    point_to_append = np.array(
+                        list(map(lambda x: [x] if type(x) == list else x.tolist(), point_to_append)))
                     plate.append(point_to_append)
                     plate_hierachy.append(hi)
                     cv2.drawContours(org, [point_to_append], -1, (255, 255, 255), 2)
 
-        for i in range(0,len(plate)):
+        for i in range(0, len(plate)):
             plate[i] = np.array(plate[i])
-            plate[i] = np.reshape(plate[i],(4,2))
+            plate[i] = np.reshape(plate[i], (4, 2))
             '''My code '''
             if orientation:
-                plateOrientation.append(__class__.find_orient(plate[i],model_x,model_y))
+                plateOrientation.append(__class__.find_orient(plate[i], model_x, model_y))
 
             # print('**********************')
             # print(image.shape)
@@ -546,24 +546,23 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             rect = __class__.order_points(plate[i])
             (tl, tr, br, bl) = rect
             # print(br,bl)
-            cv2.circle(image2,tuple(br),5,[255,0,0],3)
-            cv2.line(image2,tuple(br),tuple(bl),[0,0,255],4)
-            cv2.imshow("vector_I_sas",image2)
+            cv2.circle(image2, tuple(br), 5, [255, 0, 0], 3)
+            cv2.line(image2, tuple(br), tuple(bl), [0, 0, 255], 4)
+            cv2.imshow("vector_I_sas", image2)
             cv2.waitKey(10)
             '''End of my code'''
-            plate[i],M = __class__.four_point_transform(org,plate[i],matrice=True)
-
+            plate[i], M = __class__.four_point_transform(org, plate[i], matrice=True)
 
         if orientation and center:
-            return plate, platePos,plateOrientation
+            return plate, platePos, plateOrientation
         elif orientation:
-            return plate,None, plateOrientation
+            return plate, None, plateOrientation
         elif center:
-            return plate, platePos,None
+            return plate, platePos, None
         else:
             return plate
 
-    def Get_Word2(plate,thres_kirnel=21,boundary=20,black_tollerance=10,image_size=(60,30),Resize= True):
+    def Get_Word2(plate, thres_kirnel=21, boundary=20, black_tollerance=10, image_size=(60, 30), Resize=True):
         '''
         :param plate:              list of image of plate  
         :param thres_kirnel:        dimension of kernel use to binarize 
@@ -576,26 +575,26 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         :return: list of word image
         '''
         listOfWord = []
-        for i in range(0,len(plate)):
-            word = __class__.binarize(plate[i],method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
+        for i in range(0, len(plate)):
+            word = __class__.binarize(plate[i], method=__class__.SAUVOLA_THRESHOLDING, value=thres_kirnel)
 
-            wx,wy = word.shape
-            print(wx,wy)
+            wx, wy = word.shape
+            print(wx, wy)
             bou = boundary
-            word = 255-np.array(word)
-            word = word[bou:wx-bou,bou:wy-bou]
-            plate[i] = plate[i][bou:wx-bou,bou:wy-bou]
-            #word = IP.morph(word,mode=IP.OPENING,value=[5,5])
-            word = __class__.crop_image(plate[i],word,tol=black_tollerance)
+            word = 255 - np.array(word)
+            word = word[bou:wx - bou, bou:wy - bou]
+            plate[i] = plate[i][bou:wx - bou, bou:wy - bou]
+            # word = IP.morph(word,mode=IP.OPENING,value=[5,5])
+            word = __class__.crop_image(plate[i], word, tol=black_tollerance)
 
             if word != []:
                 if Resize:
-                    word = cv2.resize(word,(image_size[1],image_size[0]))
+                    word = cv2.resize(word, (image_size[1], image_size[0]))
                 listOfWord.append(word)
         if Resize:
             return listOfWord
         else:
-            return listOfWord,bou
+            return listOfWord, bou
 
     def magnifly(image, percentage=100, shiftxy=[0, 0]):
         '''
@@ -621,13 +620,13 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         x_ = x * percentage // 100
         y_ = y * percentage // 100
 
-        img = cv2.resize(image, (y_, x_),interpolation=cv2.INTER_LANCZOS4)
+        img = cv2.resize(image, (y_, x_), interpolation=cv2.INTER_LANCZOS4)
         base = np.ones((x, y)) * 255.0
         base = Image.fromarray(base)
 
         img = Image.fromarray(img)
         base.paste(img, (-(x_ - x) // 2 + shiftxy[0], -(y_ - y) // 2 + shiftxy[1]))
-        fuck=np.array(base, dtype=np.uint8)
+        fuck = np.array(base, dtype=np.uint8)
         # base.show('hello')
         return np.array(base, dtype=np.uint8)
 
@@ -644,25 +643,25 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         # such that the first entry in the list is the top-left,
         # the second entry is the top-right, the third is the
         # bottom-right, and the fourth is the bottom-left
-        rect = np.zeros((4, 2), dtype = "float32")
+        rect = np.zeros((4, 2), dtype="float32")
 
         # the top-left point will have the smallest sum, whereas
         # the bottom-right point will have the largest sum
-        s = pts.sum(axis = 1)
+        s = pts.sum(axis=1)
         rect[0] = pts[np.argmin(s)]
         rect[2] = pts[np.argmax(s)]
 
         # now, compute the difference between the points, the
         # top-right point will have the smallest difference,
         # whereas the bottom-left will have the largest difference
-        diff = np.diff(pts, axis = 1)
+        diff = np.diff(pts, axis=1)
         rect[1] = pts[np.argmin(diff)]
         rect[3] = pts[np.argmax(diff)]
 
         # return the ordered coordinates
         return rect
 
-    def four_point_transform(image, pts,matrice = False):
+    def four_point_transform(image, pts, matrice=False):
         '''
         :param image: image in which you get your 4 points
         :param pts: 4 points 
@@ -697,7 +696,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             [0, 0],
             [maxWidth - 1, 0],
             [maxWidth - 1, maxHeight - 1],
-            [0, maxHeight - 1]], dtype = "float32")
+            [0, maxHeight - 1]], dtype="float32")
 
         # compute the perspective transform matrix and then apply it
         M = cv2.getPerspectiveTransform(rect, dst)
@@ -706,11 +705,10 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
 
         # return the warped image
         if matrice:
-
-            return warped,M
+            return warped, M
         return warped
 
-    def remove_perspective(image, region, shape,org_shape=None,auto_sort= True):
+    def remove_perspective(image, region, shape, org_shape=None, auto_sort=True):
         '''
         *********** not use anymore **************
         :param region: 
@@ -722,19 +720,18 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         if org_shape == None:
             org_shape = shape
 
-
-        #print([region[3], region[1], region[2], region[0]])
-        #pts1 = np.float32([region[2], region[3], region[1], region[0]])
+        # print([region[3], region[1], region[2], region[0]])
+        # pts1 = np.float32([region[2], region[3], region[1], region[0]])
         pts2 = np.float32([[0, 0], [org_shape[0], 0], [org_shape[0], org_shape[1]], [0, org_shape[1]]])
         if auto_sort:
             best_pts = []
-            min_cost = pow(shape[0]*shape[1],2)
+            min_cost = pow(shape[0] * shape[1], 2)
             coss = []
-            for i in range(0,4):
-                rg = np.reshape(region,(-1,2)).tolist()
+            for i in range(0, 4):
+                rg = np.reshape(region, (-1, 2)).tolist()
                 pts_1 = np.array(rg[-i:] + rg[:-i])
                 pts_2 = np.array(pts2)
-                cost = np.sum(np.abs(pts_1-pts_2))
+                cost = np.sum(np.abs(pts_1 - pts_2))
                 coss.append(cost)
                 if min_cost >= cost:
                     min_cost = cost
@@ -742,23 +739,24 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             pts_1 = best_pts
             pts2 = np.float32([[0, 0], [shape[0], 0], [shape[0], shape[1]], [0, shape[1]]])
 
-            pts1 = np.float32([[pts_1[0]],[pts_1[1]],[pts_1[2]],[pts_1[3]]])
+            pts1 = np.float32([[pts_1[0]], [pts_1[1]], [pts_1[2]], [pts_1[3]]])
         else:
 
             pts2 = np.float32([[0, 0], [shape[0], 0], [shape[0], shape[1]], [0, shape[1]]])
-            pts1 = np.float32([[region[0]],[region[1]],[region[2]],[region[3]]])
-        #print(pts1.tolist())
-        #pts1 = np.float32([region[1], region[0], region[3], region[2]])
-        #print([[0, 0], [shape[0], 0], [0, shape[1]], [shape[0], shape[1]]])
-        #print('point from auto shuffling',pts1)
+            pts1 = np.float32([[region[0]], [region[1]], [region[2]], [region[3]]])
+        # print(pts1.tolist())
+        # pts1 = np.float32([region[1], region[0], region[3], region[2]])
+        # print([[0, 0], [shape[0], 0], [0, shape[1]], [shape[0], shape[1]]])
+        # print('point from auto shuffling',pts1)
         matrix = cv2.getPerspectiveTransform(pts1, pts2)
-        img = cv2.warpPerspective(image, matrix, shape,borderValue=255)
+        img = cv2.warpPerspective(image, matrix, shape, borderValue=255)
         return img
 
     class Plate():
         '''***************** Not being use anymore *********************'''
-        #A class for plate
-        def __init__(self, image, cnt, word_cnt,extract_shape):
+
+        # A class for plate
+        def __init__(self, image, cnt, word_cnt, extract_shape):
             '''***************** Not being use anymore *********************'''
             rect = cv2.minAreaRect(cnt)
             box = cv2.boxPoints(rect)
@@ -781,11 +779,11 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             #                                                                                                   word_box,
             #                                                                                                 (50, 25))
             # print(matrix)
-            #cv2.imshow("suck",image)
-            #cv2.waitKey(0)
+            # cv2.imshow("suck",image)
+            # cv2.waitKey(0)
             self.image = image
-            #cv2.imshow("suck",self.image)
-            #cv2.waitKey(0)
+            # cv2.imshow("suck",self.image)
+            # cv2.waitKey(0)
             self.cnt = cnt
             self.PlateBox = box
             self.Original_Word_Size = word_rect[1]
@@ -796,36 +794,43 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             self.word_angle = word_rect[2]
             self.show = color
 
-            #self.UnrotateImg = cv2.warpAffine(image, matrix, image.shape, borderMode=cv2.BORDER_CONSTANT,borderValue=255)
+            # self.UnrotateImg = cv2.warpAffine(image, matrix, image.shape, borderMode=cv2.BORDER_CONSTANT,borderValue=255)
 
-            self.UnrotateImg = Image_Processing_And_Do_something_to_make_Dataset_be_Ready.remove_perspective(image,box,(int(rect[1][0]),int(rect[1][1])))
+            self.UnrotateImg = Image_Processing_And_Do_something_to_make_Dataset_be_Ready.remove_perspective(image, box,
+                                                                                                             (int(rect[
+                                                                                                                      1][
+                                                                                                                      0]),
+                                                                                                              int(rect[
+                                                                                                                      1][
+                                                                                                                      1])))
 
-            #self.UnrotateImg = image
+            # self.UnrotateImg = image
 
             if word_rect[1][0] > word_rect[1][1]:
-                y1 = int(word_rect[1][0] / 2) + int(self.UnrotateImg.shape[0]/2)
-                y2 = int(self.UnrotateImg.shape[0]/2) - int(word_rect[1][0] / 2)
-                x1 = int(word_rect[1][0] / 2) + int(self.UnrotateImg.shape[1]/2)
-                x2 = int((self.UnrotateImg.shape[1]/2) - int(word_rect[1][0] / 2))
+                y1 = int(word_rect[1][0] / 2) + int(self.UnrotateImg.shape[0] / 2)
+                y2 = int(self.UnrotateImg.shape[0] / 2) - int(word_rect[1][0] / 2)
+                x1 = int(word_rect[1][0] / 2) + int(self.UnrotateImg.shape[1] / 2)
+                x2 = int((self.UnrotateImg.shape[1] / 2) - int(word_rect[1][0] / 2))
             else:
-                y1 = int(word_rect[1][1] / 2) + int(self.UnrotateImg.shape[0]/2)
-                y2 = int(self.UnrotateImg.shape[0]/2) - int(word_rect[1][1] / 2)
-                x1 = int(word_rect[1][1] / 2) + int(self.UnrotateImg.shape[1]/2)
-                x2 = int(self.UnrotateImg.shape[1]/2) - int(word_rect[1][1] / 2)
+                y1 = int(word_rect[1][1] / 2) + int(self.UnrotateImg.shape[0] / 2)
+                y2 = int(self.UnrotateImg.shape[0] / 2) - int(word_rect[1][1] / 2)
+                x1 = int(word_rect[1][1] / 2) + int(self.UnrotateImg.shape[1] / 2)
+                x2 = int(self.UnrotateImg.shape[1] / 2) - int(word_rect[1][1] / 2)
             # y1 = int(word_rect[1][0] / 2 + word_rect[0][0])
             # y2 = int(word_rect[0][0] - word_rect[1][0] / 2)
             # x1 = int(word_rect[1][1] / 2 + word_rect[0][1])
             # x2 = int(word_rect[0][1] - word_rect[1][1] / 2)
             # print([x2,x1,y2,y1])
             # print(cx,cy)
-            #cv2.imshow("show",self.UnrotateImg)
-            #cv2.waitKey(0)
-            #print('image',self.UnrotateImg.shape, x2,x1,y2,y1)
+            # cv2.imshow("show",self.UnrotateImg)
+            # cv2.waitKey(0)
+            # print('image',self.UnrotateImg.shape, x2,x1,y2,y1)
 
             self.UnrotateWord = cv2.resize(self.UnrotateImg[y2:y1, x2:x1], extract_shape)
             # cv2.imshow("kkkkk",self.UnrotateWord)
             # cv2.waitKey(100)
-            self.UnrotateWord = Image_Processing_And_Do_something_to_make_Dataset_be_Ready.Adapt_Image(self.UnrotateWord,extract_shape)
+            self.UnrotateWord = Image_Processing_And_Do_something_to_make_Dataset_be_Ready.Adapt_Image(
+                self.UnrotateWord, extract_shape)
             # cv2.imshow("suk",self.UnrotateWord)
             # cv2.waitKey(0)
 
@@ -846,24 +851,24 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         # return the edged image
         return edged
 
-    def get_plate(image,extract_shape,dilate=30):
-        #Decapacipate
+    def get_plate(image, extract_shape, dilate=30):
+        # Decapacipate
         '''
         ***************** Not being use anymore *********************
         :param extract_shape: 
         :param dilate: 
         :return: 
         '''
-        org = cv2.cvtColor(image,cv2.COLOR_GRAY2BGR)
+        org = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
         image1 = 255 - image
-        image1 = __class__.morph(image1, __class__.DILATE, [dilate,dilate])
-        #cv2.imshow('image',image1)
-        #cv2.waitKey(0)
+        image1 = __class__.morph(image1, __class__.DILATE, [dilate, dilate])
+        # cv2.imshow('image',image1)
+        # cv2.waitKey(0)
         img, contours, hierarchy = cv2.findContours(image1, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
         all_plate = []
-        cv2.drawContours(org,contours,-1,[255,0,0])
+        cv2.drawContours(org, contours, -1, [255, 0, 0])
         # cv2.imshow("jjjj",org)
-        #try:
+        # try:
         if 1:
             for cnt, hier, i in zip(contours, hierarchy[0], range(3)):
 
@@ -873,11 +878,11 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                     while hierach[2] != -1:
                         index = hierach[2]
                         hierach = hierarchy[0, index]
-                    all_plate.append(__class__.Plate(image, cnt, contours[index],extract_shape))
+                    all_plate.append(__class__.Plate(image, cnt, contours[index], extract_shape))
             return all_plate
-        #except:
-            #print('return None')
-            #return None
+            # except:
+            # print('return None')
+            # return None
 
     # example
     # img = cv2.imread('ThreeEN.jpg',0)
@@ -896,7 +901,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
        cv2.imshow('img',img)
        cv2.waitKey(0)'''
 
-    def ztretch(image,bord=0,axis='horizontal',multiply=1):
+    def ztretch(image, bord=0, axis='horizontal', multiply=1):
         '''
         
         :param bord:        border
@@ -904,59 +909,59 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         :param multiply:    
         :return: 
         '''
-        y,x = image.shape
-        bod = [0,0]
+        y, x = image.shape
+        bod = [0, 0]
         if axis == 'horizontal':
 
             bod[1] = bord
         elif axis == 'vertical':
             bod[0] = bord
-        #image = cv2.resize(image,(multiply*x,multiply*y))
-        #point = np.array([(y_//2)-(y//2),(y_//2)+(y//2),(x_//2)-(x//2),(x_//2)+(x//2)])
-        #point = point*multiply
-        #conner = np.array([[point[0],point[2]],[point[1],point[2]],[point[1],point[3]],[point[0],point[3]]])
-        #conner = np.array([[0,0],[x*multiply,0],[x*multiply,y*multiply],[0,y*multiply]])
-        #conner = np.array([[0,0],[-y,0],[-y,-x],[0,-x]])
-        #print('conner',conner)
-        #image = __class__.remove_perspective(image,conner,shape=(y,x),org_shape=(multiply*x,multiply*y))
-        #four_point_transform(image,conner,size=(multiply*y,multiply*x),divider=multiply)
+        # image = cv2.resize(image,(multiply*x,multiply*y))
+        # point = np.array([(y_//2)-(y//2),(y_//2)+(y//2),(x_//2)-(x//2),(x_//2)+(x//2)])
+        # point = point*multiply
+        # conner = np.array([[point[0],point[2]],[point[1],point[2]],[point[1],point[3]],[point[0],point[3]]])
+        # conner = np.array([[0,0],[x*multiply,0],[x*multiply,y*multiply],[0,y*multiply]])
+        # conner = np.array([[0,0],[-y,0],[-y,-x],[0,-x]])
+        # print('conner',conner)
+        # image = __class__.remove_perspective(image,conner,shape=(y,x),org_shape=(multiply*x,multiply*y))
+        # four_point_transform(image,conner,size=(multiply*y,multiply*x),divider=multiply)
 
-        #print(x,y,x_,y_)
-        if bod[0] > y//2:
-            bod[0] = y//2
-        if bod[1] > x//2:
-            bod[1] = x//2
-        interest = image[bod[0]:y-bod[0]+1,bod[1]:x-bod[1]+1]
-        #print('bood after',bod)
-        #print('inter',interest.shape)
+        # print(x,y,x_,y_)
+        if bod[0] > y // 2:
+            bod[0] = y // 2
+        if bod[1] > x // 2:
+            bod[1] = x // 2
+        interest = image[bod[0]:y - bod[0] + 1, bod[1]:x - bod[1] + 1]
+        # print('bood after',bod)
+        # print('inter',interest.shape)
 
         return image
 
-    def Adapt_Image(image,output_shape):
+    def Adapt_Image(image, output_shape):
         '''
         
         :param output_shape: 
         :return: 
         '''
-        #output_shape =(60,30) #
+        # output_shape =(60,30) #
         ''' (width,height) of picture'''
         # cv2.imshow("image",image)
         # cv2.waitKey(0)
-        dilate_kernel_shape=(10,10)
+        dilate_kernel_shape = (10, 10)
         '''2d (x,y) can adjust offset if too less can't extract'''
 
         inv_image = 255 - image
         dilate = cv2.dilate(inv_image, np.ones(dilate_kernel_shape))
-        col = cv2.cvtColor(image,cv2.COLOR_GRAY2BGR)
+        col = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
         # cv2.imshow("dil",dilate)
         # cv2.waitKey(0)
         ret, cnt, hierarchy = cv2.findContours(dilate, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        cv2.drawContours(col,cnt,-1,[0,255,0])
+        cv2.drawContours(col, cnt, -1, [0, 255, 0])
         # cv2.imshow("con",col)
         # print(len(cnt))
         # cv2.waitKey(0)
         try:
-            if len(cnt)>0:
+            if len(cnt) > 0:
                 rect = cv2.minAreaRect(cnt[0])
                 # print(rect)
                 # print(rect)
@@ -971,30 +976,30 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                     x1 = int(rect[1][0] / 2) + int(rect[0][0])
                     x2 = int(rect[0][0]) - int(rect[1][0] / 2)
                 # print(x2, x1, y2, y1)
-                if y2<0 and y1-y2>40:
+                if y2 < 0 and y1 - y2 > 40:
                     y1 = int(rect[1][1] / 2) + int(rect[0][0])
                     y2 = int(rect[0][0]) - int(rect[1][1] / 2)
                     x1 = int(rect[1][0] / 2) + int(rect[0][1])
                     x2 = int(rect[0][1]) - int(rect[1][0] / 2)
-                if(x2>x1):
-                    a=x2
-                    x2=x1
-                    x1=a
-                if (y2>y1):
+                if (x2 > x1):
+                    a = x2
+                    x2 = x1
+                    x1 = a
+                if (y2 > y1):
                     a = y2
                     y2 = y1
                     y1 = a
-                if x1>output_shape[1]and x2>0 :
-                    a= y1
-                    b= x2
+                if x1 > output_shape[1] and x2 > 0:
+                    a = y1
+                    b = x2
                     x2 = y2
                     y2 = b
-                    y1= x1
+                    y1 = x1
                     x1 = a
-                if x2<0:
-                    x2=0
-                if x1>output_shape[1]:
-                    x1=output_shape[1]
+                if x2 < 0:
+                    x2 = 0
+                if x1 > output_shape[1]:
+                    x1 = output_shape[1]
 
                 # print(x2,x1,y2,y1)
                 # y1 = int(rect[1][0] / 2 + rect[0][0])
@@ -1011,31 +1016,30 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         except:
             return image
 
-
-    def zkeleton(img,multi=2,morph=15):
+    def zkeleton(img, multi=2, morph=15):
         '''
         :param img:
         :param multi: 
         :param morph: 
         :return: 
         '''
-        img = 255-img
-        element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+        img = 255 - img
+        element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
         done = False
-        size = np.size(img)/multi
-        skel = np.zeros(img.shape,np.uint8)
-        while( not done):
-            eroded = cv2.erode(img,element)
-            temp = cv2.dilate(eroded,element)
-            temp = cv2.subtract(img,temp)
-            skel = cv2.bitwise_or(skel,temp)
+        size = np.size(img) / multi
+        skel = np.zeros(img.shape, np.uint8)
+        while (not done):
+            eroded = cv2.erode(img, element)
+            temp = cv2.dilate(eroded, element)
+            temp = cv2.subtract(img, temp)
+            skel = cv2.bitwise_or(skel, temp)
             img = eroded.copy()
 
             zeros = size - cv2.countNonZero(img)
-            if zeros==size:
+            if zeros == size:
                 done = True
-        skel = 255-skel
-        img = __class__.morph(skel,__class__.ERODE,[morph,morph])
+        skel = 255 - skel
+        img = __class__.morph(skel, __class__.ERODE, [morph, morph])
         return img
 
     def getHog(listOfImage):
@@ -1043,6 +1047,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         :param listOfImage: a list of image          
         :return: a list of histogram of gradient of image
         '''
+
         def deskew(img):
             m = cv2.moments(img)
             if abs(m['mu02']) < 1e-2:
@@ -1072,12 +1077,13 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             hog = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma,
                                     histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradient)
             return hog
+
         hog = HOG_int()
         hog_feature = list(map(lambda x: hog.compute(x.astype(np.uint8), winStride=(20, 20)), listOfImage))
         hog_feature = list(map(lambda x: x.reshape((-1,)), hog_feature))
-        return  hog_feature
+        return hog_feature
 
-    def getHis(listOfImage,rowOrColPerBar=1):
+    def getHis(listOfImage, rowOrColPerBar=1):
         '''
         :param listOfImage: a list of image
         :param rowOrColPerBar: a number of row / column that will be group together
@@ -1085,7 +1091,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         :return: a list of histogram feature
         '''
         histogram_x = list(
-            map(lambda x: [x[:, y:y + rowOrColPerBar] for y in range(0,x.shape[1] , rowOrColPerBar)], listOfImage))
+            map(lambda x: [x[:, y:y + rowOrColPerBar] for y in range(0, x.shape[1], rowOrColPerBar)], listOfImage))
         histogram_x = list(map(lambda x: list(map(lambda y: np.sum(y.astype(float)), x)), histogram_x))
         histogram_y = list(
             map(lambda x: [x[y:y + rowOrColPerBar, :] for y in range(0, x.shape[0], rowOrColPerBar)], listOfImage))
@@ -1116,11 +1122,14 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         Y_divide = 1 / (0.00001 + point[1])
         XY_divide = X_divide * Y_divide
 
-        feature_x = np.array([X,Y,XY2, X2, Y2,  XY])#np.array([X,Y,YX2,X3, XY2, X5, X3Y2, XY4, X2, Y2, XY]) ,X_divide,Y_divide,XY_divid
+        feature_x = np.array([X, Y, XY2, X2, Y2,
+                              XY])  # np.array([X,Y,YX2,X3, XY2, X5, X3Y2, XY4, X2, Y2, XY]) ,X_divide,Y_divide,XY_divid
         # ,XY2, X2, Y2
-        feature_y = np.array([X,Y,YX2, X2, Y2, XY])#np.array([X,Y,XY2,YX2, Y3, YX4, X2Y3, Y5, X2, Y2, XY]) ,X_divide,Y_divide,XY_divide
+        feature_y = np.array([X, Y, YX2, X2, Y2,
+                              XY])  # np.array([X,Y,XY2,YX2, Y3, YX4, X2Y3, Y5, X2, Y2, XY]) ,X_divide,Y_divide,XY_divide
         #  YX2, X2, Y2,
-        return feature_x,feature_y
+        return feature_x, feature_y
+
     # extract plate from image
     # example
     '''import Image_Processing_And_Do_something_to_make_Dataset_be_Ready() as ipaddr
@@ -1148,34 +1157,39 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                 new_plate_orientation.append(z)
         return new_plate_img, new_plate_position, new_plate_orientation
 
-    def find_same_point_and_average_it(all_image,all_position,all_orientation,r=75):
+    def find_same_point_and_average_it(all_image, all_position, all_orientation, r=75):
         new_position = []
         new_image = []
         new_orientation = []
-        if all_position != []:
-            tree = cKDTree(all_position)
-            already_duplicate_index=[]
-            for i in range(0,len(all_position)):
-                if i not in already_duplicate_index:
-                    result = tree.query_ball_point(all_position[i],r)
-                    if len(result)<=1:
-                        new_position.append(all_position[i])
-                        new_image.append(all_image[i])
-                        new_orientation.append(all_orientation[i])
-                    elif len(result)>1:
-                        new_x = []
-                        new_y = []
-                        new_z = []
-                        for s in result:
-                            buffer=all_position[s]
-                            new_x.append(buffer[0])
-                            new_y.append(buffer[1])
-                            new_z.append(buffer[2])
-                            already_duplicate_index.append(s)
-                        new_x = np.mean(new_x)
-                        new_y = np.mean(new_y)
-                        new_z = np.mean(new_z)
-                        new_position.append([new_x,new_y,new_z])
-                        new_image.append(all_image[i])
-                        new_orientation.append(all_orientation[i])
-            return new_image,new_position,new_orientation
+        try:
+            if all_position != []:
+                tree = cKDTree(all_position)
+                already_duplicate_index = []
+                for i in range(0, len(all_position)):
+                    if i not in already_duplicate_index:
+                        result = tree.query_ball_point(all_position[i], r)
+                        if len(result) <= 1:
+                            new_position.append(all_position[i])
+                            new_image.append(all_image[i])
+                            new_orientation.append(all_orientation[i])
+                        elif len(result) > 1:
+                            new_x = []
+                            new_y = []
+                            new_z = []
+                            for s in result:
+                                buffer = all_position[s]
+                                new_x.append(buffer[0])
+                                new_y.append(buffer[1])
+                                new_z.append(buffer[2])
+                                already_duplicate_index.append(s)
+                            new_x = np.mean(new_x)
+                            new_y = np.mean(new_y)
+                            new_z = np.mean(new_z)
+                            new_position.append([new_x, new_y, new_z])
+                            new_image.append(all_image[i])
+                            new_orientation.append(all_orientation[i])
+        except:
+            new_image = []
+            new_position = []
+            new_orientation = []
+        return new_image, new_position, new_orientation
