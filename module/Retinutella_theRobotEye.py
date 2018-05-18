@@ -21,6 +21,7 @@ from sklearn.externals import  joblib
 *               class Retinutella                  *
 *                                                  *
 *************************************************'''
+OFFSET_ORIENTATION = 0.261799
 
 class Retinutella():
     name = None  # camera name
@@ -274,7 +275,7 @@ class Retinutella():
         if orientation is None:
             return None
         else:
-            orientation = orientation+0.261799
+            orientation = orientation+OFFSET_ORIENTATION
             if 'L' in self.name:
                 return np.array([[0, 0, -1],
                                  [np.sin(orientation[0]), np.cos(orientation[0]), 0],
