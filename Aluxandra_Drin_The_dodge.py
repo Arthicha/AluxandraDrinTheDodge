@@ -79,7 +79,7 @@ MAN = MANipulator()
 PORT = 4
 SEND_SERIAL = True
 RECIEVE_SERIAL = SEND_SERIAL
-MANUAL_STEP = False
+MANUAL_STEP = True
 
 # main serial setting
 RUN_MATLAB = False
@@ -87,33 +87,33 @@ CHECK_LASER = False
 PATH_PLANING_MODE = 3 # 0 -> None , 1-> wan , 2 -> zumo , 3 -> combine
 SERVO_PLANING = False
 HALF_IK = False
-SIMULATOR = False
+SIMULATOR = True
 
 # initial constant 
 INITIAL_POSITION = [[0,300,700],'F',MAN.RE_F]
 PLATE_POSITION_X = [-260,-90,90,260]
-PLATE_POSITION_Y = 665
+PLATE_POSITION_Y = 645
 PLATE_POSITION_Z = [725,550,300]
 
-OFFSET_LENGHT_IN = 180  # before to position   
+OFFSET_LENGHT_IN = 80  # before to position   
 OFFSET_LENGHT_OUT_BOTTOM = 500 # after to position of bottom wall
-OFFSET_LENGHT_OUT_OTHER = 240 # after to position of left and right wall
+OFFSET_LENGHT_OUT_OTHER = 80 # after to position of left and right wall
 EXTRA_OFFSET_IN = 150 # before put
 EXTRA_OFFSET_OUT = 150 # after put
 PLATE_HEIGHT = 14
 STEP_ROTATION = 4
-STEP_DISTANCE = 100
-STEP_OFFSET_DISTANCE = 5
+STEP_DISTANCE = 25
+STEP_OFFSET_DISTANCE = 10
 
 #offset set Q
-OFFSET_Q = [230,35,160 ,135,130,135] # [230,32,147,135,135,135]
+OFFSET_Q = [230,35,160 ,135,135,135] # [230,32,147,135,135,135]
 GAIN_Q = [-1,1,1,1,1,1]
 GAIN_MAGNETIC = 7/9
 
 NEW_Z_EQUATION = lambda r: -0.08951*r + 47.72    # 0 if r > 375 else 0
 Q_FOR_BACKLASH = [lambda x: 0, lambda x: x[1],lambda x: x[1]+x[2],lambda x: 0,
                         lambda x: 0,lambda x: 0 ]
-OFFSET_BACKLASH = [lambda x: 0, lambda x: 3,lambda x: 5 ,lambda x: 0,
+OFFSET_BACKLASH = [lambda x: 0, lambda x: 5,lambda x: 10 ,lambda x: 0,
                         lambda x: 0,lambda x: 0 ]
 CASE_BACKLASH = [lambda x:  radians(90), lambda x: radians(90), lambda x: radians(90)-x, lambda x: radians(135), 
                     lambda x: radians(135), lambda x: radians(135)]
@@ -121,14 +121,14 @@ CASE_BACKLASH = [lambda x:  radians(90), lambda x: radians(90), lambda x: radian
 ENLIGHT_POS = [[-150,400,700],[0,300,800],[150,400,700]]
 
 # test condition
-TEST_MODE = True
+TEST_MODE = False
 MODE_POSITION = True
 MODE_FIX_DATA = False   
 
 # START STEP
 POSITION_STEP_1 = [radians(90),radians(135),radians(-130),radians(0),radians(0),radians(0)]
 POSITION_STEP_2 = [radians(90),radians(30),radians(-140),radians(0),radians(0),radians(0)] 
-POSITION_STEP_3 = [radians(90),radians(135),radians(-130),radians(0),radians(0),radians(0)]
+
 HOME_STEP1 = [radians(-10),radians(105),radians(-150),radians(0),radians(-90),radians(0)]
 HOME_STEP15 = [radians(45),radians(110),radians(-150),radians(0),radians(-90),radians(0)]
 HOME_STEP2 = [radians(90),radians(135),radians(-150),radians(0),radians(-90),radians(0)]
@@ -137,10 +137,6 @@ HOME_STEP2 = [radians(90),radians(135),radians(-150),radians(0),radians(-90),rad
 # test data
 if TEST_MODE:
     if MODE_POSITION:
-        # data = [ [[200,400,100],'B',10,MAN.RE_B], [[-400,200,800],'L',10,MAN.RE_L],[[400,200,700],'R',10,MAN.RE_R],  [[0,450,300],'B',10,MAN.RE_B]  ]
-        # data = [ [[-200,400,700],'L',10,MAN.RE_L]]
-        # data = [ [[200,650,600],'F',0,MAN.RE_F] ] 
-        # data = [ [[300,650,500],'F',0,MAN.RE_F ] ] 
         # data = [ [[-300,400,100], 'B',0, MAN.RE_B ], [[-0,400,500], 'B',0, MAN.RE_B ] , [[300,400,500], 'B',0, MAN.RE_B ] ]
         # data  = [  [[300,600,700],'F',0,MAN.RE_F ], [[300,500,600],'F',0,MAN.RE_F ], [[300,500,400],'F',0,MAN.RE_F ], [[300,500,300],'F',0,MAN.RE_F ], [[300,500,200],'F',0,MAN.RE_F ]]
         # data = [  [[0,750,500], 'F',0, MAN.RE_F ] , [[-300,650,500],'F',0,MAN.RE_F ] , [[-300,650,700],'F',0,MAN.RE_F ] , [[-300,650,500],'F',0,MAN.RE_F ] , [[-300,650,700],'F',0,MAN.RE_F ]  ]
@@ -156,11 +152,12 @@ if TEST_MODE:
 # data = [95/180*pi,115/180*pi,-120/180*pi,135/180*pi,135/180*pi,135/180*pi]  # up rising
 # data = [1/2*pi,0*pi,-110/180*pi,0*pi,0*pi,0*pi]                             # hua pak           
 # data = [1/2*pi,-35/180*pi,-110/180*pi,0*pi,0*pi,0*pi]                       # drin the dodge
+
 FIND_SAME_POINT_AND_AVERAGE_IT = False
 LOAD_IMAGE = False
 RADIANT = 75
-ALL_PIC_PATH = {'L':'picture\\testpic\\TestLeftSide.jpg', 'R':'picture\\testpic\\TestRightSide.jpg', 'Bl':'picture\\testpic\\Bl_test1.png' , 
-                'Bm':'picture\\testpic\\Bm_test1.png', 'Br':'picture\\testpic\\Br_test1.png' }
+ALL_PIC_PATH = {'L':'picture\\testpic\\TestLeftSide.jpg', 'R':'picture\\testpic\\TestRightSide.jpg', 'Bl_bottom':'picture\\testpic\\Bl_test1.png' , 
+                'Bm':'picture\\testpic\\Bm_test1.png', 'Br_bottom':'picture\\testpic\\Br_test1.png' }
 IMG_PATH = ALL_PIC_PATH['L']
 
 ROTATION = 90
@@ -173,7 +170,7 @@ CAM_LEFT_NAME = 'L'
 CAM_LEFT_PORT = 1
 CAM_LEFT_MODE = 1
 CAM_LEFT_ORIENTATION = -90
-CAM_LEFT_FOUR_POINTS = np.array([[81, 0], [81, 639], [493, 530], [603, 85]])
+CAM_LEFT_FOUR_POINTS = np.array([[82, 1], [75, 639], [492, 520], [600, 80]])
 CAM_LEFT_MINIMUM_AREA = 0.01
 CAM_LEFT_MAXIMUM_AREA = 0.9
 CAM_LEFT_LENGTH_PERCENT = 0.01
@@ -183,17 +180,16 @@ CAM_LEFT_BINARIZE_METHOD = IP.SAUVOLA_THRESHOLDING
 CAM_LEFT_OFFSET_HOMO_X = -81  # -300
 CAM_LEFT_OFFSET_HOMO_Y = 0  # -100
 
-# Camera Right
-CAM_BOTTOM_MIDDLE_NAME = 'R'
-CAM_BOTTOM_MIDDLE_PORT = 2
+CAM_BOTTOM_MIDDLE_NAME = 'Bm'
+CAM_BOTTOM_MIDDLE_PORT = 3
 CAM_BOTTOM_MIDDLE_MODE = 1
-CAM_BOTTOM_MIDDLE_ORIENTATION = 90
-CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[559, 4], [560, 639], [145, 504], [42, 77]])
+CAM_BOTTOM_MIDDLE_ORIENTATION = -180
+CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[0, 433], [136, 157], [500, 161], [639, 422]])
 CAM_BOTTOM_MIDDLE_MINIMUM_AREA = 0.01
 CAM_BOTTOM_MIDDLE_MAXIMUM_AREA = 0.9
 CAM_BOTTOM_MIDDLE_LENGTH_PERCENT = 0.01
-CAM_BOTTOM_MIDDLE_THRESH_KERNEL = 21
-CAM_BOTTOM_MIDDLE_BOUNDARY = 20
+CAM_BOTTOM_MIDDLE_THRESH_KERNEL = 37
+CAM_BOTTOM_MIDDLE_BOUNDARY = 5
 CAM_BOTTOM_MIDDLE_BINARIZE_METHOD = IP.SAUVOLA_THRESHOLDING
 CAM_BOTTOM_MIDDLE_OFFSET_HOMO_X = -42  # -300
 CAM_BOTTOM_MIDDLE_OFFSET_HOMO_Y = 0  # -100
@@ -299,10 +295,10 @@ gainQ = [-1,1,1,1,1,1]
 #                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
 
 
-cam1 = lambda : Retinutella(CAM_LEFT_NAME, CAM_LEFT_PORT, CAM_LEFT_ORIENTATION, CAM_LEFT_MODE, CAM_LEFT_FOUR_POINTS,
+cam1 = lambda : Retinutella(CAM_LEFT_NAME, 0, CAM_LEFT_ORIENTATION, CAM_LEFT_MODE, CAM_LEFT_FOUR_POINTS,
                        CAM_LEFT_THRESH_KERNEL, CAM_LEFT_MINIMUM_AREA, CAM_LEFT_MAXIMUM_AREA, CAM_LEFT_LENGTH_PERCENT,
                        CAM_LEFT_BOUNDARY, CAM_LEFT_BINARIZE_METHOD)
-cam2 = lambda : Retinutella(CAM_RIGHT_NAME, CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAM_RIGHT_FOUR_POINTS,
+cam2 = lambda : Retinutella(CAM_RIGHT_NAME, 0, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAM_RIGHT_FOUR_POINTS,
                         CAM_RIGHT_THRESH_KERNEL, CAM_RIGHT_MINIMUM_AREA, CAM_RIGHT_MAXIMUM_AREA,
                         CAM_RIGHT_LENGTH_PERCENT, CAM_RIGHT_BOUNDARY, CAM_RIGHT_BINARIZE_METHOD)
 
@@ -325,8 +321,8 @@ cam5 = lambda : Retinutella(CAM_BOTTOM_LEFT_NAME, CAM_BOTTOM_LEFT_PORT, CAM_BOTT
                               CAM_BOTTOM_LEFT_MINIMUM_AREA, CAM_BOTTOM_LEFT_MAXIMUM_AREA,
                               CAM_BOTTOM_LEFT_LENGTH_PERCENT, CAM_BOTTOM_LEFT_BOUNDARY, CAM_BOTTOM_LEFT_BINARIZE_METHOD)
 
-listCam = [ cam1,cam2,cam3,cam4, cam5]
-# listCam = [cam5]
+# listCam = [ cam1,cam2,cam3,cam4, cam5]
+listCam = [cam2]
 
 
 send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL, manualStep= MANUAL_STEP, 
@@ -482,9 +478,11 @@ if 1:
 
 
 if TEST_MODE == False:
+    send_serial.getSetQAndWrite(HOME_STEP15,0)
     send_serial.getSetQAndWrite(HOME_STEP1,0)
     input('start program')
     send_serial.getSetQAndWrite(HOME_STEP15,0)
+    send_serial.getSetQAndWrite(POSITION_STEP_1,0)
     oldCam = ''
     data = []
     all_image = []
@@ -494,8 +492,6 @@ if TEST_MODE == False:
         # get word from original picture
         # after pass through this section, we get list of word (image) in the variable
         # 'plate'.
-    # if LOAD_IMAGE == False:
-    #     send_serial.getSetQAndWrite(POSITION_STEP_1,0)
     while len(all_image) == 0:
         for cam in listCam:
             cam = cam()
@@ -504,22 +500,22 @@ if TEST_MODE == False:
             
             if LOAD_IMAGE == False:
                 if cam.name in ['L','R'] :
-                    # input('press key to move to LOW position')
+                    # move to LOW position
                     send_serial.getSetQAndWrite(POSITION_STEP_2,0)
 
-                elif cam.name in ['Bl','Bm','Br']  :
-                    # input('press key to move to HIGH position')
+                elif cam.name in ['Bl_bottom','Bm','Br_bottom']  :
+                    # move to HIGH position
                     send_serial.getSetQAndWrite(POSITION_STEP_1,0)
 
+            sleep(3)
             ret,_ = cam.cam.read()        
             oldCam = cam.name
 
-            org,plate,platePos,plateOrientation = cam.getListOfPlate(image_size=IMAGE_SIZE, platePos=True,
-                                                                            plateOrientation=True, show=True,
+            org,plate,platePos,plateOrientation = cam.getListOfPlate(image_size=IMAGE_SIZE,
+                                                                            show=True,
                                                                             LOAD_IMAGE=LOAD_IMAGE ,
                                                                             FILENAME=IMG_PATH)
-            # input(len(cam.getImage()))
-            # a1,a2,_ = cam.getImage(remove_pers=True)
+
             if cam.name == 'Br' or cam.name=='Bl':
                 b1,b2,b3,_,__ = cam.getImage(remove_pers=True)
             else:
@@ -527,10 +523,6 @@ if TEST_MODE == False:
             print('save image!!!')
             cv2.imwrite('picture\\savedPic\\'+str(cam.name)+'test2.jpg',b1)
             plate, platePos, plateOrient8ation = IP.filter_plate(plate_img = plate, plate_position = platePos, plate_Orientation= plateOrientation)
-            # print('--------------')
-            # # print(platePos)
-            # # print(plateOrientation)
-            # print('--------------')
 
             # check if plate is found
             if platePos != []:
@@ -572,10 +564,10 @@ if TEST_MODE == False:
             wall = 'R'
 
         data.append( [selectPosition, wall, mainPredict([selectPlate],model='CNN')[0] ,selectOreintation] )
+send_serial.getSetQAndWrite(POSITION_STEP_1,0)
 
-send_serial.getSetQAndWrite(HOME_STEP15,0)
-send_serial.getSetQAndWrite(HOME_STEP2,0)
-print(data)
+for dat in data:
+    print(data.index(dat), ' ', dat)
 sleep(5)
 # input('data from detection :')
 
@@ -588,16 +580,4 @@ if MODE_POSITION or TEST_MODE == False:
 else :
     send_serial.getSetQAndWrite(data,0)
         
-
-# input("press some key and enter to exit : ")
-
-
-    # #show and finally destroy those windows.
-    # for p in range(0,len(plate)):
-    #     plate[p] = cv2.resize(plate[p],(IMAGE_SIZE[1]*5,IMAGE_SIZE[0]*5))
-    #     cam.show(plate[p],frame='plate_'+str(NUM2WORD[pred_result[p]]))
-    #     cv2.moveWindow('plate_'+str(NUM2WORD[pred_result[p]]), 700,300);
-    #     font = cv2.FONT_HERSHEY_SIMPLEX
-    #     cv2.putText(corg, str(NUM2WORD[pred_result[p]]), (50, 400), font, 5, (0, 0, 255), 5, cv2.LINE_AA)
-    # cam.show(corg,wait=30)
-    # cam.destroyWindows()
+send_serial.getSetQAndWrite(POSITION_STEP_1,0)

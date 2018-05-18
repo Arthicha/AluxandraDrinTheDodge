@@ -70,7 +70,7 @@ class sendSerial:
 
         self.MAN = MANipulator()
         self.simulator = simulator
-        # self.R_e = MAN.RE_R
+        
         self.package = prePackage(pathPlaning=self.pathPlaning, runMatLab=self.runMatLab, offsetlenghtIn=self.offsetLenghtIn, offsetlenghtOutOther= self.offsetLenghtOutOther,
                                     plateHeight=self.plateHeight ,platePositionX=self.platePositionX, stepOffsetDistance= self.stepOffsetDistance,
                                     platePositionY =self.platePositionY, platePositionZ=self.platePositionZ, extraoffsetIn =self.extraoffsetIn, 
@@ -106,31 +106,9 @@ class sendSerial:
             r = sqrt(pow(x,2)+pow(y-85,2)+pow(z-500,2) )
             
             print('r :',r)
-            if str(type(self.new_z_equation)) == "<class 'function'>":
+            if str(type(self.new_z_equation)) == "<class 'function'>" and False:
                 z -= self.new_z_equation(r)                
             
-                
-            for enLightPos in self.enLightPos:
-                # print('sum')
-                # input(abs(sqrt(sum([ (enLightPos[0]-x)**2,(enLightPos[1]-y)**2,(enLightPos[2]-z )**2 ] ))))
-                
-                    
-                if abs(sqrt(sum([ (enLightPos[0]-x)**2,(enLightPos[1]-y)**2,(enLightPos[2]-z )**2 ] ))) < 50 and enLightPos != self.enLightPos[1] and worseCase :
-                    indexStart = data.index([position,wall,valve,orentation])
-                    indexEnd = copy.deepcopy(indexStart)    
-                    # input(data.index([position,wall,valve,orentation]))
-                    
-                    try :
-                        while data[indexEnd][2] == valve :
-                            # print('ends')
-                            # input(indexEnd)
-                            indexEnd +=1            
-                        indexEnd+=1
-                    except:
-                        pass
-                    # input(indexEnd)
-                    worseCase = False
-                    break
             try :
                 
                 dx = x-dd[0]
@@ -140,8 +118,6 @@ class sendSerial:
                 ans = self.MAN.inverse_kinamatic2(dx,dy,dz,self.MAN.DH_param,R_e)
                 ans = self.MAN.setJointLimits(ans,self.MAN.jointLimit)
                 # input(self.enLightPos)
-
-                
 
                 if len(ans) == 0:
                     if self.manualStep:
@@ -160,49 +136,55 @@ class sendSerial:
                             key = dataList
 
                     ans = key
-                    # for n in range(3,4):
-                    #     if abs(ans[n] - self.oldAns[n]) > np.pi/3:
-                    #         ans[n] = radians(135)
-                    
+
                     self.oldAns = copy.deepcopy(ans)
+
+                    for enLightPos in self.enLightPos:
+                        # print('sum')
+                        # input(abs(sqrt(sum([ (enLightPos[0]-x)**2,(enLightPos[1]-y)**2,(enLightPos[2]-z )**2 ] ))))
+                        
+                        if self.decreaseSingularity(self.oldAns,ans,valve) and False:    
+                            if abs(sqrt(sum([ (enLightPos[0]-x)**2,(enLightPos[1]-y)**2,(enLightPos[2]-z )**2 ] ))) < 50 and enLightPos != self.enLightPos[1] and worseCase :
+                                try:    
+                                    indexStart = data.index([position,wall,valve,orentation])
+                                    indexEnd = copy.deepcopy(indexStart)    
+                                    # input(data.index([position,wall,valve,orentation]))
+                                    
+                                    try :
+                                        while data[indexEnd][2] == valve :
+                                            indexEnd +=1            
+                                        indexEnd+=1
+                                    except:
+                                        pass
+                                    # input(indexEnd)
+                                    worseCase = False
+                                    break
+                                except: 
+                                    pass
 
                     if self.half_IK:
                         ans = ans[:3]+[0/180*pi,0/180*pi,0/180*pi]
                         
                     
-                    nextValve = data[data.index([position,wall,valve,orentation])+1][2]
-                    if wall in ['L','R']:
+                    # nextValve = data[data.index([position,wall,valve,orentation])+1][2]
+                    # if wall in ['L','R'] :
                         
-                        if valve == 0 and nextValve == 1:
+                    #     if valve == 0 and nextValve == 1:
                             
-                            if ans[0] < radians(140):
-                                ans[0] -= radians(4)
-                            else : 
-                                ans[0] += radians(4)
+                    #         if ans[0] < radians(140):
+                    #             ans[0] -= radians(4)
+                    #         else : 
+                    #             ans[0] += radians(4)
                     
                     listAns.append([ans,valve,position])
 
-                    # print('qqqqqqqqqqqq')
-                    # print([position,wall,valve,orentation])
-                    # input(data[indexEnd])
-                    # print(indexStart)
-                    # input(indexEnd)
-                    if data[indexEnd] == [position,wall,valve,orentation] and indexEnd != indexStart :
-                        for n in range(len(listAns)-(indexEnd-indexStart),len(listAns) ):
-                            listAns[n][0][3:6] = copy.deepcopy(listAns[-1][0][3:6])
-                            # print(listAns[-1][0][3:6])
-                            # print(listAns[n][0][3:6])
-                            # input(listAns)
-                            # print(n)
-                            # print(listAns[-1][0][3:6])
-                            # input(listAns[n][0][3:6])
+                    if self.decreaseSingularity(self.oldAns,ans,valve) and False:
+                        if data[indexEnd] == [position,wall,valve,orentation] and indexEnd != indexStart :
+                            for n in range(len(listAns)-(indexEnd-indexStart),len(listAns) ):
+                                listAns[n][0][3:6] = copy.deepcopy(listAns[-1][0][3:6])
 
                         worseCase= True
                     
-                    # self.decreaseSingularity(self.oldAns,ans,valve)
-
-                
-                    # self.getSetQAndWrite(ans,valve)
                     
             except :
                 print('IK calculate fail')
@@ -244,29 +226,6 @@ class sendSerial:
 
         set_q_after_offset = [sum(q) for q in zip( [qi[0]*qi[1] for qi in zip(new_set_q,self.gainQ)] ,[radians(qi) for qi in self.offsetQ] )]
 
-        # print('\nposition per joint : ') 
-        # for index_Hi in range(Hi.shape[0]):
-        #     xi, yi ,zi = [ int(i) for i in Hi[index_Hi,0:3,3]]
-        #     print('joint '+str(index_Hi+1) + ' : ' + str((xi,yi,zi)))
-
-        # print('\nFK position : ' +str((x,y,z)))
-        # print('set_q unoffset : '+str([qi for qi in set_q]))
-        # print('set_q unoffset : '+str([degrees(qi) for qi in set_q]))
-        # print('set_q backlash : '+str([qi/pi for qi in new_set_q]))
-        # print('set_q backlash : '+ str( [degrees(qi) for qi in new_set_q]))
-        # n = []
-        # if oldValve ==  0 and valve == 1:
-        #     oldValve =1 
-        #     n = set_q_after_offset
-        #     if n[0] < radians(140):
-        #         n[0] -= radians(4) 
-        #     else:
-        #         n[0] += radians(4) 
-        #     self.ser.write(q=n,valve=valve)        
-        # elif oldValve == 1 and valve == 0:
-        #     oldValve = 0
-        # if n == []:
-
         self.ser.write(q=set_q_after_offset,valve=valve)        
         
         
@@ -304,10 +263,11 @@ class sendSerial:
             diffQ.append(newQ[n]-oldQ[n])
         # input(diffQ)
         if sum(diffQ) > 0.5*pi:
-            
-            self.getSetQAndWrite([oldQ[0], oldQ[1], oldQ[2], oldQ[3], 0, oldQ[5] ],valve)
-            time.sleep(1)
-            self.getSetQAndWrite([oldQ[0], oldQ[1], oldQ[2], newQ[3], 0, newQ[5] ],valve)
-            time.sleep(1)
-
-        return 0
+            return True
+        else:
+            return False
+        #     self.getSetQAndWrite([oldQ[0], oldQ[1], oldQ[2], oldQ[3], 0, oldQ[5] ],valve)
+        #     time.sleep(1)
+        #     self.getSetQAndWrite([oldQ[0], oldQ[1], oldQ[2], newQ[3], 0, newQ[5] ],valve)
+        #     time.sleep(1)
+        # return 0

@@ -26,13 +26,27 @@ class prePackage:
         self.plateHeight = plateHeight
         Y = platePositionY
 
-        self.platePosition = [[platePositionX[0],Y,platePositionZ[0] ],[platePositionX[1],Y,platePositionZ[0] ],
-                        [platePositionX[2],Y,platePositionZ[0] ],[platePositionX[3],Y,platePositionZ[0] ],
-                        [platePositionX[0],Y,platePositionZ[1] ],[platePositionX[1],Y,platePositionZ[1] ],
-                        [platePositionX[2],Y,platePositionZ[1] ],[platePositionX[3],Y,platePositionZ[1] ],
+        self.platePosition = [[platePositionX[0]+20,Y+25,platePositionZ[0]-20 ],[platePositionX[1]+20,Y,platePositionZ[0] ],
+                        [platePositionX[2],Y,platePositionZ[0] ],[platePositionX[3],Y+25,platePositionZ[0] ],
+                        [platePositionX[0],Y+25,platePositionZ[1] ],[platePositionX[1],Y,platePositionZ[1] ],
+                        [platePositionX[2],Y,platePositionZ[1] ],[platePositionX[3],Y+25,platePositionZ[1] ],
                         [platePositionX[1],Y,platePositionZ[2] ],[platePositionX[2],Y,platePositionZ[2] ] ]
-        self.offsetPlatePosition = [[x,y-extraoffsetIn,z] for x,y,z in self.platePosition]
-        self.nextoffsetPlatePosition = [[x,y-extraoffsetOut,z] for x,y,z in self.platePosition]
+
+
+        self.offsetPlatePosition = [[platePositionX[0]+75,Y-extraoffsetIn,platePositionZ[0] ],[platePositionX[1]+25,Y-extraoffsetIn,platePositionZ[0] ],
+                                    [platePositionX[2]-25,Y-extraoffsetIn,platePositionZ[0] ],[platePositionX[3]-75,Y-extraoffsetIn,platePositionZ[0] ],
+                                    [platePositionX[0]+75,Y-extraoffsetIn,platePositionZ[1] ],[platePositionX[1]+25,Y-extraoffsetIn,platePositionZ[1] ],
+                                    [platePositionX[2]+75,Y-extraoffsetIn,platePositionZ[1] ],[platePositionX[3]-75,Y-extraoffsetIn,platePositionZ[1] ],
+                                    [platePositionX[1]+25,Y-extraoffsetIn,platePositionZ[2] ],[platePositionX[2]-25,Y-extraoffsetIn,platePositionZ[2] ] ]
+        
+        self.nextoffsetPlatePosition = [[platePositionX[0]+75,Y-extraoffsetIn,platePositionZ[0] ],[platePositionX[1]+25,Y-extraoffsetIn,platePositionZ[0] ],
+                                    [platePositionX[2]-25,Y-extraoffsetIn,platePositionZ[0] ],[platePositionX[3]-75,Y-extraoffsetIn,platePositionZ[0] ],
+                                    [platePositionX[0]+75,Y-extraoffsetIn,platePositionZ[1] ],[platePositionX[1]+25,Y-extraoffsetIn,platePositionZ[1] ],
+                                    [platePositionX[2]+75,Y-extraoffsetIn,platePositionZ[1] ],[platePositionX[3]-75,Y-extraoffsetIn,platePositionZ[1] ],
+                                    [platePositionX[1]+25,Y-extraoffsetIn,platePositionZ[2] ],[platePositionX[2]-25,Y-extraoffsetIn,platePositionZ[2] ] ]
+
+        # self.offsetPlatePosition = [[x,y-extraoffsetIn,z] for x,y,z in self.platePosition]
+        # self.nextoffsetPlatePosition = [[x,y-extraoffsetOut,z] for x,y,z in self.platePosition]
         self.MAN = MANipulator()
         self.stepRotation = stepRotation
         self.planingStepDistance = planingStepDistance/10.0
@@ -167,17 +181,17 @@ class prePackage:
                     offsetPosition[1] = int(offsetPosition[1])-int(self.offsetlenghtIn)-int(self.plateHeight)
                     nextoffsetPosition[1] = int(nextoffsetPosition[1])-int(self.offsetlenghtOutOther)-int(self.plateHeight)
                 if wall == 'L':
-                    position[0] = int(position[0])+int(self.plateHeight)-15
-                    position[2] = int(position[2]) + 60
-                    offsetPosition[0] = int(offsetPosition[0])+int(self.offsetlenghtIn)+int(self.plateHeight) - 60
-                    offsetPosition[2] = int(offsetPosition[2])+60
-                    nextoffsetPosition[0] = int(nextoffsetPosition[0])+int(self.offsetlenghtOutOther)+int(self.plateHeight) - 60
+                    position[0] = int(position[0])+int(self.plateHeight) +15
+                    position[2] = int(position[2]) 
+                    offsetPosition[0] = int(offsetPosition[0])+int(self.offsetlenghtIn)+int(self.plateHeight) - 30
+                    offsetPosition[2] = int(offsetPosition[2])
+                    nextoffsetPosition[0] = int(nextoffsetPosition[0])+int(self.offsetlenghtOutOther)+int(self.plateHeight) - 30
                 if wall == 'R':
-                    position[2] = int(position[2]) + 30
-                    position[0] = int(position[0])-int(self.plateHeight) + 15
-                    offsetPosition[2] = int(offsetPosition[2])+30
-                    offsetPosition[0] = int(offsetPosition[0])-int(self.offsetlenghtIn)-int(self.plateHeight)+60
-                    nextoffsetPosition[0] = int(nextoffsetPosition[0])-int(self.offsetlenghtOutOther)-int(self.plateHeight)
+                    position[2] = int(position[2]) 
+                    position[0] = int(position[0])-int(self.plateHeight) +10
+                    offsetPosition[2] = int(offsetPosition[2])
+                    offsetPosition[0] = int(offsetPosition[0])-int(self.offsetlenghtIn)-int(self.plateHeight) + 50
+                    nextoffsetPosition[0] = int(nextoffsetPosition[0])-int(self.offsetlenghtOutOther)-int(self.plateHeight) + 50
                 if wall == 'B':
                     
                     if position[0] > 0:
@@ -203,8 +217,10 @@ class prePackage:
                 
    
                 # get pai to offset after get pai 
-                for deltaPosition in self.sendToPoint(position,nextoffsetPosition,'offset'):
-                    key.append([deltaPosition,wall,1,oreintation] )
+                # for deltaPosition in self.sendToPoint(position,nextoffsetPosition,'offset'):
+                #     key.append([deltaPosition,wall,1,oreintation] )
+                key.append([ position,wall,1,oreintation])
+                key.append([ nextoffsetPosition,wall,1,oreintation])
 
                 # offset from get pai to offset before put pai
                 notEnlight = True
