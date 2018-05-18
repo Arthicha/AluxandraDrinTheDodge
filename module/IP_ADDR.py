@@ -428,9 +428,10 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
 
     def find_orient(pts,model_x=None,model_y = None):
         point = __class__.order_points(pts)
-        if model_x is None or model_y is None:
+        if True:
             (tl, tr, br, bl) = point
-            return -1*np.arctan2([br[1]-bl[1]],[br[0]-bl[0]])
+            print(-1*np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])]))
+            return -1*np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])])
         else:
             (tl, tr, br, bl) = point
             feature_x,feature_y = __class__.get_XY_feature(br)
@@ -440,6 +441,10 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             br = (0, 0)
             bl[0] = model_x.predict([feature_x])[0]
             bl[1] = model_y.predict([feature_y])[0][0]
+            print("-------")
+            print(np.arctan([(br[1] - bl[1])/(br[0] - bl[0])]))
+            print(np.arctan2([br[1] - bl[1]], [br[0] - bl[0]]))
+            print("---------")
             return -1 * np.arctan2([br[1] - bl[1]], [br[0] - bl[0]])
 
     def Get_Plate2(org,thres_kirnel=21,min_area=0.01,max_area=0.9,lengPercent=0.01,morph=False, center=False, before =False,orientation=False,model_x=None,model_y=None,binarization_method = SAUVOLA_THRESHOLDING,closing_kernel_size=5):
@@ -461,6 +466,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         platePos = []
         plateOrientation=[]
         image = copy.deepcopy(org)
+        image2 = copy.deepcopy(org)
         if binarization_method ==  __class__.SAUVOLA_THRESHOLDING:
             image = __class__.binarize(image,method=__class__.SAUVOLA_THRESHOLDING,value=thres_kirnel)
         else:
@@ -499,8 +505,6 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                     plate.append(approx)
                     plate_hierachy.append(hi)
                     cv2.drawContours(org, [approx], -1, (255, 255, 255), 2)
-                    cv2.imshow('ca',org)
-                    cv2.waitKey(0)
                 else:
                     new_approx = copy.deepcopy(approx)
                     new_approx = list(map(lambda x: x[0],new_approx))
@@ -525,20 +529,27 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                     plate_hierachy.append(hi)
                     cv2.drawContours(org, [point_to_append], -1, (255, 255, 255), 2)
 
-                cv2.imshow('original', org)
-                cv2.waitKey(0)
         for i in range(0,len(plate)):
             plate[i] = np.array(plate[i])
             plate[i] = np.reshape(plate[i],(4,2))
             '''My code '''
             if orientation:
                 plateOrientation.append(__class__.find_orient(plate[i],model_x,model_y))
+
             # print('**********************')
             # print(image.shape)
             # print(plate[i])
             # Full =True
             if center and before:
                 platePos.append(__class__.center_of_Mass(plate[i]))
+
+            rect = __class__.order_points(plate[i])
+            (tl, tr, br, bl) = rect
+            # print(br,bl)
+            cv2.circle(image2,tuple(br),5,[255,0,0],3)
+            cv2.line(image2,tuple(br),tuple(bl),[0,0,255],4)
+            cv2.imshow("vector_I_sas",image2)
+            cv2.waitKey(10)
             '''End of my code'''
             plate[i],M = __class__.four_point_transform(org,plate[i],matrice=True)
 

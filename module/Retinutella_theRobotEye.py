@@ -146,7 +146,7 @@ class Retinutella():
         if show:
             show_capture = copy.deepcopy(capture)
             show_capture = cv2.cvtColor(show_capture, cv2.COLOR_GRAY2BGR)
-            for i in plate_pos:
+            for i,j in zip(plate_pos,plate_orientation):
                 pos = (int(i[0]), int(i[1]))
                 cv2.circle(show_capture, pos, 3, [255, 0, 0])
             cv2.imshow("capture", show_capture)
@@ -275,15 +275,23 @@ class Retinutella():
             return None
         else:
             if 'L' in self.name:
-                return np.array([[0, 0, -1], [np.cos(orientation[0]), np.sin(orientation[0]), 0],
-                                 [np.sin(orientation[0]), -np.cos(orientation[0]), 0]])
+                return np.array([[0, 0, -1],
+                                 [np.sin(orientation[0]), np.cos(orientation[0]), 0],
+                                 [np.cos(orientation[0]), -np.sin(orientation[0]), 0]])
             elif 'R' in self.name:
-                return np.array([[0, 0, 1], [np.cos(orientation[0]), np.sin(orientation[0]), 0],
-                                 [-np.sin(orientation[0]), np.cos(orientation[0]), 0]])
+                return np.array([[0, 0, 1],
+                                 [np.sin(orientation[0]), np.cos(orientation[0]), 0],
+                                 [-np.cos(orientation[0]), np.sin(orientation[0]), 0]])
             elif 'B' in self.name:
-                return np.array([[np.cos(orientation[0]), np.sin(orientation[0]), 0],
-                                 [np.sin(orientation[0]), -np.cos(orientation[0]), 0],
+                return np.array([[np.cos(orientation[0]), -np.sin(orientation[0]), 0],
+                                 [-np.sin(orientation[0]), -np.cos(orientation[0]), 0],
                                  [0, 0, -1]])
 
-
+    def draw_x_vector(self,orientation_matrix):
+        if 'L' in self.name:
+            print(orientation_matrix[1:,0:2])
+        elif 'R' in self.name:
+            print(orientation_matrix[1:, 0:2])
+        elif 'B' in self.name:
+            print(orientation_matrix[1:, 0:2])
 

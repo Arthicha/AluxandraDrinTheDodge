@@ -14,43 +14,33 @@ from module.UniqueCameraClass import *
 
 # Measures are in milimeters
 
-LOAD_IMAGE_NAME = "L_tune.png"
+LOAD_IMAGE_NAME = "Bm_tune_latest1.png"
 #   'C:\\Users\\cha45\\PycharmProjects\\piv\\Ltest4.jpg'
 # "L_tune.png"
 #    'C:\\Users\\cha45\\PycharmProjects\\piv\\Ltest4.jpg'#newR_test.png
-SAVE_IMAGE_NAME = 'sam.png'
-FROM_FILE = False
+SAVE_IMAGE_NAME = 'Bm_test_latest1.png'
+FROM_FILE = True
 TEST_MODEL = True
 CLASS = True
 CAM_NAME = 'Bm'
 MODEL_FILE_NAME = 'Bm'
 CAM_ORIENT = 0
 CAM_FOUR_POINT = np.array([[82, 1], [75, 639], [492, 520], [600, 80]])
-# np.array([[113, 167], [308, 181], [356, 631], [68, 638]])
-# np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
-# np.array([[72, 1], [608, 78], [472, 567], [72, 625]])
-# np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
-#  np.array([[82, 0], [614, 93], [463, 609], [17, 638]])
-#    np.array([[82, 0], [614, 93], [463, 609], [17, 638]])
-# np.array([[106, 167], [301, 182], [349, 619], [68, 629]])
-# np.array([[353, 153], [277, 588], [556, 613], [553, 143]])
-# np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
-#    np.array([[119, 173], [51, 639], [358, 638], [314, 189]])
-# np.array([[544, 173], [553, 638], [269, 621], [348, 182]])
-# np.array([[290,230],[356,638],[96,225],[63,639]])
+# 38.5 from inside
+# 31.5 from left
 '''Regression Parameter'''
 SAVED_MODEL_NAME = 'Bm'
-KERNEL_SIZE = (4, 4)
-NUMBER_OF_POINTS = (15, 15)
+KERNEL_SIZE = (7, 7)
+NUMBER_OF_POINTS = (12, 13)
 DIFFERENCE_DISTANCE_PER_POINT = [30, 30]
-SHIFT_X = 700 - 597.5
+SHIFT_X = -500+315
 # -190
 # 527.5
 # 527.5-240 = 287.5
-SHIFT_Y = 1000 - 582.5 + 35
+SHIFT_Y = 700-385
 # 420
 # 420+210 =630
-BINARY_THRESHOLD = 55
+BINARY_THRESHOLD = 100
 # right
 # from above = 57
 # from inside = 20.75
@@ -64,8 +54,10 @@ CAMERA_ALL_OFFSET_Z = 25
 CAM_BOTTOM_MIDDLE_NAME = 'Bm'
 CAM_BOTTOM_MIDDLE_PORT = 1
 CAM_BOTTOM_MIDDLE_MODE = 1
-CAM_BOTTOM_MIDDLE_ORIENTATION = -180
-CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[17, 483], [178, 293], [485, 285], [637, 479]])
+CAM_BOTTOM_MIDDLE_ORIENTATION = 0
+CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[0, 433], [136, 157], [500, 161], [639, 422]])
+# np.array([[0, 514], [148, 347], [547, 330], [639, 477]])
+# np.array([[17, 483], [178, 293], [485, 285], [637, 479]])
 CAM_BOTTOM_MIDDLE_MINIMUM_AREA = 0.01
 CAM_BOTTOM_MIDDLE_MAXIMUM_AREA = 0.9
 CAM_BOTTOM_MIDDLE_LENGTH_PERCENT = 0.03
