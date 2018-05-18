@@ -5,7 +5,7 @@ import random
 import math
 from matplotlib import pyplot as plt
 from sklearn import linear_model
-from sklearn.svm import SVR,LinearSVR
+from sklearn.svm import SVR, LinearSVR
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.externals import joblib
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
@@ -14,38 +14,43 @@ from module.UniqueCameraClass import *
 
 # Measures are in milimeters
 
-LOAD_IMAGE_NAME = 'Bm_test1.png'#newR_test.png
-SAVE_IMAGE_NAME = 'Bm_test1.png'
+LOAD_IMAGE_NAME = "L_tune.png"
+#   'C:\\Users\\cha45\\PycharmProjects\\piv\\Ltest4.jpg'
+# "L_tune.png"
+#    'C:\\Users\\cha45\\PycharmProjects\\piv\\Ltest4.jpg'#newR_test.png
+SAVE_IMAGE_NAME = 'sam.png'
 FROM_FILE = False
 TEST_MODEL = True
 CLASS = True
-MODEL_FILE_NAME = 'Bl_bottom'
-CAM_ORIENT = -180
-CAM_FOUR_POINT = np.array([[113, 167], [308, 181], [356, 631], [68, 638]])
-#np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
-#np.array([[72, 1], [608, 78], [472, 567], [72, 625]])
-#np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
+CAM_NAME = 'Bm'
+MODEL_FILE_NAME = 'Bm'
+CAM_ORIENT = 0
+CAM_FOUR_POINT = np.array([[82, 1], [75, 639], [492, 520], [600, 80]])
+# np.array([[113, 167], [308, 181], [356, 631], [68, 638]])
+# np.array([[20, 512], [636, 510], [488, 305], [182, 309]])
+# np.array([[72, 1], [608, 78], [472, 567], [72, 625]])
+# np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
 #  np.array([[82, 0], [614, 93], [463, 609], [17, 638]])
 #    np.array([[82, 0], [614, 93], [463, 609], [17, 638]])
 # np.array([[106, 167], [301, 182], [349, 619], [68, 629]])
-#np.array([[353, 153], [277, 588], [556, 613], [553, 143]])
+# np.array([[353, 153], [277, 588], [556, 613], [553, 143]])
 # np.array([[23, 503], [636, 508], [485, 304], [180, 309]])
 #    np.array([[119, 173], [51, 639], [358, 638], [314, 189]])
-    #np.array([[544, 173], [553, 638], [269, 621], [348, 182]])
+# np.array([[544, 173], [553, 638], [269, 621], [348, 182]])
 # np.array([[290,230],[356,638],[96,225],[63,639]])
 '''Regression Parameter'''
-SAVED_MODEL_NAME = 'Bl_bottom'
-KERNEL_SIZE = (5, 5)
-NUMBER_OF_POINTS = (15, 10)
+SAVED_MODEL_NAME = 'Bm'
+KERNEL_SIZE = (4, 4)
+NUMBER_OF_POINTS = (15, 15)
 DIFFERENCE_DISTANCE_PER_POINT = [30, 30]
-SHIFT_X = 500-298
+SHIFT_X = 700 - 597.5
 # -190
-#527.5
+# 527.5
 # 527.5-240 = 287.5
-SHIFT_Y = 700-452.5
-#420
+SHIFT_Y = 1000 - 582.5 + 35
+# 420
 # 420+210 =630
-BINARY_THRESHOLD = 60
+BINARY_THRESHOLD = 55
 # right
 # from above = 57
 # from inside = 20.75
@@ -55,6 +60,26 @@ BINARY_THRESHOLD = 60
 # from inside = 65 cm
 '''Cam config for run with cam'''
 CAMERA_ALL_OFFSET_Z = 25
+
+CAM_BOTTOM_MIDDLE_NAME = 'Bm'
+CAM_BOTTOM_MIDDLE_PORT = 1
+CAM_BOTTOM_MIDDLE_MODE = 1
+CAM_BOTTOM_MIDDLE_ORIENTATION = -180
+CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[17, 483], [178, 293], [485, 285], [637, 479]])
+CAM_BOTTOM_MIDDLE_MINIMUM_AREA = 0.01
+CAM_BOTTOM_MIDDLE_MAXIMUM_AREA = 0.9
+CAM_BOTTOM_MIDDLE_LENGTH_PERCENT = 0.03
+CAM_BOTTOM_MIDDLE_THRESH_KERNEL = 175
+CAM_BOTTOM_MIDDLE_BOUNDARY = 10
+CAM_BOTTOM_MIDDLE_BINARIZE_METHOD = -1
+CAM_BOTTOM_MIDDLE_OFFSET_HOMO_X = -17
+CAM_BOTTOM_MIDDLE_OFFSET_HOMO_Y = -285
+
+cam_bottom_middle = Retinutella(CAM_BOTTOM_MIDDLE_NAME, CAM_BOTTOM_MIDDLE_PORT, CAM_BOTTOM_MIDDLE_ORIENTATION,
+                                CAM_BOTTOM_MIDDLE_MODE, CAM_BOTTOM_MIDDLE_FOUR_POINTS, CAM_BOTTOM_MIDDLE_THRESH_KERNEL,
+                                CAM_BOTTOM_MIDDLE_MINIMUM_AREA, CAM_BOTTOM_MIDDLE_MAXIMUM_AREA,
+                                CAM_BOTTOM_MIDDLE_LENGTH_PERCENT, CAM_BOTTOM_MIDDLE_BOUNDARY,
+                                CAM_BOTTOM_MIDDLE_BINARIZE_METHOD)
 
 CAM_BOTTOM_RIGHT_PORT = 4
 CAM_BOTTOM_RIGHT_MODE = 1
@@ -122,7 +147,7 @@ def Regression_HaHA(Image_naja, kernel_size=(4, 4), binarization_thresh_kernel_s
     print('center Y:')
     print(conWorldMatY)
     print('------------------')
-    cv2.imshow('dot',imgC)
+    cv2.imshow('dot', imgC)
     cv2.waitKey(0)
     # *************************************************************************
     # REAL WORLD POINTS
@@ -184,11 +209,11 @@ def Regression_HaHA(Image_naja, kernel_size=(4, 4), binarization_thresh_kernel_s
         Y_divide = 1 / (0.00001 + conWorldMatY[k])
         XY_divide = X_divide * Y_divide
 
-        dummyX = np.array([X, Y,XY2, X2, Y2, XY])  # X3,X5, X3Y2, XY4, , X_divide,Y_divide,XY_divide
-        #, XY2, X2, Y2
+        dummyX = np.array([X, Y, XY2, X2, Y2, XY])  # X3,X5, X3Y2, XY4, , X_divide,Y_divide,XY_divide
+        # , XY2, X2, Y2
         DisX[k] = dummyX
-        dummyY = np.array([X, Y,YX2, X2, Y2,  XY])  # Y3, YX4, X2Y3, Y5,   ,X_divide,Y_divide,XY_divide
-        #, YX2, X2, Y2
+        dummyY = np.array([X, Y, YX2, X2, Y2, XY])  # Y3, YX4, X2Y3, Y5,   ,X_divide,Y_divide,XY_divide
+        # , YX2, X2, Y2
         DisY[k] = dummyY
 
     # regX = LinearSVR()
@@ -214,7 +239,12 @@ def m_click(event, x, y, k, l):
 if FROM_FILE:
     pass
 
-cam = Retinutella('cam1', 1, CAM_ORIENT, cameraMode=1, four_points=CAM_FOUR_POINT)
+cam = Retinutella(CAM_BOTTOM_MIDDLE_NAME, CAM_BOTTOM_MIDDLE_PORT, CAM_BOTTOM_MIDDLE_ORIENTATION,
+                  CAM_BOTTOM_MIDDLE_MODE, CAM_BOTTOM_MIDDLE_FOUR_POINTS, CAM_BOTTOM_MIDDLE_THRESH_KERNEL,
+                  CAM_BOTTOM_MIDDLE_MINIMUM_AREA, CAM_BOTTOM_MIDDLE_MAXIMUM_AREA,
+                  CAM_BOTTOM_MIDDLE_LENGTH_PERCENT, CAM_BOTTOM_MIDDLE_BOUNDARY,
+                  CAM_BOTTOM_MIDDLE_BINARIZE_METHOD)
+# Retinutella(CAM_NAME, 1, CAM_ORIENT, cameraMode=1, four_points=CAM_FOUR_POINT)
 # cam.getImage()
 # cam = cv2.VideoCapture(1)
 # ret,im = cam.read()
