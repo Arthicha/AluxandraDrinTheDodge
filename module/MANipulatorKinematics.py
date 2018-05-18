@@ -253,18 +253,19 @@ class MANipulator():
             c5 = Rz[2]
             q3_ind += 1
             #q5 = asin(sqrt(pow(Rz[0],2)+pow(Rz[1],2)))
-            q5 = acos(c5)
-            q4 = atan2(Rz[1],Rz[0])
+            q5 = atan(s5/c5)
+            #q4 = atan2(Rz[1],Rz[0])
+            q4 = atan(Rz[1]/Rz[0])
             #print('check',Rz)
-            if (q4 > math.pi/2) or (q4 < -math.pi/2):
+            '''if (q4 > math.pi/2) or (q4 < -math.pi/2):
                 #print('in')
                 if (q4 > math.pi/2):
                     q4 -= math.pi
                 else:
                     q4 += math.pi
-                q5 = -q5
+                q5 = -q5'''
 
-            Rx = R[:, 1]*-1
+            Rx = R[:, 0]*-1
             # q6 = 0
             q6 = atan((sin(q4)*Rx[0]-cos(q4)*Rx[1])*sin(q5)/Rx[2])
             q.append([q1,q2,q3,q4,q5,q6])
