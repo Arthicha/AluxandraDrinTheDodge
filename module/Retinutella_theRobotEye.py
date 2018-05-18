@@ -274,6 +274,7 @@ class Retinutella():
         if orientation is None:
             return None
         else:
+            orientation = orientation+0.261799
             if 'L' in self.name:
                 return np.array([[0, 0, -1],
                                  [np.sin(orientation[0]), np.cos(orientation[0]), 0],
