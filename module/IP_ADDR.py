@@ -428,7 +428,12 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         point = __class__.order_points(pts)
         if True:
             (tl, tr, br, bl) = point
+            print('---------------------------------')
+            print(pts)
+            print(br,bl)
+            print((br[1] - bl[1]) / (br[0] - bl[0]))
             print(-1 * np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])]))
+            print('----------------------------------')
             return -1 * np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])])
         else:
             (tl, tr, br, bl) = point
