@@ -149,10 +149,10 @@ class Retinutella():
                                                                     binarization_method=self.binarize_method,
                                                                     closing_kernel_size=self.closing_kernel_size,
                                                                     model_x=self.model_x, model_y=self.model_y)
-        print(len(plate_capture))
+        # print(len(plate_capture))
         plate, plate_pos, plate_orientation = IP.Get_Word2(plate_capture, plate_pos, plate_orientation,
                                                            image_size=image_size, boundary=self.boundary)
-        print(len(plate_capture))
+        # print(len(plate_capture))
         ''' my part '''
         if show:
             show_capture = copy.deepcopy(capture)
