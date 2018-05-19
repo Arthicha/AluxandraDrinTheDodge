@@ -25,9 +25,9 @@ from sklearn.externals import joblib
 OFFSET_ORIENTATION_L = 0.261799
 OFFSET_ORIENTATION_R = 0.261799
 OFFSET_ORIENTATION_B = 0.261799
-COEFFICIENT_ORIENTATION_L = -1
-COEFFICIENT_ORIENTATION_R = -1
-COEFFICIENT_ORIENTATION_B = -1
+COEFFICIENT_ORIENTATION_L = 1
+COEFFICIENT_ORIENTATION_R = 1
+COEFFICIENT_ORIENTATION_B = 1
 
 
 class Retinutella():
@@ -286,23 +286,23 @@ class Retinutella():
         if orientation is None:
             return None
         else:
-            if orientation == np.NaN or orientation == np.NAN:
-                orientation = (45.0 / 180.0) * np.pi
+            if orientation[0] == np.NaN or orientation[0] == np.NAN:
+                orientation[0] = (45.0 / 180.0) * np.pi
             else:
                 pass
 
             if 'L' in self.name:
-                orientation = COEFFICIENT_ORIENTATION_L * orientation + OFFSET_ORIENTATION_L
+                orientation[0] = COEFFICIENT_ORIENTATION_L * orientation[0] + OFFSET_ORIENTATION_L
                 return np.array([[0, 0, -1],
                                  [np.sin(orientation[0]), np.cos(orientation[0]), 0],
                                  [np.cos(orientation[0]), -np.sin(orientation[0]), 0]])
             elif 'R' in self.name:
-                orientation = COEFFICIENT_ORIENTATION_R * orientation + OFFSET_ORIENTATION_R
+                orientation[0] = COEFFICIENT_ORIENTATION_R * orientation[0] + OFFSET_ORIENTATION_R
                 return np.array([[0, 0, 1],
                                  [np.sin(orientation[0]), np.cos(orientation[0]), 0],
                                  [-np.cos(orientation[0]), np.sin(orientation[0]), 0]])
             elif 'B' in self.name:
-                orientation = COEFFICIENT_ORIENTATION_B * orientation + OFFSET_ORIENTATION_B
+                orientation[0] = COEFFICIENT_ORIENTATION_B * orientation[0] + OFFSET_ORIENTATION_B
                 return np.array([[np.cos(orientation[0]), -np.sin(orientation[0]), 0],
                                  [-np.sin(orientation[0]), -np.cos(orientation[0]), 0],
                                  [0, 0, -1]])
