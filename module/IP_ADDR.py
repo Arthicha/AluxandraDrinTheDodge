@@ -535,11 +535,9 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             '''My code '''
             if orientation:
                 plateOrientation.append(__class__.find_orient(plate[i], model_x, model_y))
-
             # print('**********************')
             # print(image.shape)
             # print(plate[i])
-            # Full =True
             if center and before:
                 platePos.append(__class__.center_of_Mass(plate[i]))
 
@@ -562,7 +560,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         else:
             return plate
 
-    def Get_Word2(plate, thres_kirnel=21, boundary=20, black_tollerance=10, image_size=(60, 30), Resize=True):
+    def Get_Word2(plate,plate_position,plate_orientation, thres_kirnel=21, boundary=20, black_tollerance=10, image_size=(60, 30), Resize=True):
         '''
         :param plate:              list of image of plate  
         :param thres_kirnel:        dimension of kernel use to binarize 
@@ -574,7 +572,9 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         :param image_size:          word image size
         :return: list of word image
         '''
-        listOfWord = []
+        listOfWord =  []
+        listOfPosition = []
+        listOfOrientation =[]
         for i in range(0, len(plate)):
             word = __class__.binarize(plate[i], method=__class__.SAUVOLA_THRESHOLDING, value=thres_kirnel)
 
@@ -591,8 +591,11 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
                 if Resize:
                     word = cv2.resize(word, (image_size[1], image_size[0]))
                 listOfWord.append(word)
+                listOfPosition.append(plate_position[i])
+                listOfOrientation.append(plate_orientation[i])
+
         if Resize:
-            return listOfWord
+            return listOfWord,listOfPosition,listOfOrientation
         else:
             return listOfWord, bou
 

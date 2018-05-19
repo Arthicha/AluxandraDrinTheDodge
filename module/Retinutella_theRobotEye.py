@@ -15,13 +15,20 @@ import numpy as np
 import cv2
 from scipy.spatial import cKDTree
 from module.IP_ADDR import Image_Processing_And_Do_something_to_make_Dataset_be_Ready as IP
-from sklearn.externals import  joblib
+from sklearn.externals import joblib
+
 '''*************************************************
 *                                                  *
 *               class Retinutella                  *
 *                                                  *
 *************************************************'''
-OFFSET_ORIENTATION = 0.261799
+OFFSET_ORIENTATION_L = 0.261799
+OFFSET_ORIENTATION_R = 0.261799
+OFFSET_ORIENTATION_B = 0.261799
+COEFFICIENT_ORIENTATION_L = -1
+COEFFICIENT_ORIENTATION_R = -1
+COEFFICIENT_ORIENTATION_B = -1
+
 
 class Retinutella():
     name = None  # camera name
@@ -129,10 +136,11 @@ class Retinutella():
             return img, capture, matrice
         return img, None, None
 
-    def getListOfPlate(self, image_size=(30, 60), show=False,LOAD_IMAGE =False,FILENAME='picture\\testpic\TestBottomRightSide.jpg'):
+    def getListOfPlate(self, image_size=(30, 60), show=False, LOAD_IMAGE=False,
+                       FILENAME='picture\\testpic\TestBottomRightSide.jpg'):
         '''have been edited'''
         image, capture, matrice = self.getImage(remove_pers=True, LOAD_IMAGE=LOAD_IMAGE,
-                 FILE_NAME_or_PATH=FILENAME)
+                                                FILE_NAME_or_PATH=FILENAME)
         plate_capture, plate_pos, plate_orientation = IP.Get_Plate2(capture, thres_kirnel=self.thresh_kernel,
                                                                     max_area=self.maximum_area,
                                                                     min_area=self.minimum_area,
@@ -142,12 +150,14 @@ class Retinutella():
                                                                     closing_kernel_size=self.closing_kernel_size,
                                                                     model_x=self.model_x, model_y=self.model_y)
         print(len(plate_capture))
-        plate = IP.Get_Word2(plate_capture, image_size=image_size, boundary=self.boundary)
+        plate, plate_pos, plate_orientation = IP.Get_Word2(plate_capture, plate_pos, plate_orientation,
+                                                           image_size=image_size, boundary=self.boundary)
+        print(len(plate_capture))
         ''' my part '''
         if show:
             show_capture = copy.deepcopy(capture)
             show_capture = cv2.cvtColor(show_capture, cv2.COLOR_GRAY2BGR)
-            for i,j in zip(plate_pos,plate_orientation):
+            for i, j in zip(plate_pos, plate_orientation):
                 pos = (int(i[0]), int(i[1]))
                 cv2.circle(show_capture, pos, 3, [255, 0, 0])
             cv2.imshow("capture", show_capture)
@@ -157,7 +167,8 @@ class Retinutella():
         sorted_plate_orientation = list(map(lambda x: self.orientation_to_mat(x), plate_orientation))
         plate, sorted_plate_pos, sorted_plate_orientation = IP.filter_plate(plate, sorted_plate_pos,
                                                                             sorted_plate_orientation)
-        plate, sorted_plate_pos, sorted_plate_orientation = IP.find_same_point_and_average_it(plate, sorted_plate_pos, sorted_plate_orientation)
+        plate, sorted_plate_pos, sorted_plate_orientation = IP.find_same_point_and_average_it(plate, sorted_plate_pos,
+                                                                                              sorted_plate_orientation)
         return image, plate, sorted_plate_pos, sorted_plate_orientation
 
     def close(self):
@@ -275,25 +286,31 @@ class Retinutella():
         if orientation is None:
             return None
         else:
-            orientation = orientation+OFFSET_ORIENTATION
+            if orientation == np.NaN or orientation == np.NAN:
+                orientation = (45.0 / 180.0) * np.pi
+            else:
+                pass
+
             if 'L' in self.name:
+                orientation = COEFFICIENT_ORIENTATION_L * orientation + OFFSET_ORIENTATION_L
                 return np.array([[0, 0, -1],
                                  [np.sin(orientation[0]), np.cos(orientation[0]), 0],
                                  [np.cos(orientation[0]), -np.sin(orientation[0]), 0]])
             elif 'R' in self.name:
+                orientation = COEFFICIENT_ORIENTATION_R * orientation + OFFSET_ORIENTATION_R
                 return np.array([[0, 0, 1],
                                  [np.sin(orientation[0]), np.cos(orientation[0]), 0],
                                  [-np.cos(orientation[0]), np.sin(orientation[0]), 0]])
             elif 'B' in self.name:
+                orientation = COEFFICIENT_ORIENTATION_B * orientation + OFFSET_ORIENTATION_B
                 return np.array([[np.cos(orientation[0]), -np.sin(orientation[0]), 0],
                                  [-np.sin(orientation[0]), -np.cos(orientation[0]), 0],
                                  [0, 0, -1]])
 
-    def draw_x_vector(self,orientation_matrix):
+    def draw_x_vector(self, orientation_matrix):
         if 'L' in self.name:
-            print(orientation_matrix[1:,0:2])
+            print(orientation_matrix[1:, 0:2])
         elif 'R' in self.name:
             print(orientation_matrix[1:, 0:2])
         elif 'B' in self.name:
             print(orientation_matrix[1:, 0:2])
-
