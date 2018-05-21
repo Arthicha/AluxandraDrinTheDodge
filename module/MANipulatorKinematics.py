@@ -39,9 +39,15 @@ class MANipulator():
         self.jointLimit = [[-1/4*math.pi,5/4*math.pi],
                     [1/12*math.pi,math.pi],
                     [-11/12*math.pi,0/12*math.pi],
-                    [-8/4*math.pi,8/4*math.pi],
-                    [-8/4*math.pi,8/4*math.pi],
-                    [-8/4*math.pi,8/4*math.pi]]
+                    [-2/4*math.pi,2/4*math.pi],
+                    [-2/4*math.pi,2/4*math.pi],
+                    [-2/4*math.pi,2/4*math.pi]]
+        # self.setJointLimits = [ [math.radians(-10),math.radians(190)] ,
+        #                         [math.radians(15),math.radians(170)] ,
+        #                         [math.radians(-165),math.radians(0)] ,
+        #                         [math.radians(90),math.radians(90)] ,
+        #                         [math.radians(-90),math.radians(90)] ,
+        #                         [math.radians(-90),math.radians(90)] ]
 
 
 
@@ -119,10 +125,13 @@ class MANipulator():
         ax.set_xlabel('x_0-direction')
         ax.set_ylabel('y_0-direction')
         #fig.canvas.draw()
+        
         if matplotLibs:
+            
             plt.show(fig)
             return None
         else:
+            
             fig.savefig('inverse.png')
             img = cv2.imread('inverse.png')
             cv2.imshow('inverse kinematics',img)
@@ -248,14 +257,17 @@ class MANipulator():
 
             H,_ = self.forward_kin(DH_param[:3,:],[q1,q2,q3])
             R = np.matmul(np.transpose(H[:3,:3]),R_e)
+            Rx = R[:, 0]
+            Ry = R[:, 1]
             Rz = R[:,-1]
             s5 = sqrt(pow(Rz[0],2)+pow(Rz[1],2))
             c5 = Rz[2]
             q3_ind += 1
             #q5 = asin(sqrt(pow(Rz[0],2)+pow(Rz[1],2)))
-            q5 = atan(s5/c5)
-            #q4 = atan2(Rz[1],Rz[0])
-            q4 = atan(Rz[1]/Rz[0])
+            # q5 = atan(sqrt(Rx[2]**2+Ry[2]**2)/Rz[2]) 
+            q5 = atan( s5/c5)
+            # q4 = atan(Rz[1]/Rz[0])
+            q4 = atan2(Rz[1],Rz[0])
             #print('check',Rz)
             '''if (q4 > math.pi/2) or (q4 < -math.pi/2):
                 #print('in')
@@ -265,8 +277,9 @@ class MANipulator():
                     q4 += math.pi
                 q5 = -q5'''
 
-            Rx = R[:, 0]*-1
+            
             # q6 = 0
+            # q6 = atan(-Ry[2]/Rx[2])
             q6 = atan((sin(q4)*Rx[0]-cos(q4)*Rx[1])*sin(q5)/Rx[2])
             q.append([q1,q2,q3,q4,q5,q6])
 

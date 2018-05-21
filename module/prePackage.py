@@ -109,7 +109,8 @@ class prePackage:
             end = output[index+count][0]
             output.insert(index+count,(start,end))
 
-            keep[(start,end)] = [[data, keep[output[index]][0][1], keep[output[index]][0][2], keep[output[index+count+1]][0][3] ] for data in self.sendToPoint(start,end)] 
+            # keep[(start,end)] = [[data, keep[output[index]][0][1], keep[output[index]][0][2], keep[output[index+count+1]][0][3] ] for data in self.sendToPoint(start,end)] 
+            keep[(start,end)] = [[data, keep[output[index]][0][1], 0, keep[output[index+count+1]][0][3] ] for data in self.sendToPoint(start,end)] 
 
          # connect all path and keep in 1 list 
         for index in output: 
@@ -181,14 +182,14 @@ class prePackage:
                     offsetPosition[1] = int(offsetPosition[1])-int(self.offsetlenghtIn)-int(self.plateHeight)
                     nextoffsetPosition[1] = int(nextoffsetPosition[1])-int(self.offsetlenghtOutOther)-int(self.plateHeight)
                 if wall == 'L':
-                    position[0] = int(position[0])+int(self.plateHeight) +15
+                    position[0] = int(position[0])+int(self.plateHeight) +25
                     position[2] = int(position[2]) 
                     offsetPosition[0] = int(offsetPosition[0])+int(self.offsetlenghtIn)+int(self.plateHeight) - 30
                     offsetPosition[2] = int(offsetPosition[2])
                     nextoffsetPosition[0] = int(nextoffsetPosition[0])+int(self.offsetlenghtOutOther)+int(self.plateHeight) - 30
                 if wall == 'R':
                     position[2] = int(position[2]) 
-                    position[0] = int(position[0])-int(self.plateHeight) +10
+                    position[0] = int(position[0])-int(self.plateHeight) +20
                     offsetPosition[2] = int(offsetPosition[2])
                     offsetPosition[0] = int(offsetPosition[0])-int(self.offsetlenghtIn)-int(self.plateHeight) + 50
                     nextoffsetPosition[0] = int(nextoffsetPosition[0])-int(self.offsetlenghtOutOther)-int(self.plateHeight) + 50
@@ -199,8 +200,8 @@ class prePackage:
                     else:
                         k = +50 
                     position[0] += k
-                    offsetPosition[0] += k
-                    nextoffsetPosition[0] += k
+                    offsetPosition[0] += 0
+                    nextoffsetPosition[0] += 0
                     position[2] = int(position[2])+int(self.plateHeight)
                     offsetPosition[2] = int(offsetPosition[2])+int(self.offsetlenghtIn)   +int(self.plateHeight)
                     nextoffsetPosition[2] = int(nextoffsetPosition[2])+int(self.offsetlenghtOutBottom)   +int(self.plateHeight)
@@ -210,12 +211,11 @@ class prePackage:
 
                 # if wall == 'B':
                 for deltaPosition in self.sendToPoint(offsetPosition,position,'offset'):
-                    key.append([deltaPosition,wall,0,oreintation] )
+                    key.append([deltaPosition,wall,1,oreintation] )
                 key.append([deltaPosition,wall,1,oreintation] )
                 
                 # open valve
                 
-   
                 # get pai to offset after get pai 
                 # for deltaPosition in self.sendToPoint(position,nextoffsetPosition,'offset'):
                 #     key.append([deltaPosition,wall,1,oreintation] )
