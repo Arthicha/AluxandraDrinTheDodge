@@ -28,7 +28,7 @@ OFFSET_ORIENTATION_B = 0.261799
 COEFFICIENT_ORIENTATION_L = 1
 COEFFICIENT_ORIENTATION_R = 1
 COEFFICIENT_ORIENTATION_B = 1
-
+TOLERANCE_TO_0 = 1.000000000e-10
 
 class Retinutella():
     name = None  # camera name
@@ -293,19 +293,38 @@ class Retinutella():
 
             if 'L' in self.name:
                 orientation[0] = COEFFICIENT_ORIENTATION_L * orientation[0] + OFFSET_ORIENTATION_L
-                return np.array([[0, 0, -1],
-                                 [np.sin(orientation[0]), np.cos(orientation[0]), 0],
-                                 [np.cos(orientation[0]), -np.sin(orientation[0]), 0]])
+                rot_y_270 = np.array([[np.cos(-np.pi / 2), 0, np.sin(-np.pi / 2)],
+                                      [0, 1, 0],
+                                      [-np.sin(-np.pi / 2), 0, np.cos(-np.pi / 2)]])
+                rot_z_by_theta = np.array([[np.cos(orientation[0]), -np.sin(orientation[0]), 0],
+                                           [np.sin(orientation[0]), np.cos(orientation[0]), 0],
+                                           [0, 0, 1]])
+                result = np.matmul(rot_y_270, rot_z_by_theta)
+                result[np.logical_and((result < TOLERANCE_TO_0), (result > -TOLERANCE_TO_0))] = 0
+                return result
             elif 'R' in self.name:
                 orientation[0] = COEFFICIENT_ORIENTATION_R * orientation[0] + OFFSET_ORIENTATION_R
-                return np.array([[0, 0, 1],
-                                 [np.sin(orientation[0]), np.cos(orientation[0]), 0],
-                                 [-np.cos(orientation[0]), np.sin(orientation[0]), 0]])
+                rot_y_90 = np.array([[np.cos(np.pi / 2), 0, np.sin(np.pi / 2)],
+                                     [0, 1, 0],
+                                     [-np.sin(np.pi / 2), 0, np.cos(np.pi / 2)]])
+                rot_z_by_theta = np.array([[np.cos(orientation[0]), -np.sin(orientation[0]), 0],
+                                           [np.sin(orientation[0]), np.cos(orientation[0]), 0],
+                                           [0, 0, 1]])
+                result = np.matmul(rot_y_90, rot_z_by_theta)
+                result[np.logical_and((result < TOLERANCE_TO_0), (result > -TOLERANCE_TO_0))] = 0
+                return result
             elif 'B' in self.name:
                 orientation[0] = COEFFICIENT_ORIENTATION_B * orientation[0] + OFFSET_ORIENTATION_B
-                return np.array([[np.cos(orientation[0]), -np.sin(orientation[0]), 0],
-                                 [-np.sin(orientation[0]), -np.cos(orientation[0]), 0],
-                                 [0, 0, -1]])
+                rot_x_180 = np.array([[1, 0, 0],
+                                      [0, np.cos(np.pi), -np.sin(np.pi)],
+                                      [0, np.sin(np.pi), np.cos(np.pi)]])
+                rot_z_by_theta = np.array([[np.cos(orientation[0]), -np.sin(orientation[0]), 0],
+                                           [np.sin(orientation[0]), np.cos(orientation[0]), 0],
+                                           [0, 0, 1]])
+                result = np.matmul(rot_x_180, rot_z_by_theta)
+                result[np.logical_and((result < TOLERANCE_TO_0), (result > -TOLERANCE_TO_0))] = 0
+                return result
+
 
     def draw_x_vector(self, orientation_matrix):
         if 'L' in self.name:
