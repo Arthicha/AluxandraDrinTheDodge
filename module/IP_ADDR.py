@@ -428,12 +428,13 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
         point = __class__.order_points(pts)
         if True:
             (tl, tr, br, bl) = point
-            print('---------------------------------')
-            print(pts)
-            print(br,bl)
-            print((br[1] - bl[1]) / (br[0] - bl[0]))
-            print(-1 * np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])]))
-            print('----------------------------------')
+            # print('---------------------------------')
+            # print(pts)
+            # print(br,bl)
+            # print((br[1]-bl[1]),(br[0]-bl[0]))
+            # print((br[1] - bl[1]) / (br[0] - bl[0]))
+            # print(-1 * np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])]))
+            # print('----------------------------------')
             return -1 * np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])])
         else:
             (tl, tr, br, bl) = point
@@ -444,10 +445,10 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             br = (0, 0)
             bl[0] = model_x.predict([feature_x])[0]
             bl[1] = model_y.predict([feature_y])[0][0]
-            print("-------")
-            print(np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])]))
-            print(np.arctan2([br[1] - bl[1]], [br[0] - bl[0]]))
-            print("---------")
+            # print("-------")
+            # print(np.arctan([(br[1] - bl[1]) / (br[0] - bl[0])]))
+            # print(np.arctan2([br[1] - bl[1]], [br[0] - bl[0]]))
+            # print("---------")
             return -1 * np.arctan2([br[1] - bl[1]], [br[0] - bl[0]])
 
     def Get_Plate2(org, thres_kirnel=21, min_area=0.01, max_area=0.9, lengPercent=0.01, morph=False, center=False,
@@ -504,7 +505,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             # cv2.waitKey(0)
             if (area > min_area * image_area) and (area < image_area * max_area) and (hi[2] != -1) and (
                 (len(approx) == 4) or (len(approx) == 5)):
-                print('pass')
+                # print('pass')
                 if len(approx) == 4:
                     plate.append(approx)
                     plate_hierachy.append(hi)
@@ -584,7 +585,7 @@ class Image_Processing_And_Do_something_to_make_Dataset_be_Ready():
             word = __class__.binarize(plate[i], method=__class__.SAUVOLA_THRESHOLDING, value=thres_kirnel)
 
             wx, wy = word.shape
-            print(wx, wy)
+            # print(wx, wy)
             bou = boundary
             word = 255 - np.array(word)
             word = word[bou:wx - bou, bou:wy - bou]
