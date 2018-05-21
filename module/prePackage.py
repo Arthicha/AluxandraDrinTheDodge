@@ -200,8 +200,8 @@ class prePackage:
                     else:
                         k = +50 
                     position[0] += k
-                    offsetPosition[0] += 0
-                    nextoffsetPosition[0] += 0
+                    offsetPosition[0] += k
+                    nextoffsetPosition[0] += k
                     position[2] = int(position[2])+int(self.plateHeight)
                     offsetPosition[2] = int(offsetPosition[2])+int(self.offsetlenghtIn)   +int(self.plateHeight)
                     nextoffsetPosition[2] = int(nextoffsetPosition[2])+int(self.offsetlenghtOutBottom)   +int(self.plateHeight)
@@ -217,10 +217,12 @@ class prePackage:
                 # open valve
                 
                 # get pai to offset after get pai 
-                # for deltaPosition in self.sendToPoint(position,nextoffsetPosition,'offset'):
-                #     key.append([deltaPosition,wall,1,oreintation] )
-                key.append([ position,wall,1,oreintation])
-                key.append([ nextoffsetPosition,wall,1,oreintation])
+                if wall =='B':
+                    for deltaPosition in self.sendToPoint(position,nextoffsetPosition,'offset'):
+                        key.append([deltaPosition,wall,1,oreintation] )
+                else:   
+                    key.append([ position,wall,1,oreintation])
+                    key.append([ nextoffsetPosition,wall,1,oreintation])
 
                 # offset from get pai to offset before put pai
                 notEnlight = True
