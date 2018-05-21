@@ -79,7 +79,7 @@ MAN = MANipulator()
 PORT = 4
 SEND_SERIAL = True
 RECIEVE_SERIAL = SEND_SERIAL
-MANUAL_STEP = True
+MANUAL_STEP = False
 
 # main serial setting
 RUN_MATLAB = False
@@ -87,10 +87,10 @@ CHECK_LASER = False
 PATH_PLANING_MODE = 3 # 0 -> None , 1-> wan , 2 -> zumo , 3 -> combine
 SERVO_PLANING = False
 HALF_IK = False
-SIMULATOR = True
+SIMULATOR = False
 
 # initial constant 
-INITIAL_POSITION = [[0,300,700],'F',MAN.RE_F]
+INITIAL_POSITION = [[0,400,700],'F',MAN.RE_F]
 PLATE_POSITION_X = [-260,-90,90,260]
 PLATE_POSITION_Y = 645
 PLATE_POSITION_Z = [725,550,300]
@@ -111,19 +111,18 @@ GAIN_Q = [-1,1,1,1,1,1]
 GAIN_MAGNETIC = 7/9
 
 NEW_Z_EQUATION = lambda r: -0.08951*r + 47.72    # 0 if r > 375 else 0
-Q_FOR_BACKLASH = [lambda x: 0, lambda x: x[1],lambda x: x[1]+x[2],lambda x: 0,
-                        lambda x: 0,lambda x: 0 ]
+
 OFFSET_BACKLASH = [lambda x: 0, lambda x: 5,lambda x: 10 ,lambda x: 0,
                         lambda x: 0,lambda x: 0 ]
-CASE_BACKLASH = [lambda x:  radians(90), lambda x: radians(90), lambda x: radians(90)-x, lambda x: radians(135), 
+CASE_BACKLASH = [lambda x:  radians(90), lambda x: radians(90), lambda x: radians(90)-x[1], lambda x: radians(135), 
                     lambda x: radians(135), lambda x: radians(135)]
 
-ENLIGHT_POS = [[-150,400,700],[0,300,800],[150,400,700]]
+ENLIGHT_POS = [[-200,400,700],[0,300,700],[200,400,700]]
 
 # test condition
-TEST_MODE = False
+TEST_MODE = True
 MODE_POSITION = True
-MODE_FIX_DATA = False   
+MODE_FIX_DATA = False
 
 # START STEP
 POSITION_STEP_1 = [radians(90),radians(135),radians(-130),radians(0),radians(0),radians(0)]
@@ -143,10 +142,43 @@ if TEST_MODE:
         # data = [  [[0,750,500], 'B',0, MAN.RE_B ] , [[-300,650,500],'B',0, MAN.RE_B  ] , [[-300,650,700],'B',0, MAN.RE_B ] , [[-300,650,500],'B',0, MAN.RE_B  ] , [[-300,650,700],'B',0, MAN.RE_B  ]  ]
         # data = [ [[-300,650,500],'F',0,MAN.RE_F ] ] 
         # data = [[[0,350,25], 'B',0, MAN.RE_B ]]
-        # data = [ [[-525,600,700] ,'L',17,MAN.RE_L ], [[525,600,700] ,'R',10,MAN.RE_R ], [[371,392,25] ,'B',17,MAN.RE_B ]  ]
-        data = [[[-500,565,700] ,'L',17,MAN.RE_L ] ]
+        # data = [ [[-425,600,700] ,'L',17,MAN.RE_L ], [[425,600,700] ,'R',10,MAN.RE_R ], [[371,392,25] ,'B',17,MAN.RE_B ]  ]
+        # data = [[[-500,565,700] ,'L',17,MAN.RE_L ] ]
+        # data = [ [ [-200,425,667],'B',0,MAN.RE_B ] ]
+        data = [ [[-475.0, 551.2993603576629, 630.5625787777094], 'L', 0, np.array([[ 0.        ,  0.        , -1.        ],
+       [ 0.20582585,  0.97858864,  0.        ],
+       [ 0.97858864, -0.20582585,  0.        ]])], [[-475.0, 245.74050512504883, 710.701509479417], 'L', 19, np.array([[ 0.        ,  0.        , -1.        ],
+       [ 0.54862332,  0.83606964,  0.        ],
+       [ 0.83606964, -0.54862332,  0.        ]])], [[475.0, 328.4786052588786, 393.4999013780226], 'R', 18, np.array([[ 0.        ,  0.        ,  1.        ],
+       [-0.11519377,  0.99334306,  0.        ],
+       [-0.99334306, -0.11519377,  0.        ]])], [[475.0, 180.27426381337818, 711.5402149226298], 'R', 7, np.array([[ 0.        ,  0.        ,  1.        ],
+       [ 0.47770828,  0.87851852,  0.        ],
+       [-0.87851852,  0.47770828,  0.        ]])], [[475.0, 474.41021880213293, 778.7605630040975], 'R', 15, np.array([[ 0.        ,  0.        ,  1.        ],
+       [ 0.05712606,  0.99836695,  0.        ],
+       [-0.99836695,  0.05712606,  0.        ]])], [[377.86777357142137, 115.7263742812928, 25.0], 'B', 8, np.array([[ 0.96794957, -0.25114468,  0.        ],
+       [-0.25114468, -0.96794957,  0.        ],
+       [ 0.        ,  0.        , -1.        ]])], [[279.1847441565908, 498.7037793725063, 25], 'B', 28, np.array([[ 0.98133159, -0.19232339,  0.        ],
+       [-0.19232339, -0.98133159,  0.        ],
+       [ 0.        ,  0.        , -1.        ]])], [[-270.2495874121164, 521.6234534714949, 25], 'B', 25, np.array([[ 0.89717662, -0.441672  ,  0.        ],
+       [-0.441672  , -0.89717662,  0.        ],
+       [ 0.        ,  0.        , -1.        ]])], [[-366.76389939798526, 124.55950482568153, 25.0], 'B', 8, np.array([[ 0.97000611, -0.24308044,  0.        ],
+       [-0.24308044, -0.97000611,  0.        ],
+       [ 0.        ,  0.        , -1.        ]])]]
+
+    #     data = [  [[377.86777357142137, 115.7263742812928, 25.0], 'B', 8, np.array([[ 0.96794957, -0.25114468,  0.        ],
+    #    [-0.25114468, -0.96794957,  0.        ],
+    #    [ 0.        ,  0.        , -1.        ]])], [[279.1847441565908, 498.7037793725063, 25], 'B', 28, np.array([[ 0.98133159, -0.19232339,  0.        ],
+    #    [-0.19232339, -0.98133159,  0.        ],
+    #    [ 0.        ,  0.        , -1.        ]])], [[-270.2495874121164, 521.6234534714949, 25], 'B', 25, np.array([[ 0.89717662, -0.441672  ,  0.        ],
+    #    [-0.441672  , -0.89717662,  0.        ],
+    #    [ 0.        ,  0.        , -1.        ]])], [[-366.76389939798526, 124.55950482568153, 25.0], 'B', 8, np.array([[ 0.97000611, -0.24308044,  0.        ],
+    #    [-0.24308044, -0.97000611,  0.        ],
+    #    [ 0.        ,  0.        , -1.        ]])]]
+
     else:
-       data= [radians(-10),radians(105),radians(-150),radians(0),radians(-90),radians(0)]
+    #    data= [radians(-10),radians(105),radians(-150),radians(0),radians(-90),radians(0)]
+       data = [radians(90),radians(135),radians(-150),radians(0),radians(0),radians(0)]
+    #    data = [radians(90),radians(45),radians(-150),radians(0),radians(0),radians(0)]
 
 
 # data = [95/180*pi,115/180*pi,-120/180*pi,135/180*pi,135/180*pi,135/180*pi]  # up rising
@@ -167,7 +199,7 @@ IMAGE_SIZE = (32,64)
 CAMERA_ALL_OFFSET_Z = 25
 
 CAM_LEFT_NAME = 'L'
-CAM_LEFT_PORT = 1
+CAM_LEFT_PORT = 0
 CAM_LEFT_MODE = 1
 CAM_LEFT_ORIENTATION = -90
 CAM_LEFT_FOUR_POINTS = np.array([[82, 1], [75, 639], [492, 520], [600, 80]])
@@ -181,7 +213,7 @@ CAM_LEFT_OFFSET_HOMO_X = -81  # -300
 CAM_LEFT_OFFSET_HOMO_Y = 0  # -100
 
 CAM_BOTTOM_MIDDLE_NAME = 'Bm'
-CAM_BOTTOM_MIDDLE_PORT = 3
+CAM_BOTTOM_MIDDLE_PORT = 1
 CAM_BOTTOM_MIDDLE_MODE = 1
 CAM_BOTTOM_MIDDLE_ORIENTATION = -180
 CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[0, 433], [136, 157], [500, 161], [639, 422]])
@@ -211,7 +243,7 @@ CAM_RIGHT_OFFSET_HOMO_Y = 0  # -100
 
 # Camera Bottom Right
 CAM_BOTTOM_RIGHT_NAME = 'Br_bottom'
-CAM_BOTTOM_RIGHT_PORT = 4
+CAM_BOTTOM_RIGHT_PORT = 3
 CAM_BOTTOM_RIGHT_MODE = 1
 CAM_BOTTOM_RIGHT_ORIENTATION = -90
 CAM_BOTTOM_RIGHT_FOUR_POINTS = np.array([[113, 167], [308, 181], [356, 631], [68, 638]])
@@ -226,7 +258,7 @@ CAM_BOTTOM_RIGHT_OFFSET_HOMO_Y = -167  # -100
 
 # Camera Bottom Left
 CAM_BOTTOM_LEFT_NAME = 'Bl_bottom'
-CAM_BOTTOM_LEFT_PORT = 5
+CAM_BOTTOM_LEFT_PORT = 4
 CAM_BOTTOM_LEFT_MODE = 1
 CAM_BOTTOM_LEFT_ORIENTATION = 90
 CAM_BOTTOM_LEFT_FOUR_POINTS = np.array([[348, 147], [547, 138], [549, 629], [269, 599]])
@@ -295,10 +327,10 @@ gainQ = [-1,1,1,1,1,1]
 #                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
 
 
-cam1 = lambda : Retinutella(CAM_LEFT_NAME, 0, CAM_LEFT_ORIENTATION, CAM_LEFT_MODE, CAM_LEFT_FOUR_POINTS,
+cam1 = lambda : Retinutella(CAM_LEFT_NAME, CAM_LEFT_PORT, CAM_LEFT_ORIENTATION, CAM_LEFT_MODE, CAM_LEFT_FOUR_POINTS,
                        CAM_LEFT_THRESH_KERNEL, CAM_LEFT_MINIMUM_AREA, CAM_LEFT_MAXIMUM_AREA, CAM_LEFT_LENGTH_PERCENT,
                        CAM_LEFT_BOUNDARY, CAM_LEFT_BINARIZE_METHOD)
-cam2 = lambda : Retinutella(CAM_RIGHT_NAME, 0, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAM_RIGHT_FOUR_POINTS,
+cam2 = lambda : Retinutella(CAM_RIGHT_NAME, CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAM_RIGHT_FOUR_POINTS,
                         CAM_RIGHT_THRESH_KERNEL, CAM_RIGHT_MINIMUM_AREA, CAM_RIGHT_MAXIMUM_AREA,
                         CAM_RIGHT_LENGTH_PERCENT, CAM_RIGHT_BOUNDARY, CAM_RIGHT_BINARIZE_METHOD)
 
@@ -321,8 +353,8 @@ cam5 = lambda : Retinutella(CAM_BOTTOM_LEFT_NAME, CAM_BOTTOM_LEFT_PORT, CAM_BOTT
                               CAM_BOTTOM_LEFT_MINIMUM_AREA, CAM_BOTTOM_LEFT_MAXIMUM_AREA,
                               CAM_BOTTOM_LEFT_LENGTH_PERCENT, CAM_BOTTOM_LEFT_BOUNDARY, CAM_BOTTOM_LEFT_BINARIZE_METHOD)
 
-# listCam = [ cam1,cam2,cam3,cam4, cam5]
-listCam = [cam2]
+listCam = [ cam1,cam2,cam3,cam4, cam5]
+# listCam = [cam1]
 
 
 send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL, manualStep= MANUAL_STEP, 
@@ -331,7 +363,7 @@ send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MAT
                 platePositionZ = PLATE_POSITION_Z, offsetLenghtIn=  OFFSET_LENGHT_IN, plateHeight = PLATE_HEIGHT, offsetLenghtOutBottom= OFFSET_LENGHT_OUT_BOTTOM,
                 offsetQ= OFFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION, stepOffsetDistance= STEP_OFFSET_DISTANCE, 
                 enLightPos=ENLIGHT_POS, offsetBacklash = OFFSET_BACKLASH ,caseBacklash = CASE_BACKLASH, gainMagnetic= GAIN_MAGNETIC,
-                qForBackLash= Q_FOR_BACKLASH, planingStepDistance= STEP_DISTANCE, extraoffsetOut= EXTRA_OFFSET_OUT, new_z_equation= NEW_Z_EQUATION, simulator= SIMULATOR)
+                planingStepDistance= STEP_DISTANCE, extraoffsetOut= EXTRA_OFFSET_OUT, new_z_equation= NEW_Z_EQUATION, simulator= SIMULATOR)
 
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",
@@ -507,7 +539,7 @@ if TEST_MODE == False:
                     # move to HIGH position
                     send_serial.getSetQAndWrite(POSITION_STEP_1,0)
 
-            sleep(3)
+            # sleep(3)
             ret,_ = cam.cam.read()        
             oldCam = cam.name
 
@@ -564,12 +596,12 @@ if TEST_MODE == False:
             wall = 'R'
 
         data.append( [selectPosition, wall, mainPredict([selectPlate],model='CNN')[0] ,selectOreintation] )
-send_serial.getSetQAndWrite(POSITION_STEP_1,0)
+    send_serial.getSetQAndWrite(POSITION_STEP_1,0)
 
 for dat in data:
-    print(data.index(dat), ' ', dat)
-sleep(5)
-# input('data from detection :')
+    print(data.index(dat)+1, ' ', dat)
+# sleep(5)
+input('data from detection :')
 
 if len(data) > 10:
     data = data[:10]
@@ -580,4 +612,5 @@ if MODE_POSITION or TEST_MODE == False:
 else :
     send_serial.getSetQAndWrite(data,0)
         
-send_serial.getSetQAndWrite(POSITION_STEP_1,0)
+if TEST_MODE == False:
+    send_serial.getSetQAndWrite(POSITION_STEP_1,0)

@@ -19,7 +19,7 @@ class sendSerial:
                  platePositionX= 600, platePositionY = [300,100,-100,-300], platePositionZ = [700,500,300], 
                  offsetLenghtIn = 20, plateHeight = 50, offsetQ = [205,35,150,0,0,0], new_z_equation = 10,
                 gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,offsetLenghtOutBottom = 40, offsetLenghtOutOther = 20, servoPlaning = True, 
-                offsetBacklash = [0,0,0,0,0,0],caseBacklash = [90,90,90,135,135,135], gainMagnetic = 7/9, qForBackLash= [], 
+                offsetBacklash = [0,0,0,0,0,0],caseBacklash = [90,90,90,135,135,135], gainMagnetic = 7/9, 
                 planingStepDistance = 10.0, extraoffsetIn = 60,extraoffsetOut = 60, stepOffsetDistance= 10.0, simulator=False):
     
         self.platePositionX = platePositionX
@@ -39,9 +39,9 @@ class sendSerial:
         self.offsetQ = offsetQ
         self.gainQ = gainQ
         self.gainMagnetic = gainMagnetic
+        
         self.offsetBacklash = offsetBacklash
         self.caseBacklash = caseBacklash
-        self.qForBackLash = qForBackLash
 
         self.runMatLab = runMatlab
 
@@ -121,7 +121,9 @@ class sendSerial:
 
                 if len(ans) == 0:
                     if self.manualStep:
-                        input('joint limit block all')
+                        print('joint limit block all')
+                    listAns.append([None,valve,position,orentation])
+
                 if len(ans) >= 1:
                     key = []
                     saveSumVal = 0
@@ -143,7 +145,7 @@ class sendSerial:
                         # print('sum')
                         # input(abs(sqrt(sum([ (enLightPos[0]-x)**2,(enLightPos[1]-y)**2,(enLightPos[2]-z )**2 ] ))))
                         
-                        if self.decreaseSingularity(self.oldAns,ans,valve) and False:    
+                        if self.decreaseSingularity(self.oldAns,ans,valve) :    
                             if abs(sqrt(sum([ (enLightPos[0]-x)**2,(enLightPos[1]-y)**2,(enLightPos[2]-z )**2 ] ))) < 50 and enLightPos != self.enLightPos[1] and worseCase :
                                 try:    
                                     indexStart = data.index([position,wall,valve,orentation])
@@ -151,9 +153,13 @@ class sendSerial:
                                     # input(data.index([position,wall,valve,orentation]))
                                     
                                     try :
-                                        while data[indexEnd][2] == valve :
+                                        oldRpos = 0
+                                        rPos = 0
+                                        while rPos >= oldRpos:
+                                            oldRpos = rPos
+                                            rPos = sum([ abs(pow(rData[1]-rData[1],2)) for rData in zip(data[indexEnd][0], data[indexStart][0]) ])
                                             indexEnd +=1            
-                                        indexEnd+=1
+
                                     except:
                                         pass
                                     # input(indexEnd)
@@ -176,9 +182,9 @@ class sendSerial:
                     #         else : 
                     #             ans[0] += radians(4)
                     
-                    listAns.append([ans,valve,position])
+                    listAns.append([ans,valve,position,orentation])
 
-                    if self.decreaseSingularity(self.oldAns,ans,valve) and False:
+                    if self.decreaseSingularity(self.oldAns,ans,valve) :
                         if data[indexEnd] == [position,wall,valve,orentation] and indexEnd != indexStart :
                             for n in range(len(listAns)-(indexEnd-indexStart),len(listAns) ):
                                 listAns[n][0][3:6] = copy.deepcopy(listAns[-1][0][3:6])
@@ -191,9 +197,16 @@ class sendSerial:
                 pass
                 # sys.exit('IK calculate fail')
         # input('write')
-        for ans,valve,position in listAns:
-            print('position:',position)
-            self.getSetQAndWrite(ans,valve)
+        
+        for ans,valve,position,orentation in listAns:
+            print('-------------------------------\nposition:',position)
+            print('oreintation:\t',orentation[0],'\n\t\t',orentation[1],'\n\t\t',orentation[2])
+            if ans != None:
+                self.getSetQAndWrite(ans,valve)
+            else :
+                input('failed IK\n') if self.manualStep else print('failed IK\n')
+
+                
 
                 
     def getSetQAndWrite(self,set_q,valve):
@@ -214,10 +227,14 @@ class sendSerial:
                     print('ALERT LASER!!!')
 
         if self.simulator:
-            H,Hi = self.MAN.forward_kin(self.MAN.DH_param,set_q)
-            H_a = [Hi[:,:4,3]]
-            x,y,z = [int(i) for i in  Hi[-1,0:3,3]]
-            self.MAN.plot(H_a,matplotLibs=False,plotTarget=[x,y,z])
+            try:
+                
+                H,Hi = self.MAN.forward_kin(self.MAN.DH_param,set_q)
+                H_a = [Hi[:,:4,3]]
+                x,y,z = [int(i) for i in  Hi[-1,0:3,3]]
+                self.MAN.plot(H_a,matplotLibs=False,plotTarget=[x,y,z])
+            except:
+                pass
 
         new_set_q = copy.deepcopy(set_q)
         
@@ -226,9 +243,10 @@ class sendSerial:
 
         set_q_after_offset = [sum(q) for q in zip( [qi[0]*qi[1] for qi in zip(new_set_q,self.gainQ)] ,[radians(qi) for qi in self.offsetQ] )]
 
+        print('zumo q:',[ int(degrees(i)) for i in set_q])
+        print('set q after offset:',[ int(degrees(i)) for i in set_q_after_offset])
+
         self.ser.write(q=set_q_after_offset,valve=valve)        
-        
-        
         
         if self.recieveSerial:
             serRead = self.ser.read() 
@@ -242,9 +260,8 @@ class sendSerial:
 
     def offsetBackLash(self, set_q):
         
-        dataToFunction = [0, set_q[1], 0, 0, 0 ,0]
-        caseBacklash = [self.caseBacklash[indexN](dataToFunction[indexN]) for indexN in range(6) ]
-        offsetBacklash = [self.offsetBacklash[indexN](self.qForBackLash[0](set_q)) for indexN in range(6)] 
+        caseBacklash = [self.caseBacklash[indexN](set_q) for indexN in range(6) ]
+        offsetBacklash = [self.offsetBacklash[indexN](set_q) for indexN in range(6)] 
         output = set_q
         for indexQ in range(len(set_q)):
             if set_q[indexQ] > radians(caseBacklash[indexQ]):
