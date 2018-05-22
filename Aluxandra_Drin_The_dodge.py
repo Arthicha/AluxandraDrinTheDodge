@@ -77,20 +77,21 @@ MAN = MANipulator()
 
 # protocal serial setting
 PORT = 4
-SEND_SERIAL = True
+SEND_SERIAL = True # send serial package to board
 RECIEVE_SERIAL = SEND_SERIAL
-MANUAL_STEP = False
+MANUAL_STEP = False # press key all round
+KEEP_DATA = False # open save position mode
 
 # main serial setting
-RUN_MATLAB = False
-CHECK_LASER = False
+RUN_MATLAB = False # same as name / don't open it
+CHECK_LASER = False # same as name / don't open it
 PATH_PLANING_MODE = 3 # 0 -> None , 1-> wan , 2 -> zumo , 3 -> combine
-SERVO_PLANING = False
-HALF_IK = False
-SIMULATOR = False
+SERVO_PLANING = False # servo sub move generate
+HALF_IK = False # doesn't change it to True
+SIMULATOR = False # doesn't open it when real run
 
 # initial constant 
-INITIAL_POSITION = [[0,400,700],'F',MAN.RE_F]
+INITIAL_POSITION = [[0,350,700],'F',MAN.RE_F]
 PLATE_POSITION_X = [-260,-90,90,260]
 PLATE_POSITION_Y = 645
 PLATE_POSITION_Z = [725,550,300]
@@ -117,10 +118,10 @@ OFFSET_BACKLASH = [lambda x: 0, lambda x: 5,lambda x: 10 ,lambda x: 0,
 CASE_BACKLASH = [lambda x:  radians(90), lambda x: radians(90), lambda x: radians(90)-x[1], lambda x: radians(135), 
                     lambda x: radians(135), lambda x: radians(135)]
 
-ENLIGHT_POS = [[-200,400,700],[0,300,700],[200,400,700]]
+ENLIGHT_POS = [[-200,400,700],[0,350,700],[200,400,700]]
 
 # test condition
-TEST_MODE = True
+TEST_MODE = False
 MODE_POSITION = True
 MODE_FIX_DATA = False
 
@@ -165,6 +166,10 @@ if TEST_MODE:
        [-0.24308044, -0.97000611,  0.        ],
        [ 0.        ,  0.        , -1.        ]])]]
 
+    #     data = [ [[-590.0, 651.2993603576629, 730.5625787777094], 'L', 0, np.array([[ 0.        ,  0.        , -1.        ],
+    #    [ 0.20582585,  0.97858864,  0.        ],
+    #    [ 0.97858864, -0.20582585,  0.        ]])] ]
+
     #     data = [  [[377.86777357142137, 115.7263742812928, 25.0], 'B', 8, np.array([[ 0.96794957, -0.25114468,  0.        ],
     #    [-0.25114468, -0.96794957,  0.        ],
     #    [ 0.        ,  0.        , -1.        ]])], [[279.1847441565908, 498.7037793725063, 25], 'B', 28, np.array([[ 0.98133159, -0.19232339,  0.        ],
@@ -174,6 +179,8 @@ if TEST_MODE:
     #    [ 0.        ,  0.        , -1.        ]])], [[-366.76389939798526, 124.55950482568153, 25.0], 'B', 8, np.array([[ 0.97000611, -0.24308044,  0.        ],
     #    [-0.24308044, -0.97000611,  0.        ],
     #    [ 0.        ,  0.        , -1.        ]])]]
+       
+        # data = [[[-600,565,700] ,'L',17,MAN.RE_L ] ]
 
     else:
     #    data= [radians(-10),radians(105),radians(-150),radians(0),radians(-90),radians(0)]
@@ -327,7 +334,7 @@ gainQ = [-1,1,1,1,1,1]
 #                           CAMERA_ALL_OFFSET_Z, CAM_BOTTOM_LEFT_FOUR_POINTS_BOTTOM, CAM_BOTTOM_LEFT_FOUR_POINTS_LEFT)
 
 
-cam1 = lambda : Retinutella(CAM_LEFT_NAME, CAM_LEFT_PORT, CAM_LEFT_ORIENTATION, CAM_LEFT_MODE, CAM_LEFT_FOUR_POINTS,
+cam1 = lambda : Retinutella(CAM_LEFT_NAME, 0, CAM_LEFT_ORIENTATION, CAM_LEFT_MODE, CAM_LEFT_FOUR_POINTS,
                        CAM_LEFT_THRESH_KERNEL, CAM_LEFT_MINIMUM_AREA, CAM_LEFT_MAXIMUM_AREA, CAM_LEFT_LENGTH_PERCENT,
                        CAM_LEFT_BOUNDARY, CAM_LEFT_BINARIZE_METHOD)
 cam2 = lambda : Retinutella(CAM_RIGHT_NAME, CAM_RIGHT_PORT, CAM_RIGHT_ORIENTATION, CAM_RIGHT_MODE, CAM_RIGHT_FOUR_POINTS,
@@ -342,7 +349,7 @@ cam3 = lambda : Retinutella(CAM_BOTTOM_MIDDLE_NAME, CAM_BOTTOM_MIDDLE_PORT, CAM_
                                 CAM_BOTTOM_MIDDLE_BINARIZE_METHOD)
 
 
-cam4 = lambda : Retinutella(CAM_BOTTOM_RIGHT_NAME, CAM_BOTTOM_RIGHT_PORT, CAM_BOTTOM_RIGHT_ORIENTATION,
+cam4 = lambda : Retinutella(CAM_BOTTOM_RIGHT_NAME, 0, CAM_BOTTOM_RIGHT_ORIENTATION,
                                CAM_BOTTOM_RIGHT_MODE, CAM_BOTTOM_RIGHT_FOUR_POINTS, CAM_BOTTOM_RIGHT_THRESH_KERNEL,
                                CAM_BOTTOM_RIGHT_MINIMUM_AREA, CAM_BOTTOM_RIGHT_MAXIMUM_AREA,
                                CAM_BOTTOM_RIGHT_LENGTH_PERCENT, CAM_BOTTOM_RIGHT_BOUNDARY,
@@ -353,8 +360,8 @@ cam5 = lambda : Retinutella(CAM_BOTTOM_LEFT_NAME, CAM_BOTTOM_LEFT_PORT, CAM_BOTT
                               CAM_BOTTOM_LEFT_MINIMUM_AREA, CAM_BOTTOM_LEFT_MAXIMUM_AREA,
                               CAM_BOTTOM_LEFT_LENGTH_PERCENT, CAM_BOTTOM_LEFT_BOUNDARY, CAM_BOTTOM_LEFT_BINARIZE_METHOD)
 
-listCam = [ cam1,cam2,cam3,cam4, cam5]
-# listCam = [cam1]
+# listCam = [ cam1,cam2,cam3,cam4, cam5]
+listCam = [cam1]
 
 
 send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MATLAB, sendSerial= SEND_SERIAL, manualStep= MANUAL_STEP, 
@@ -363,7 +370,7 @@ send_serial = sendSerial(port=PORT, checkLaser = CHECK_LASER, runMatlab= RUN_MAT
                 platePositionZ = PLATE_POSITION_Z, offsetLenghtIn=  OFFSET_LENGHT_IN, plateHeight = PLATE_HEIGHT, offsetLenghtOutBottom= OFFSET_LENGHT_OUT_BOTTOM,
                 offsetQ= OFFSET_Q, gainQ = GAIN_Q ,modeFixData=MODE_FIX_DATA, stepRotation= STEP_ROTATION, stepOffsetDistance= STEP_OFFSET_DISTANCE, 
                 enLightPos=ENLIGHT_POS, offsetBacklash = OFFSET_BACKLASH ,caseBacklash = CASE_BACKLASH, gainMagnetic= GAIN_MAGNETIC,
-                planingStepDistance= STEP_DISTANCE, extraoffsetOut= EXTRA_OFFSET_OUT, new_z_equation= NEW_Z_EQUATION, simulator= SIMULATOR)
+                planingStepDistance= STEP_DISTANCE, extraoffsetOut= EXTRA_OFFSET_OUT, new_z_equation= NEW_Z_EQUATION, simulator= SIMULATOR, keepData=KEEP_DATA)
 
 
 NUM2WORD = ["0","1","2","3","4","5","6","7","8","9",

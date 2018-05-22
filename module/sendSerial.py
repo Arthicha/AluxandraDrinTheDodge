@@ -20,7 +20,7 @@ class sendSerial:
                  offsetLenghtIn = 20, plateHeight = 50, offsetQ = [205,35,150,0,0,0], new_z_equation = 10,
                 gainQ = [-1,1,1,1,1,1],modeFixData = False, stepRotation = 5,offsetLenghtOutBottom = 40, offsetLenghtOutOther = 20, servoPlaning = True, 
                 offsetBacklash = [0,0,0,0,0,0],caseBacklash = [90,90,90,135,135,135], gainMagnetic = 7/9, 
-                planingStepDistance = 10.0, extraoffsetIn = 60,extraoffsetOut = 60, stepOffsetDistance= 10.0, simulator=False):
+                planingStepDistance = 10.0, extraoffsetIn = 60,extraoffsetOut = 60, stepOffsetDistance= 10.0, simulator=False, keepData = False):
     
         self.platePositionX = platePositionX
         self.platePositionY = platePositionY
@@ -54,6 +54,7 @@ class sendSerial:
 
         self.recieveSerial = recieveSerial
         self.manualStep = manualStep
+        self.keepData = keepData
 
         self.half_IK = half_IK
         self.new_z_equation = new_z_equation
@@ -78,6 +79,9 @@ class sendSerial:
                                     enLightPos= enLightPos, planingStepDistance= self.planingStepDistance, extraoffsetOut =self.extraoffsetOut)
 
         self.ser.clearSerialData()
+        if self.keepData:
+            with open('Saved_xyz.txt','w') as f:
+                f.write('predict\t\tactual\nx,y,z\t\tx,y,z\n')
 
 
     def getXYZAndWrite(self,data):
@@ -117,6 +121,10 @@ class sendSerial:
 
                 ans = self.MAN.inverse_kinamatic2(dx,dy,dz,self.MAN.DH_param,R_e)
                 ans = self.MAN.setJointLimits(ans,self.MAN.jointLimit)
+                # if wall == 'B':
+                #     ans[4] *=-1
+                #     ans[5] *=-1
+
                 # input(self.enLightPos)
 
                 if len(ans) == 0:
@@ -137,7 +145,11 @@ class sendSerial:
                             saveSumVal = sumVal
                             key = dataList
 
+                    
                     ans = key
+                    
+                    # ans = ans[0]
+                    # print('lenans',len(ans))
 
                     self.oldAns = copy.deepcopy(ans)
 
@@ -145,7 +157,7 @@ class sendSerial:
                         # print('sum')
                         # input(abs(sqrt(sum([ (enLightPos[0]-x)**2,(enLightPos[1]-y)**2,(enLightPos[2]-z )**2 ] ))))
                         
-                        if self.decreaseSingularity(self.oldAns,ans,valve) :    
+                        if self.decreaseSingularity(self.oldAns,ans,valve) and False :    
                             if abs(sqrt(sum([ (enLightPos[0]-x)**2,(enLightPos[1]-y)**2,(enLightPos[2]-z )**2 ] ))) < 50 and enLightPos != self.enLightPos[1] and worseCase :
                                 try:    
                                     indexStart = data.index([position,wall,valve,orentation])
@@ -184,7 +196,7 @@ class sendSerial:
                     
                     listAns.append([ans,valve,position,orentation])
 
-                    if self.decreaseSingularity(self.oldAns,ans,valve) :
+                    if self.decreaseSingularity(self.oldAns,ans,valve) and False:
                         if data[indexEnd] == [position,wall,valve,orentation] and indexEnd != indexStart :
                             for n in range(len(listAns)-(indexEnd-indexStart),len(listAns) ):
                                 listAns[n][0][3:6] = copy.deepcopy(listAns[-1][0][3:6])
@@ -201,10 +213,29 @@ class sendSerial:
         for ans,valve,position,orentation in listAns:
             print('-------------------------------\nposition:',position)
             print('oreintation:\t',orentation[0],'\n\t\t',orentation[1],'\n\t\t',orentation[2])
+            
             if ans != None:
+                
                 self.getSetQAndWrite(ans,valve)
+
+                if self.keepData:
+                    if True:
+                        keyX = input('get x:')
+                        keyY = input('get y:')
+                        keyZ = input('get z:')
+                        key = [keyX-500.0,keyY-300.0,keyZ]
+                    else :
+                        key  = input('get x,y,z:')
+                        key = [k for k in list(str(key).split(','))[0:3] ]
+
+                    with open('Saved_xyz.txt','a') as f:
+                        f.write(str(int(position[0]))+','+str(int(position[1]))+','+str(int(position[2]))+'\t'+str(int(key[0]))+','+str(int(key[1]))+','+str(int(key[2]))+'\n' )
             else :
+                # input('failed IK\n')
                 input('failed IK\n') if self.manualStep else print('failed IK\n')
+        
+        # if self.keepData:
+        #     self.saveData.close()
 
                 
 
@@ -244,7 +275,6 @@ class sendSerial:
         set_q_after_offset = [sum(q) for q in zip( [qi[0]*qi[1] for qi in zip(new_set_q,self.gainQ)] ,[radians(qi) for qi in self.offsetQ] )]
 
         print('zumo q:',[ int(degrees(i)) for i in set_q])
-        print('set q after offset:',[ int(degrees(i)) for i in set_q_after_offset])
 
         self.ser.write(q=set_q_after_offset,valve=valve)        
         
