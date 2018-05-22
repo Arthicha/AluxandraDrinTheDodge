@@ -14,33 +14,33 @@ from module.UniqueCameraClass import *
 
 # Measures are in milimeters
 
-LOAD_IMAGE_NAME = "Bm_tune_latest1.png"
+LOAD_IMAGE_NAME = "Br_tune_latest1.jpg"
 #   'C:\\Users\\cha45\\PycharmProjects\\piv\\Ltest4.jpg'
 # "L_tune.png"
 #    'C:\\Users\\cha45\\PycharmProjects\\piv\\Ltest4.jpg'#newR_test.png
-SAVE_IMAGE_NAME = 'Bm_test_latest1.png'
+SAVE_IMAGE_NAME = 'Br_tune_latest1.jpg'
 FROM_FILE = True
 TEST_MODEL = True
 CLASS = True
-CAM_NAME = 'Bm'
-MODEL_FILE_NAME = 'Bm'
+CAM_NAME = 'Br_bottom'
+MODEL_FILE_NAME = 'Br_bottom'
 CAM_ORIENT = 0
-CAM_FOUR_POINT = np.array([[82, 1], [75, 639], [492, 520], [600, 80]])
+CAM_FOUR_POINT = np.array([[121, 162], [315, 174], [360, 621], [73, 619]])
 # 38.5 from inside
 # 31.5 from left
 '''Regression Parameter'''
-SAVED_MODEL_NAME = 'Bm'
-KERNEL_SIZE = (7, 7)
-NUMBER_OF_POINTS = (12, 13)
+SAVED_MODEL_NAME = 'Br_bottom'
+KERNEL_SIZE = (4, 4)
+NUMBER_OF_POINTS = (15, 10)
 DIFFERENCE_DISTANCE_PER_POINT = [30, 30]
-SHIFT_X = -500+315
+SHIFT_X = 500-298
 # -190
 # 527.5
 # 527.5-240 = 287.5
-SHIFT_Y = 700-385
+SHIFT_Y = 700-445
 # 420
 # 420+210 =630
-BINARY_THRESHOLD = 100
+BINARY_THRESHOLD = 70
 # right
 # from above = 57
 # from inside = 20.75
@@ -54,7 +54,7 @@ CAMERA_ALL_OFFSET_Z = 25
 CAM_BOTTOM_MIDDLE_NAME = 'Bm'
 CAM_BOTTOM_MIDDLE_PORT = 1
 CAM_BOTTOM_MIDDLE_MODE = 1
-CAM_BOTTOM_MIDDLE_ORIENTATION = 0
+CAM_BOTTOM_MIDDLE_ORIENTATION = -180
 CAM_BOTTOM_MIDDLE_FOUR_POINTS = np.array([[0, 433], [136, 157], [500, 161], [639, 422]])
 # np.array([[0, 514], [148, 347], [547, 330], [639, 477]])
 # np.array([[17, 483], [178, 293], [485, 285], [637, 479]])
@@ -231,12 +231,12 @@ def m_click(event, x, y, k, l):
 if FROM_FILE:
     pass
 
-cam = Retinutella(CAM_BOTTOM_MIDDLE_NAME, CAM_BOTTOM_MIDDLE_PORT, CAM_BOTTOM_MIDDLE_ORIENTATION,
-                  CAM_BOTTOM_MIDDLE_MODE, CAM_BOTTOM_MIDDLE_FOUR_POINTS, CAM_BOTTOM_MIDDLE_THRESH_KERNEL,
-                  CAM_BOTTOM_MIDDLE_MINIMUM_AREA, CAM_BOTTOM_MIDDLE_MAXIMUM_AREA,
-                  CAM_BOTTOM_MIDDLE_LENGTH_PERCENT, CAM_BOTTOM_MIDDLE_BOUNDARY,
-                  CAM_BOTTOM_MIDDLE_BINARIZE_METHOD)
-# Retinutella(CAM_NAME, 1, CAM_ORIENT, cameraMode=1, four_points=CAM_FOUR_POINT)
+# cam = Retinutella(CAM_BOTTOM_MIDDLE_NAME, CAM_BOTTOM_MIDDLE_PORT, CAM_BOTTOM_MIDDLE_ORIENTATION,
+                  # CAM_BOTTOM_MIDDLE_MODE, CAM_BOTTOM_MIDDLE_FOUR_POINTS, CAM_BOTTOM_MIDDLE_THRESH_KERNEL,
+                  # CAM_BOTTOM_MIDDLE_MINIMUM_AREA, CAM_BOTTOM_MIDDLE_MAXIMUM_AREA,
+                  # CAM_BOTTOM_MIDDLE_LENGTH_PERCENT, CAM_BOTTOM_MIDDLE_BOUNDARY,
+                  # CAM_BOTTOM_MIDDLE_BINARIZE_METHOD)
+cam = Retinutella(CAM_NAME, 1, CAM_ORIENT, cameraMode=1, four_points=CAM_FOUR_POINT)
 # cam.getImage()
 # cam = cv2.VideoCapture(1)
 # ret,im = cam.read()
